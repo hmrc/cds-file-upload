@@ -28,15 +28,15 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class CacheController @Inject()(cache: BatchFileUploadRepository)(implicit ec: ExecutionContext) extends BaseController {
 
-	def put(eori: EORI): Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def put(eori: EORI): Action[JsValue] = Action.async(parse.json) { implicit request =>
 
-		withJsonBody[List[BatchFileUpload]] { json =>
-			cache.put(eori, json).map(_ => Ok)
-		}
+    withJsonBody[List[BatchFileUpload]] { json =>
+      cache.put(eori, json).map(_ => Ok)
+    }
 	}
 
-	def getAll(eori: EORI): Action[AnyContent] = Action.async { implicit request =>
+  def getAll(eori: EORI): Action[AnyContent] = Action.async { implicit request =>
 
-		cache.getAll(eori).map(result => Ok(Json.toJson(result)))
-	}
+    cache.getAll(eori).map(result => Ok(Json.toJson(result)))
+  }
 }
