@@ -8,12 +8,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import suite.FailOnUnindexedQueries
+import suite.MongoSuite
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class CacheControllerSpec extends WordSpec with MustMatchers
-  with FailOnUnindexedQueries
+  with MongoSuite
   with ScalaFutures
   with IntegrationPatience
   with OptionValues
@@ -21,11 +21,11 @@ class CacheControllerSpec extends WordSpec with MustMatchers
 
   private lazy val builder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
 
-  override val beforeEach: Unit = {
+  override def beforeEach(): Unit = {
     database.map(_.drop()).futureValue
   }
 
-  val postData = List(BatchFileUpload(MRN("abc"), List(File("abcde", Uploaded))))
+  val postData = BatchFileUpload(MRN("abc"), List(File("abcde", Uploaded)))
 
   "cacheController" should {
 
@@ -52,10 +52,11 @@ class CacheControllerSpec extends WordSpec with MustMatchers
         val getRequest  = FakeRequest(GET,  "/cds-file-upload/batch/123")
 
         route(app, postRequest).value.futureValue
+        route(app, postRequest).value.futureValue
         val result = route(app, getRequest).value
 
         status(result) mustBe OK
-        contentAsJson(result).as[List[BatchFileUpload]] mustBe postData
+        contentAsJson(result).as[List[BatchFileUpload]] mustBe List(postData, postData)
       }
     }
   }

@@ -30,8 +30,8 @@ class CacheController @Inject()(cache: BatchFileUploadRepository)(implicit ec: E
 
   def put(eori: EORI): Action[JsValue] = Action.async(parse.json) { implicit request =>
 
-    withJsonBody[List[BatchFileUpload]] { json =>
-      cache.put(eori, json).map(_ => Ok)
+    withJsonBody[BatchFileUpload] { batch =>
+      cache.put(eori, batch).map(_ => Ok)
     }
 	}
 
