@@ -3,7 +3,6 @@ package repositories
 import domain.FileState.Uploaded
 import domain.{BatchFileUpload, EORI, File, MRN}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{MustMatchers, OptionValues, WordSpec}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
@@ -15,8 +14,7 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
   with FailOnUnindexedQueries
   with ScalaFutures
   with IntegrationPatience
-  with OptionValues
-  with PropertyChecks {
+  with OptionValues {
 
   private lazy val builder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
 
@@ -35,7 +33,7 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
           val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
           val test = for {
-            _ <- started(fileUploadResponseRepo)
+            _      <- started(fileUploadResponseRepo)
             result <- fileUploadResponseRepo.getAll(EORI("123"))
           } yield {
             result mustBe List.empty

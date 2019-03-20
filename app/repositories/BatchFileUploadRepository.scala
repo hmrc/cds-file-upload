@@ -25,7 +25,7 @@ import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.ImplicitBSONHandlers.JsObjectDocumentWriter
 import reactivemongo.play.json.collection.JSONCollection
 import config.Crypto
-import domain.{BatchFileUpload, EORI, File}
+import domain.{BatchFileUpload, EORI}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,8 +38,8 @@ trait BatchFileUploadRepository extends Repository {
 }
 
 class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
-                                                  appConfig: AppConfig,
-                                                  crypto: Crypto)(implicit ex: ExecutionContext)
+                                               appConfig: AppConfig,
+                                               crypto: Crypto)(implicit ex: ExecutionContext)
   extends BatchFileUploadRepository {
 
   import crypto._
@@ -59,6 +59,8 @@ class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
     unique = true,
     options = BSONDocument(expireAfterSecond -> ttl.toSeconds)
   )
+
+  val started: Future[Boolean] = collection.flatMap(_.indexesManager.ensure(index))
 
   def put(eori: EORI, data: List[BatchFileUpload]): Future[Unit] = {
 
@@ -81,9 +83,6 @@ class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
       .map(_.flatMap { json =>
         (json \ dataField).asOpt[JsValue].flatMap(decrypt[List[BatchFileUpload]])
       }.getOrElse(Nil))
-
-  val started: Future[Boolean] = collection.flatMap(_.indexesManager.ensure(index))
-
 }
 
 

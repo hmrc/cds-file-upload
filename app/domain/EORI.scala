@@ -16,11 +16,18 @@
 
 package domain
 
-import play.api.libs.json.Json
+import play.api.mvc.PathBindable
 
-case class BatchFileUpload(mrn: MRN, files: List[File])
+case class EORI(value: String) extends AnyVal
 
-object BatchFileUpload {
+object EORI {
 
-  implicit val formats = Json.format[BatchFileUpload]
+  implicit def eoriBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[EORI] {
+
+    override def bind(key: String, value: String): Either[String, EORI] =
+      stringBinder.bind(key, value).right.map(EORI(_))
+
+    override def unbind(key: String, value: EORI): String =
+      value.value
+  }
 }
