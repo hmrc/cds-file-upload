@@ -1,3 +1,4 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.cdsfileupload.controllers.MicroserviceHelloWorld.hello
+POST    /batch/:eori            controllers.CacheController.put(eori: domain.EORI)
+GET     /batch/:eori            controllers.CacheController.getAll(eori: domain.EORI)
