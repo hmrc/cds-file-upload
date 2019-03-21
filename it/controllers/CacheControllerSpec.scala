@@ -1,31 +1,45 @@
 package controllers
 
-import domain.FileState.Uploaded
+import domain.Uploaded
 import domain.{BatchFileUpload, File, MRN}
+import org.mockito.ArgumentMatchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfterEach, MustMatchers, OptionValues, WordSpec}
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import suite.FailOnUnindexedQueries
+import suite.MongoSuite
+import uk.gov.hmrc.auth.core.AuthConnector
 
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class CacheControllerSpec extends WordSpec with MustMatchers
-  with FailOnUnindexedQueries
+  with MongoSuite
   with ScalaFutures
   with IntegrationPatience
   with OptionValues
-  with BeforeAndAfterEach {
+  with BeforeAndAfterEach
+  with MockitoSugar {
 
-  private lazy val builder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
+  val mockAuthConnector = mock[AuthConnector]
 
-  override val beforeEach: Unit = {
+  when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
+    .thenReturn(Future.successful(Some("InternalId")))
+
+  private lazy val builder: GuiceApplicationBuilder =
+    new GuiceApplicationBuilder()
+      .overrides(bind[AuthConnector].toInstance(mockAuthConnector))
+
+  override def beforeEach(): Unit = {
     database.map(_.drop()).futureValue
   }
 
-  val postData = List(BatchFileUpload(MRN("abc"), List(File("abcde", Uploaded))))
+  val postData = BatchFileUpload(MRN("abc"), List(File("abcde", Uploaded)))
 
   "cacheController" should {
 
@@ -52,10 +66,11 @@ class CacheControllerSpec extends WordSpec with MustMatchers
         val getRequest  = FakeRequest(GET,  "/cds-file-upload/batch/123")
 
         route(app, postRequest).value.futureValue
+        route(app, postRequest).value.futureValue
         val result = route(app, getRequest).value
 
         status(result) mustBe OK
-        contentAsJson(result).as[List[BatchFileUpload]] mustBe postData
+        contentAsJson(result).as[List[BatchFileUpload]] mustBe List(postData, postData)
       }
     }
   }

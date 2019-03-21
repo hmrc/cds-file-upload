@@ -11,12 +11,14 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-play-25"        % "4.9.0",
     "org.reactivemongo"       %% "play2-reactivemongo"      % "0.16.3-play25",
     "uk.gov.hmrc"             %% "crypto"                   % "5.3.0",
-    "uk.gov.hmrc"             %% "json-encryption"          % "4.1.0"
+    "uk.gov.hmrc"             %% "json-encryption"          % "4.1.0",
+    "io.megl"                 %% "play-json-extra"          % "2.4.3"
   )
 
   val test = Seq(
     "org.scalatest"           %% "scalatest"                % "3.0.4"                 % "test",
     "com.typesafe.play"       %% "play-test"                % current                 % "test",
+    "org.mockito"             %  "mockito-core"             % "2.13.0"                % "test, it",
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test, it",
     "uk.gov.hmrc"             %% "service-integration-test" % "0.2.0"                 % "test, it",
     "org.scalatestplus.play"  %% "scalatestplus-play"       % "2.0.0"                 % "test, it",

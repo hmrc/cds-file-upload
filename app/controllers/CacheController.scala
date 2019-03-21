@@ -17,6 +17,7 @@
 package controllers
 
 import com.google.inject._
+import controllers.actions.AuthAction
 import domain.{BatchFileUpload, EORI}
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
@@ -26,16 +27,16 @@ import repositories.BatchFileUploadRepository
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CacheController @Inject()(cache: BatchFileUploadRepository)(implicit ec: ExecutionContext) extends BaseController {
+class CacheController @Inject()(authorise: AuthAction, cache: BatchFileUploadRepository)(implicit ec: ExecutionContext) extends BaseController {
 
-  def put(eori: EORI): Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def put(eori: EORI): Action[JsValue] = authorise.async(parse.json) { implicit request =>
 
-    withJsonBody[List[BatchFileUpload]] { json =>
-      cache.put(eori, json).map(_ => Ok)
+    withJsonBody[BatchFileUpload] { batch =>
+      cache.put(eori, batch).map(_ => Ok)
     }
 	}
 
-  def getAll(eori: EORI): Action[AnyContent] = Action.async { implicit request =>
+  def getAll(eori: EORI): Action[AnyContent] = authorise.async { implicit request =>
 
     cache.getAll(eori).map(result => Ok(Json.toJson(result)))
   }

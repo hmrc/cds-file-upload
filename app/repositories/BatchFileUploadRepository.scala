@@ -18,7 +18,7 @@ package repositories
 
 import com.google.inject.{ImplementedBy, Inject}
 import config.AppConfig
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsArray, JsValue, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @ImplementedBy(classOf[MongoBatchFileUploadRepository])
 trait BatchFileUploadRepository extends Repository {
 
-  def put(eori: EORI, data: List[BatchFileUpload]): Future[Unit]
+  def put(eori: EORI, data: BatchFileUpload): Future[Unit]
 
   def getAll(eori: EORI): Future[List[BatchFileUpload]]
 }
@@ -62,12 +62,12 @@ class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
 
   val started: Future[Boolean] = collection.flatMap(_.indexesManager.ensure(index))
 
-  def put(eori: EORI, data: List[BatchFileUpload]): Future[Unit] = {
+  def put(eori: EORI, data: BatchFileUpload): Future[Unit] = {
 
     val selector = Json.obj(idField -> eori.value)
 
     val modifier = Json.obj(
-      "$set" -> Json.obj(
+      "$push" -> Json.obj(
         dataField -> encrypt(data)
       )
     )
@@ -81,8 +81,11 @@ class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
     collection
       .flatMap(_.find(Json.obj(idField -> eori.value), None).one[JsValue])
       .map(_.flatMap { json =>
-        (json \ dataField).asOpt[JsValue].flatMap(decrypt[List[BatchFileUpload]])
+        (json \ dataField)
+          .asOpt[JsArray]
+          .map(_.value.toList)
+          .map(_.map(decrypt[BatchFileUpload]).collect {
+            case Some(value) => value
+          })
       }.getOrElse(Nil))
 }
-
-

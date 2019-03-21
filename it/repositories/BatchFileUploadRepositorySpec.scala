@@ -1,6 +1,6 @@
 package repositories
 
-import domain.FileState.Uploaded
+import domain.Uploaded
 import domain.{BatchFileUpload, EORI, File, MRN}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, OptionValues, WordSpec}
@@ -9,6 +9,7 @@ import play.api.test.Helpers.running
 import suite.FailOnUnindexedQueries
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
   with FailOnUnindexedQueries
@@ -55,15 +56,16 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
 
           val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
-          val testData = List(BatchFileUpload(MRN("abc"), List(File("reference", Uploaded))))
+          val testData = BatchFileUpload(MRN("abc"), List(File("reference", Uploaded)))
           val testEORI = EORI("123")
 
           val test = for {
             _      <- started(fileUploadResponseRepo)
             _      <- fileUploadResponseRepo.put(testEORI, testData)
+            _      <- fileUploadResponseRepo.put(testEORI, testData)
             result <- fileUploadResponseRepo.getAll(testEORI)
           } yield {
-            result mustBe testData
+            result mustBe List(testData, testData)
           }
 
           test.futureValue
@@ -81,15 +83,16 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
 
           val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
-          val testData = List(BatchFileUpload(MRN("abc"), List(File("reference", Uploaded))))
+          val testData = BatchFileUpload(MRN("abc"), List(File("reference", Uploaded)))
           val testEORI = EORI("123")
 
           val test = for {
             _      <- started(fileUploadResponseRepo)
             _      <- fileUploadResponseRepo.put(testEORI, testData)
+            _      <- fileUploadResponseRepo.put(testEORI, testData)
             result <- fileUploadResponseRepo.getAll(testEORI)
           } yield {
-            result mustBe testData
+            result mustBe List(testData, testData)
           }
 
           test.futureValue
