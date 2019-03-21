@@ -1,6 +1,6 @@
 package repositories
 
-import domain.FileState.Uploaded
+import domain.Uploaded
 import domain.{BatchFileUpload, EORI, File, MRN}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{MustMatchers, OptionValues, WordSpec}

@@ -17,22 +17,11 @@
 package domain
 
 import play.api.libs.json.Json
-import play.json.extra.Variants
 
-sealed trait FileState
-final case class Waiting(uploadRequest: UploadRequest) extends FileState
-final case object Uploaded extends FileState
-final case object Successful extends FileState
-final case object Failed extends FileState
-final case object VirusDetected extends FileState
-final case object UnacceptableMimeType extends FileState
+case class UploadRequest(href: String, fields: Map[String, String])
 
-object Waiting {
+object UploadRequest {
 
-  implicit val format = Json.format[Waiting]
+  implicit val format = Json.format[UploadRequest]
 }
 
-object FileState {
-
-  implicit val format = Variants.format[FileState]
-}

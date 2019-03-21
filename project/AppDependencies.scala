@@ -11,7 +11,8 @@ object AppDependencies {
     "uk.gov.hmrc"             %% "bootstrap-play-25"        % "4.9.0",
     "org.reactivemongo"       %% "play2-reactivemongo"      % "0.16.3-play25",
     "uk.gov.hmrc"             %% "crypto"                   % "5.3.0",
-    "uk.gov.hmrc"             %% "json-encryption"          % "4.1.0"
+    "uk.gov.hmrc"             %% "json-encryption"          % "4.1.0",
+    "io.megl"                 %% "play-json-extra"          % "2.4.3"
   )
 
   val test = Seq(
