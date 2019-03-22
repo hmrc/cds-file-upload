@@ -16,11 +16,18 @@
 
 package domain
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, JsError, JsResult, JsString, JsSuccess, JsValue}
 
 case class MRN(value: String) extends AnyVal
 
 object MRN {
 
-  implicit val formats = Json.format[MRN]
+  implicit val formats = new Format[MRN] {
+    override def reads(json: JsValue): JsResult[MRN] = json match {
+      case JsString(value) => JsSuccess(MRN(value))
+      case _               => JsError("Unable to parse MRN")
+    }
+
+    override def writes(o: MRN): JsValue = JsString(o.value)
+  }
 }
