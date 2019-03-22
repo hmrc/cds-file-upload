@@ -32,7 +32,8 @@ class AuthActionImpl @Inject()(
   with AuthorisedFunctions {
 
   override def filter[A](request: Request[A]): Future[Option[Result]] = {
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc: HeaderCarrier =
+      HeaderCarrierConverter.fromHeadersAndSessionAndRequest(request.headers, session = None, request = Some(request))
 
     authorised(Enrolment("HMRC-CUS-ORG"))
       .retrieve(internalId) {
