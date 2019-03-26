@@ -50,7 +50,7 @@ class AuthActionSpec extends PlaySpec
           when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(internalId)))
 
-          val result = authController.action(FakeRequest())
+          val result = authController.testEndpoint(FakeRequest())
 
           status(result) mustBe OK
         }
@@ -64,7 +64,7 @@ class AuthActionSpec extends PlaySpec
         when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = authController.action(FakeRequest())
+        val result = authController.testEndpoint(FakeRequest())
 
         status(result) mustBe UNAUTHORIZED
       }
@@ -74,7 +74,7 @@ class AuthActionSpec extends PlaySpec
         when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
           .thenReturn(Future.failed(new Exception()))
 
-        val result = authController.action(FakeRequest())
+        val result = authController.testEndpoint(FakeRequest())
 
         status(result) mustBe UNAUTHORIZED
       }
@@ -83,7 +83,7 @@ class AuthActionSpec extends PlaySpec
 
   class TestController(actions: AuthAction) extends BaseController {
 
-    def action: Action[AnyContent] = actions {
+    def testEndpoint: Action[AnyContent] = actions {
       Ok
     }
   }
