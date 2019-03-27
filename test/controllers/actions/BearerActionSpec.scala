@@ -18,15 +18,15 @@ package controllers.actions
 
 import com.softwaremill.quicklens._
 import config.AppConfig
+import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import play.api.http.HeaderNames.AUTHORIZATION
 
-class BearerActionSpec extends PlaySpec
+class BearerActionSpec extends WordSpec with MustMatchers
   with PropertyChecks {
 
   def controller(appConfig: AppConfig): TestController =

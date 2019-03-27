@@ -30,7 +30,7 @@ class BearerActionImpl @Inject()(appConfig: AppConfig) extends BearerAction with
 
   override protected def filter[A](request: Request[A]): Future[Option[Result]] = asAsync {
 
-    request.headers.get(AUTHORIZATION).filter(_.endsWith(bearerToken)) match {
+    request.headers.get(AUTHORIZATION).filter(_ == bearerToken) match {
       case Some(_) => None
       case None    =>
         Logger.error(

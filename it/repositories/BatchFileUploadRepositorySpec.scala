@@ -3,29 +3,37 @@ package repositories
 import domain.Uploaded
 import domain.{BatchFileUpload, EORI, File, MRN}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{MustMatchers, OptionValues, WordSpec}
+import org.scalatest.{BeforeAndAfterEach, MustMatchers, OptionValues, WordSpec}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.running
 import suite.FailOnUnindexedQueries
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
   with FailOnUnindexedQueries
   with ScalaFutures
   with IntegrationPatience
-  with OptionValues {
+  with OptionValues
+  with BeforeAndAfterEach {
 
   private lazy val builder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
+
+  val testData1 = BatchFileUpload(MRN("abc"), List(File("reference1", Uploaded)))
+  val testData2 = BatchFileUpload(MRN("123"), List(File("reference2", Uploaded)))
+  val testEORI = EORI("123")
+
+  override def beforeEach: Unit = {
+    super.beforeEach()
+
+    database.map(_.drop()).futureValue
+  }
 
   "file upload response repository" should {
 
     "return none" when {
 
       "get is called on an empty store" in {
-
-        database.map(_.drop()).futureValue
 
         val app = builder.build()
 
@@ -35,7 +43,7 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
 
           val test = for {
             _      <- started(fileUploadResponseRepo)
-            result <- fileUploadResponseRepo.getAll(EORI("123"))
+            result <- fileUploadResponseRepo.getAll(testEORI)
           } yield {
             result mustBe List.empty
           }
@@ -46,56 +54,55 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
 
     "get the same values after a put" when {
 
-      "encryption is enabled" in {
+      List(true, false).foreach { enabled =>
 
-        database.map(_.drop()).futureValue
+        s"encryption is set to $enabled" in {
 
-        val app = builder.configure("mongodb.encryption-enabled" -> true).build()
+          val app = builder.configure("mongodb.encryption-enabled" -> enabled).build()
 
-        running(app) {
+          running(app) {
 
-          val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
+            val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
-          val testData = BatchFileUpload(MRN("abc"), List(File("reference", Uploaded)))
-          val testEORI = EORI("123")
+            val test = for {
+              _ <- started(fileUploadResponseRepo)
+              _ <- fileUploadResponseRepo.put(testEORI, testData1)
+              _ <- fileUploadResponseRepo.put(testEORI, testData2)
+              result <- fileUploadResponseRepo.getAll(testEORI)
+            } yield {
+              result mustBe List(testData1, testData2)
+            }
 
-          val test = for {
-            _      <- started(fileUploadResponseRepo)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            result <- fileUploadResponseRepo.getAll(testEORI)
-          } yield {
-            result mustBe List(testData, testData)
+            test.futureValue
           }
 
-          test.futureValue
         }
-
       }
+    }
 
-      "encryption is disabled" in {
+    "override all values with putAll" when {
 
-        database.map(_.drop()).futureValue
+      List(true, false).foreach { enabled =>
 
-        val app = builder.configure("mongodb.encryption-enabled" -> false).build()
+        s"encryption is set to $enabled" in {
 
-        running(app) {
+          val app = builder.configure("mongodb.encryption-enabled" -> enabled).build()
 
-          val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
+          running(app) {
 
-          val testData = BatchFileUpload(MRN("abc"), List(File("reference", Uploaded)))
-          val testEORI = EORI("123")
+            val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
-          val test = for {
-            _      <- started(fileUploadResponseRepo)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            result <- fileUploadResponseRepo.getAll(testEORI)
-          } yield {
-            result mustBe List(testData, testData)
+            val test = for {
+              _      <- started(fileUploadResponseRepo)
+              _      <- fileUploadResponseRepo.put(testEORI, testData1)
+              _      <- fileUploadResponseRepo.putAll(testEORI, List(testData2, testData2))
+              result <- fileUploadResponseRepo.getAll(testEORI)
+            } yield {
+              result mustBe List(testData2, testData2)
+            }
+
+            test.futureValue
           }
-
-          test.futureValue
         }
       }
     }

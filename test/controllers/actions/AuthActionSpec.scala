@@ -18,6 +18,7 @@ package controllers.actions
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
+import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import org.scalatestplus.play.PlaySpec
@@ -30,7 +31,7 @@ import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthActionSpec extends PlaySpec
+class AuthActionSpec extends WordSpec with MustMatchers
   with PropertyChecks
   with MockitoSugar {
 

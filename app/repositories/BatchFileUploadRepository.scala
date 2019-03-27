@@ -34,6 +34,8 @@ trait BatchFileUploadRepository extends Repository {
 
   def put(eori: EORI, data: BatchFileUpload): Future[Unit]
 
+  def putAll(eori: EORI, data: List[BatchFileUpload]): Future[Unit]
+
   def getAll(eori: EORI): Future[List[BatchFileUpload]]
 }
 
@@ -69,6 +71,21 @@ class MongoBatchFileUploadRepository @Inject()(mongo: ReactiveMongoApi,
     val modifier = Json.obj(
       "$push" -> Json.obj(
         dataField -> encrypt(data)
+      )
+    )
+
+    collection.flatMap {
+      _.findAndUpdate(selector, modifier, upsert = true).map(_ => ())
+    }
+  }
+
+  def putAll(eori: EORI, data: List[BatchFileUpload]): Future[Unit] = {
+
+    val selector = Json.obj(idField -> eori.value)
+
+    val modifier = Json.obj(
+      "$set" -> Json.obj(
+        dataField -> JsArray(data.map((a:BatchFileUpload) => encrypt(a)))
       )
     )
 
