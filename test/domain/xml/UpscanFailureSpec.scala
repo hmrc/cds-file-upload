@@ -52,13 +52,13 @@ class UpscanFailureSpec extends WordSpec with MustMatchers with PropertyChecks {
 
       "valid xml is provided" in {
 
-        forAll(string, option(string), option(string)) {
+        forAll(some(string), option(string), option(string)) {
           (ref, reason, message) =>
 
-            val xml    = createXml(Some(ref), fileStatus, reason, message)
+            val xml    = createXml(ref, fileStatus, reason, message)
             val result = UpscanFailure.parse(xml)
 
-            result.map(_.reference) mustBe Some(ref)
+            result.map(_.reference) mustBe ref
             result.map(_.reason)    mustBe Some(reason.getOrElse(""))
             result.map(_.message)   mustBe Some(message.getOrElse(""))
         }
