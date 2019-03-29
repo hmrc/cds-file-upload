@@ -16,44 +16,55 @@
 
 package domain.xml
 
-import domain.xml.Outcome.{Failure, Success}
+import domain.xml.Reason.{Quarantined, Rejected, Unknown}
 import generators.Generators
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 
-class OutcomeSpec extends WordSpec with MustMatchers with PropertyChecks with Generators {
+class ReasonSpec extends WordSpec with MustMatchers with PropertyChecks with Generators {
 
   "fromString" should {
 
-    "return Success" when {
+    "return quarantined" when {
 
-      "success is passed" in {
+      "quarantined is passed" in {
 
-        forAll(insensitive("success")) { s =>
+        forAll(insensitive("quarantined")) { reason =>
 
-          Outcome.fromString(s) mustBe Some(Success)
+          Reason.fromString(reason) mustBe Some(Quarantined)
         }
       }
     }
 
-    "return Failure" when {
+    "return rejected" when {
 
-      "failure is passed" in {
+      "rejected is passed" in {
 
-        forAll(insensitive("failure")) { s =>
+        forAll(insensitive("rejected")) { reason =>
 
-          Outcome.fromString(s) mustBe Some(Failure)
+          Reason.fromString(reason) mustBe Some(Rejected)
+        }
+      }
+    }
+
+    "return unknown" when {
+
+      "unknown is passed" in {
+
+        forAll(insensitive("unknown")) { reason =>
+
+          Reason.fromString(reason) mustBe Some(Unknown)
         }
       }
     }
 
     "return None" when {
 
-      "any other string is passed" in {
+      "an unknown string is passed" in {
 
         forAll { s: String =>
 
-          Outcome.fromString(s) mustBe None
+          Reason.fromString(s) mustBe None
         }
       }
     }

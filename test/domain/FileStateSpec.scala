@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package domain.xml
+package domain
 
-import scala.xml.NodeSeq
+import generators.Generators
+import org.scalatest._
+import org.scalatest.prop.PropertyChecks
+import play.api.libs.json.{JsSuccess, Json}
 
-sealed abstract case class UpscanFailure(reference: String, reason: String, message: String)
+class FileStateSpec extends WordSpec with MustMatchers with PropertyChecks with Generators {
 
-object UpscanFailure {
+  "json serialization" should {
 
-  val FAILED = "FAILED"
+    "convert to json and back again" in {
 
-  def parse(xml: NodeSeq): Option[UpscanFailure] =
-    for {
-      reference <- (xml \\ "reference").headOption
-      _         <- (xml \\ "fileStatus").find(_.text == FAILED)
-    } yield {
-      val reason  = (xml \\ "failureReason").headOption.fold("")(_.text)
-      val message = (xml \\ "message").headOption.fold("")(_.text)
+      forAll(fileStateGen) { fileState =>
 
-      new UpscanFailure(reference.text, reason, message) {}
+        Json.fromJson[FileState](Json.toJson(fileState)).asOpt mustBe Some(fileState)
+      }
     }
+  }
 }

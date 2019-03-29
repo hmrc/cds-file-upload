@@ -17,10 +17,10 @@
 package services
 
 
-import domain._
+import domain.{BatchFileUpload, EORI}
+import domain.FileState._
+import generators.Generators
 import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
-import org.scalacheck.Gen.{choose, listOf, listOfN}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{MustMatchers, OptionValues, WordSpec}
@@ -31,34 +31,9 @@ import scala.util.Random
 
 class NotificationServiceSpec extends WordSpec with MustMatchers
   with PropertyChecks
+  with Generators
   with ScalaFutures
   with OptionValues {
-
-  def nonEmptyList[A](gen: Gen[A]): Gen[List[A]] =
-    for {
-      n  <- choose(1, 10)
-      xs <- listOfN(n, gen)
-    } yield {
-      xs
-    }
-
-  val fileStateGen: Gen[FileState] = Gen.oneOf(Uploaded, Successful, Failed, VirusDetected, UnacceptableMimeType)
-
-  val fileGen = for {
-    ref   <- arbitrary[String] suchThat(_.nonEmpty)
-    state <- fileStateGen
-  } yield {
-    File(ref, state)
-  }
-
-  val mrnGen = arbitrary[String].map(MRN(_))
-
-  val batchFileGen = for {
-    mrn   <- mrnGen
-    files <- nonEmptyList(fileGen)
-  } yield {
-    BatchFileUpload(mrn, files)
-  }
 
   def createCache(seed: List[BatchFileUpload]) = new FakeBatchFileUploadRepository(seed)
   def service(cache: FakeBatchFileUploadRepository): NotificationService =

@@ -1,6 +1,6 @@
 package controllers
 
-import domain.Uploaded
+import domain.FileState.Uploaded
 import domain.{BatchFileUpload, File, MRN}
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._

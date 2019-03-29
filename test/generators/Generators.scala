@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package domain.xml
+package generators
 
-import scala.xml.NodeSeq
+import org.scalacheck.Shrink
 
-sealed abstract case class FileTransmissionResult(reference: String, fileName: String, outcome: Outcome)
+trait Generators extends ModelGenerators {
 
-object FileTransmissionResult {
-
-  def parse(xml: NodeSeq): Option[FileTransmissionResult] =
-    for {
-      ref     <- (xml \\ "FileReference").headOption
-      outcome <- (xml \\ "Outcome").headOption.flatMap(n => Outcome.fromString(n.text))
-    } yield {
-      val fileName = (xml \\ "FileName").headOption.fold("")(_.text)
-      new FileTransmissionResult(ref.text, fileName, outcome) {}
-    }
+  implicit def dontShrink[A]: Shrink[A] = Shrink.shrinkAny
 }

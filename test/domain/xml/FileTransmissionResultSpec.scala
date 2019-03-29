@@ -16,20 +16,16 @@
 
 package domain.xml
 
+import generators.Generators
 import org.scalacheck.Arbitrary._
-import org.scalacheck.{Gen, Shrink}
+import org.scalacheck.{Gen}
 import org.scalacheck.Gen.{option, some}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 
 import scala.xml.NodeSeq
 
-class FileTransmissionResultSpec extends WordSpec with MustMatchers with PropertyChecks {
-
-  implicit def dontShrink[A]: Shrink[A] = Shrink.shrinkAny
-
-  val string: Gen[String]     = arbitrary[String]
-  val outcomeGen: Gen[String] = Gen.oneOf("success", "failure")
+class FileTransmissionResultSpec extends WordSpec with MustMatchers with PropertyChecks with Generators {
 
   def createXml(ref: Option[String], fileName: Option[String], outcome: Option[String]): NodeSeq = {
     <Root>

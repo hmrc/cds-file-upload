@@ -16,8 +16,7 @@
 
 package domain.xml
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
+import generators.Generators
 import org.scalacheck.Gen.{option, some}
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
@@ -25,9 +24,8 @@ import org.scalatest.prop.PropertyChecks
 import scala.xml.NodeSeq
 
 
-class UpscanFailureSpec extends WordSpec with MustMatchers with PropertyChecks {
+class UpscanFailureSpec extends WordSpec with MustMatchers with PropertyChecks with Generators {
 
-  val string: Gen[String] = arbitrary[String]
   val fileStatus = Some(UpscanFailure.FAILED)
 
   def createXml(
@@ -52,14 +50,14 @@ class UpscanFailureSpec extends WordSpec with MustMatchers with PropertyChecks {
 
       "valid xml is provided" in {
 
-        forAll(some(string), option(string), option(string)) {
+        forAll(some(string), some(reasonGen), option(string)) {
           (ref, reason, message) =>
 
             val xml    = createXml(ref, fileStatus, reason, message)
             val result = UpscanFailure.parse(xml)
 
             result.map(_.reference) mustBe ref
-            result.map(_.reason)    mustBe Some(reason.getOrElse(""))
+            result.map(_.reason)    mustBe reason.flatMap(Reason.fromString)
             result.map(_.message)   mustBe Some(message.getOrElse(""))
         }
       }
@@ -69,30 +67,34 @@ class UpscanFailureSpec extends WordSpec with MustMatchers with PropertyChecks {
 
       "reference does not exist" in {
 
-        forAll(option(string), option(string)) {
+        forAll(some(reasonGen), option(string)) {
           (reason, message) =>
 
-            val xml    = createXml(None, fileStatus, reason, message)
-            val result = UpscanFailure.parse(xml)
-
-            result mustBe None
+            val xml = createXml(None, fileStatus, reason, message)
+            UpscanFailure.parse(xml) mustBe None
         }
 
       }
 
       "fileState is not FAILURE" in {
 
+        forAll(some(string), some(reasonGen), option(string)) {
+          (ref, reason, message) =>
+
+            val xml = createXml(ref, None, reason, message)
+            UpscanFailure.parse(xml) mustBe None
+        }
+      }
+
+      "reason is not valid" in {
+
         forAll(some(string), option(string), option(string)) {
           (ref, reason, message) =>
 
-            val xml    = createXml(ref, None, reason, message)
-            val result = UpscanFailure.parse(xml)
-
-            result mustBe None
+            val xml = createXml(ref, fileStatus, reason, message)
+            UpscanFailure.parse(xml) mustBe None
         }
-
       }
     }
   }
-
 }
