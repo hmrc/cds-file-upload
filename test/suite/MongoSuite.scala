@@ -20,7 +20,6 @@ import com.typesafe.config.ConfigFactory
 import org.scalatest._
 import play.api.Configuration
 import reactivemongo.api._
-import repositories.Repository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,18 +40,10 @@ object MongoSuite {
 trait MongoSuite {
   self: TestSuite =>
 
-  def started(repositories: Repository*): Future[_] = {
-
-    val started = repositories.map(_.started)
-
-    Future.sequence(started)
-  }
-
-  def database: Future[DefaultDB] = {
+  def database: Future[DefaultDB] =
     for {
-      uri        <- MongoSuite.parsedUri
+      uri <- MongoSuite.parsedUri
       connection <- MongoSuite.connection
-      database   <- connection.database(uri.db.get)
+      database <- connection.database(uri.db.get)
     } yield database
-  }
 }

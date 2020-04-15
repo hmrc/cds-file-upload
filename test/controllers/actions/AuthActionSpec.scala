@@ -25,17 +25,15 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthActionSpec extends PlaySpec
-  with PropertyChecks
-  with MockitoSugar {
+class AuthActionSpec extends PlaySpec with PropertyChecks with MockitoSugar {
 
   val mockAuthConnector = mock[AuthConnector]
-  def authAction = new AuthActionImpl(mockAuthConnector)
+  def authAction = new AuthActionImpl(mockAuthConnector, stubControllerComponents())
 
   def authController = new TestController(authAction)
 
@@ -46,7 +44,6 @@ class AuthActionSpec extends PlaySpec
       "user has internalId" in {
 
         forAll { internalId: String =>
-
           when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(internalId)))
 
@@ -81,7 +78,7 @@ class AuthActionSpec extends PlaySpec
     }
   }
 
-  class TestController(actions: AuthAction) extends BaseController {
+  class TestController(actions: AuthAction) extends BackendController(stubControllerComponents()) {
 
     def action: Action[AnyContent] = actions {
       Ok

@@ -15,17 +15,16 @@
  */
 
 import config.AppConfig
-import play.api.{Configuration, Environment, inject}
+import play.api.{inject, Configuration, Environment}
 import uk.gov.hmrc.crypto.ApplicationCrypto
 
 class Module extends inject.Module {
 
-  val cfg = pureconfig.loadConfigOrThrow[AppConfig]
+  import pureconfig.ConfigSource
+  import pureconfig.generic.auto._
 
-  def bindings(environment: Environment, configuration: Configuration): Seq[inject.Binding[_]] = {
-    Seq(
-      bind[ApplicationCrypto].toInstance(new ApplicationCrypto(configuration.underlying)),
-      bind[AppConfig].toInstance(cfg)
-    )
-  }
+  val cfg = ConfigSource.default.loadOrThrow[AppConfig]
+
+  def bindings(environment: Environment, configuration: Configuration): Seq[inject.Binding[_]] =
+    Seq(bind[ApplicationCrypto].toInstance(new ApplicationCrypto(configuration.underlying)), bind[AppConfig].toInstance(cfg))
 }

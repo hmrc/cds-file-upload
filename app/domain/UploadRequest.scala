@@ -24,4 +24,3 @@ object UploadRequest {
 
   implicit val format = Json.format[UploadRequest]
 }
-

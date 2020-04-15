@@ -24,3 +24,9 @@ object BatchFileUpload {
 
   implicit val formats = Json.format[BatchFileUpload]
 }
+
+case class BatchFileUploadDbModel(eori: EORI, data: BatchFileUpload)
+
+object BatchFileUploadDbModel {
+  implicit val format = Json.format[BatchFileUploadDbModel]
+}

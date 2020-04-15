@@ -18,7 +18,7 @@ package controllers.actions
 
 import com.google.inject.{ImplementedBy, Inject}
 import play.api.mvc.Results._
-import play.api.mvc.{ActionBuilder, ActionFilter, Request, Result}
+import play.api.mvc.{ActionBuilder, ActionFilter, AnyContent, BodyParser, ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -26,10 +26,9 @@ import uk.gov.hmrc.play.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionImpl @Inject()(
-  val authConnector: AuthConnector
-)(implicit ec: ExecutionContext) extends AuthAction
-  with AuthorisedFunctions {
+class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+    extends AuthAction with AuthorisedFunctions {
+  override val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
   override def filter[A](request: Request[A]): Future[Option[Result]] = {
     implicit val hc: HeaderCarrier =
@@ -40,10 +39,10 @@ class AuthActionImpl @Inject()(
         case Some(_) => Future.successful(None)
         case None    => Future.successful(Some(Unauthorized))
       } recover {
-        case _ => Some(Unauthorized)
-      }
+      case _ => Some(Unauthorized)
+    }
   }
 }
 
 @ImplementedBy(classOf[AuthActionImpl])
-trait AuthAction extends ActionBuilder[Request] with ActionFilter[Request]
+trait AuthAction extends ActionBuilder[Request, AnyContent] with ActionFilter[Request]

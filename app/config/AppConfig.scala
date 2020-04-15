@@ -16,7 +16,8 @@
 
 package config
 
-import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase, ProductHint}
+import pureconfig.generic.ProductHint
+import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
 
 import scala.concurrent.duration.Duration
 
