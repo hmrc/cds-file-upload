@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package models
 
-import pureconfig.generic.ProductHint
-import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
+import org.joda.time.DateTime
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import uk.gov.hmrc.time.DateTimeUtils
 
-import scala.concurrent.duration.Duration
+case class Notification(fileReference: String, outcome: String, filename: String, createdAt: DateTime = DateTimeUtils.now)
 
-case class AppConfig(mongodb: Mongo, notifications: Notifications)
-
-object AppConfig {
-  implicit val hint: ProductHint[AppConfig] = ProductHint(new ConfigFieldMapping {
-    def apply(fieldName: String): String =
-      KebabCase.fromTokens(CamelCase.toTokens(fieldName))
-  })
+object Notification {
+  implicit val dateFormat: Format[DateTime] = ReactiveMongoFormats.dateTimeFormats
+  implicit val notificationFormat = Json.format[Notification]
 }
-
-case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
-
-case class Notifications(authToken: String, maxRetries: Int, retryPauseMillis: Int, ttlSeconds: Int)

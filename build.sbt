@@ -1,17 +1,49 @@
 import play.core.PlayVersion
-import uk.gov.hmrc.SbtArtifactory
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import sbt.Keys._
+import sbt.Tests.{Group, SubProcess}
 import sbt._
+import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.versioning.SbtGitVersioning
+import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin}
 
 name := "cds-file-upload"
 majorVersion := 0
 
 PlayKeys.devSettings := Seq("play.server.http.port" -> "6795")
 
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
+  tests map {
+    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
+  }
+}
+
+lazy val IntegrationTest = config("it") extend Test
+
 lazy val microservice = (project in file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(publishingSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
+  .settings(scalaVersion := "2.12.8")
+  .settings(
+    unmanagedSourceDirectories in Test := Seq(
+      (baseDirectory in Test).value / "test/unit",
+      (baseDirectory in Test).value / "test/utils"
+    ),
+    addTestReportOption(Test, "test-reports")
+  )
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(
+    Keys.fork in IntegrationTest := false,
+    unmanagedSourceDirectories in IntegrationTest := Seq(
+      (baseDirectory in IntegrationTest).value / "test/it",
+      (baseDirectory in IntegrationTest).value / "test/utils"
+    ),
+    addTestReportOption(IntegrationTest, "int-test-reports"),
+    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
+    parallelExecution in IntegrationTest := false
+  )
 
 val compileDependencies = Seq(
   "com.github.pureconfig"   %% "pureconfig"               % "0.12.2",
