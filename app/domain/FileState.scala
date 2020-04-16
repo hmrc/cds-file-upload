@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,11 @@ object Waiting {
 
 object FileState {
 
-  private val waiting  = "waiting"
+  private val waiting = "waiting"
   private val uploaded = "uploaded"
-  private val success  = "success"
-  private val failed   = "failed"
-  private val virus    = "virus"
+  private val success = "success"
+  private val failed = "failed"
+  private val virus = "virus"
   private val mimeType = "mimeType`"
 
   implicit val format = new Format[FileState] {
@@ -56,12 +56,12 @@ object FileState {
       case JsString(`failed`)   => JsSuccess(Failed)
       case JsString(`virus`)    => JsSuccess(VirusDetected)
       case JsString(`mimeType`) => JsSuccess(UnacceptableMimeType)
-      case JsObject(map)        =>
+      case JsObject(map) =>
         map.get(waiting) match {
-          case Some(request)    => Json.fromJson[UploadRequest](request).map(Waiting(_))
-          case None             => JsError("Unable to parse FileState")
+          case Some(request) => Json.fromJson[UploadRequest](request).map(Waiting(_))
+          case None          => JsError("Unable to parse FileState")
         }
-      case _                    => JsError("Unable to parse FileState")
+      case _ => JsError("Unable to parse FileState")
     }
   }
 }

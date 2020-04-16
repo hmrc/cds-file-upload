@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ trait FailOnUnindexedQueries extends MongoSuite with BeforeAndAfterAll with Scal
     super.afterAll()
 
     commandRunner(
-      db      = MongoSuite.connection.flatMap(_.database("admin")).futureValue,
+      db = MongoSuite.connection.flatMap(_.database("admin")).futureValue,
       command = commandRunner.rawCommand(BSONDocument("setParameter" -> 1, "notablescan" -> 0))
     ).one[BSONDocument](ReadPreference.primaryPreferred).futureValue
   }

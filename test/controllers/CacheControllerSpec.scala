@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,9 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CacheControllerSpec extends WordSpec with MustMatchers
-  with MongoSuite
-  with ScalaFutures
-  with IntegrationPatience
-  with OptionValues
-  with BeforeAndAfterEach
-  with MockitoSugar {
+class CacheControllerSpec
+    extends WordSpec with MustMatchers with MongoSuite with ScalaFutures with IntegrationPatience with OptionValues with BeforeAndAfterEach
+    with MockitoSugar {
 
   val mockAuthConnector = mock[AuthConnector]
 
@@ -66,9 +62,8 @@ class CacheControllerSpec extends WordSpec with MustMatchers
     new GuiceApplicationBuilder()
       .overrides(bind[AuthConnector].toInstance(mockAuthConnector))
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     database.map(_.drop()).futureValue
-  }
 
   val postData = BatchFileUpload(MRN("abc"), List(File("abcde", Uploaded)))
 
@@ -94,7 +89,7 @@ class CacheControllerSpec extends WordSpec with MustMatchers
       running(app) {
 
         val postRequest = FakeRequest(POST, "/cds-file-upload/batch/123").withJsonBody(Json.toJson(postData))
-        val getRequest  = FakeRequest(GET,  "/cds-file-upload/batch/123")
+        val getRequest = FakeRequest(GET, "/cds-file-upload/batch/123")
 
         route(app, postRequest).value.futureValue
         route(app, postRequest).value.futureValue

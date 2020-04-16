@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,15 @@ class Crypto @Inject()(appConfig: AppConfig, applicationCrypto: ApplicationCrypt
 
   implicit val symmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
-  def encrypt[A](data: A)(implicit wrt: Writes[A]): JsValue = {
-    if(appConfig.mongodb.encryptionEnabled) {
+  def encrypt[A](data: A)(implicit wrt: Writes[A]): JsValue =
+    if (appConfig.mongodb.encryptionEnabled) {
       Json.toJson(Protected(data))(new JsonEncryptor[A]())
     } else {
       Json.toJson(data)
     }
-  }
 
-  def decrypt[A](json: JsValue)(implicit rds: Reads[A]): Option[A] = {
-    if(appConfig.mongodb.encryptionEnabled) {
+  def decrypt[A](json: JsValue)(implicit rds: Reads[A]): Option[A] =
+    if (appConfig.mongodb.encryptionEnabled) {
       json
         .validateOpt[Protected[A]](new JsonDecryptor[A]())
         .getOrElse(None)
@@ -43,5 +42,4 @@ class Crypto @Inject()(appConfig: AppConfig, applicationCrypto: ApplicationCrypt
     } else {
       json.asOpt
     }
-  }
 }

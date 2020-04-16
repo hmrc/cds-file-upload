@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package domain
 
+import play.api.libs.json.Json
 import play.api.mvc.PathBindable
 
 case class EORI(value: String) extends AnyVal
 
 object EORI {
+
+  implicit val format = Json.format[EORI]
 
   implicit def eoriBinder(implicit stringBinder: PathBindable[String]) = new PathBindable[EORI] {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,8 @@ import suite.FailOnUnindexedQueries
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
-  with FailOnUnindexedQueries
-  with ScalaFutures
-  with IntegrationPatience
-  with OptionValues {
+class BatchFileUploadRepositorySpec
+    extends WordSpec with MustMatchers with FailOnUnindexedQueries with ScalaFutures with IntegrationPatience with OptionValues {
 
   private lazy val builder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
 
@@ -50,7 +47,6 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
           val fileUploadResponseRepo = app.injector.instanceOf[BatchFileUploadRepository]
 
           val test = for {
-            _      <- started(fileUploadResponseRepo)
             result <- fileUploadResponseRepo.getAll(EORI("123"))
           } yield {
             result mustBe List.empty
@@ -76,9 +72,8 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
           val testEORI = EORI("123")
 
           val test = for {
-            _      <- started(fileUploadResponseRepo)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
+            _ <- fileUploadResponseRepo.put(testEORI, testData)
+            _ <- fileUploadResponseRepo.put(testEORI, testData)
             result <- fileUploadResponseRepo.getAll(testEORI)
           } yield {
             result mustBe List(testData, testData)
@@ -103,9 +98,8 @@ class BatchFileUploadRepositorySpec extends WordSpec with MustMatchers
           val testEORI = EORI("123")
 
           val test = for {
-            _      <- started(fileUploadResponseRepo)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
-            _      <- fileUploadResponseRepo.put(testEORI, testData)
+            _ <- fileUploadResponseRepo.put(testEORI, testData)
+            _ <- fileUploadResponseRepo.put(testEORI, testData)
             result <- fileUploadResponseRepo.getAll(testEORI)
           } yield {
             result mustBe List(testData, testData)

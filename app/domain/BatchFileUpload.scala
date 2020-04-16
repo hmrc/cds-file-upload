@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,4 +23,10 @@ case class BatchFileUpload(mrn: MRN, files: List[File])
 object BatchFileUpload {
 
   implicit val formats = Json.format[BatchFileUpload]
+}
+
+case class BatchFileUploadDbModel(eori: EORI, data: BatchFileUpload)
+
+object BatchFileUploadDbModel {
+  implicit val format = Json.format[BatchFileUploadDbModel]
 }

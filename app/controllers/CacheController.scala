@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,24 +20,23 @@ import com.google.inject._
 import controllers.actions.AuthAction
 import domain.{BatchFileUpload, EORI}
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BackendController
 import play.api.mvc._
 import repositories.BatchFileUploadRepository
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CacheController @Inject()(authorise: AuthAction, cache: BatchFileUploadRepository)(implicit ec: ExecutionContext) extends BaseController {
+class CacheController @Inject()(authorise: AuthAction, cache: BatchFileUploadRepository, cc: ControllerComponents)(implicit ec: ExecutionContext)
+    extends BackendController(cc) {
 
   def put(eori: EORI): Action[JsValue] = authorise.async(parse.json) { implicit request =>
-
     withJsonBody[BatchFileUpload] { batch =>
       cache.put(eori, batch).map(_ => Ok)
     }
-	}
+  }
 
   def getAll(eori: EORI): Action[AnyContent] = authorise.async { implicit request =>
-
     cache.getAll(eori).map(result => Ok(Json.toJson(result)))
   }
 }
