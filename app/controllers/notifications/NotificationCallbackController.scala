@@ -20,7 +20,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{Action, ControllerComponents}
-import services.NotificationsService
+import services.NotificationService
 import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationCallbackController @Inject()(notificationsService: NotificationsService, appConfig: AppConfig, cc: ControllerComponents)(
+class NotificationCallbackController @Inject()(notificationsService: NotificationService, appConfig: AppConfig, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
 

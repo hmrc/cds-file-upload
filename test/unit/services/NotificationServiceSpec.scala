@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package services
 
 import java.io.IOException
@@ -16,11 +32,11 @@ import uk.gov.hmrc.time.DateTimeUtils
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class NotificationsServiceSpec extends UnitSpec with BeforeAndAfterEach {
+class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
   private val mockRepository = mock[NotificationsRepository]
 
-  private val service = new NotificationsService(mockRepository)
+  private val service = new NotificationService(mockRepository)
 
   private val SuccessNotification =
     <Root>
@@ -61,6 +77,25 @@ class NotificationsServiceSpec extends UnitSpec with BeforeAndAfterEach {
       val result = await(service.save(SuccessNotification))
 
       result mustBe Left(exception)
+    }
+
+    "return notification if exists based on the reference" in {
+      val notification = Notification("e4d94295-52b1-4837-bdc0-7ab8d7b0f1af", "SUCCESS", "sample.pdf")
+
+      when(mockRepository.find(any())(any())).thenReturn(Future.successful(List(notification)))
+
+      val result = await(service.findNotificationByReference("e4d94295-52b1-4837-bdc0-7ab8d7b0f1af"))
+
+      result mustBe Some(notification)
+    }
+
+    "return None if notification doesn't exist" in {
+
+      when(mockRepository.find(any())(any())).thenReturn(Future.successful(List.empty))
+
+      val result = await(service.findNotificationByReference("reference"))
+
+      result mustBe None
     }
   }
 }

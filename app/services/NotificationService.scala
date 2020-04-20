@@ -20,25 +20,16 @@ import javax.inject.{Inject, Singleton}
 import models.Notification
 import play.api.Logger
 import repositories.NotificationsRepository
-import uk.gov.hmrc.http.BadRequestException
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationsService @Inject()(repository: NotificationsRepository) {
+class NotificationService @Inject()(repository: NotificationsRepository)(implicit ec: ExecutionContext) {
 
   private val logger = Logger(this.getClass)
 
-  /*
-  <FileReference>d810d4fb-4e3b-47fb-9adb-d00ab0a071a0</FileReference>
-        <BatchId>ad04f86e-325a-4bf4-adf8-55fd05443bf5</BatchId>
-        <FileName>Screenshot 2020-03-28 at 12.16.27.png</FileName>
-        <Outcome>SUCCESS</Outcome>
-        <Details>Thank you for submitting your documents. Typical clearance times are 2 hours for air and 3 hours for maritime declarations. During busy periods wait times may be longer.</Details>
-   */
-
-  def save(notification: NodeSeq)(implicit ec: ExecutionContext): Future[Either[Throwable, Unit]] = {
+  def save(notification: NodeSeq): Future[Either[Throwable, Unit]] = {
     val fileReference = (notification \\ "FileReference").text
     val filename = (notification \\ "FileName").text
     val outcome = (notification \\ "Outcome").text
@@ -50,4 +41,11 @@ class NotificationsService @Inject()(repository: NotificationsRepository) {
       .map(_ => Right(()))
       .recover { case e => Left(e) }
   }
+
+  def findNotificationByReference(reference: String): Future[Option[Notification]] =
+    repository.find("fileReference" -> reference).map { notifications =>
+      logger.info(s"Found ${notifications.length} notifications for reference $reference")
+
+      notifications.headOption
+    }
 }

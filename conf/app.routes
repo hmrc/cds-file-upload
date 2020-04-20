@@ -1,4 +1,6 @@
 # microservice specific routes
 
-POST    /batch/:eori            controllers.CacheController.put(eori: domain.EORI)
-GET     /batch/:eori            controllers.CacheController.getAll(eori: domain.EORI)
+POST    /batch/:eori                controllers.CacheController.put(eori: domain.EORI)
+GET     /batch/:eori                controllers.CacheController.getAll(eori: domain.EORI)
+
+GET     /notification/:reference    controllers.notifications.NotificationController.getNotification(reference: String)
