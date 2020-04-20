@@ -18,8 +18,6 @@ package controllers.notifications
 
 import java.io.IOException
 
-import config.{AppConfig, Notifications}
-import controllers.notifications.NotificationCallbackController
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
@@ -36,18 +34,11 @@ import scala.xml.NodeSeq
 class NotificationCallbackControllerSpec extends ControllerUnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val mockNotificationsService = mock[NotificationService]
-  val mockAppConfig = mock[AppConfig]
-  val controller = new NotificationCallbackController(mockNotificationsService, mockAppConfig, stubControllerComponents())(global)
+  val controller = new NotificationCallbackController(mockNotificationsService, stubControllerComponents())(global)
   val expectedAuthToken = "authToken"
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-
-    when(mockAppConfig.notifications).thenReturn(Notifications("authToken", 5, 300, 120))
-  }
-
   override def afterEach(): Unit = {
-    reset(mockNotificationsService, mockAppConfig)
+    reset(mockNotificationsService)
 
     super.afterEach()
   }
@@ -61,24 +52,6 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
       val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> expectedAuthToken))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
-    }
-
-    "return unauthorized when there is no auth token" in {
-
-      when(mockNotificationsService.save(any[NodeSeq])).thenReturn(Future.successful(Left(new IOException("Server error"))))
-
-      val result = controller.onNotify()(postRequest(<notification/>))
-
-      status(result) mustBe UNAUTHORIZED
-    }
-
-    "return unauthorized when auth token is invalid" in {
-
-      when(mockNotificationsService.save(any[NodeSeq])).thenReturn(Future.successful(Left(new IOException("Server error"))))
-
-      val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> "Basic: some invalid token"))
-
-      status(result) mustBe UNAUTHORIZED
     }
   }
 }

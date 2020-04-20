@@ -16,7 +16,6 @@
 
 package controllers.notifications
 
-import config.AppConfig
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
@@ -24,12 +23,9 @@ import play.api.test.Helpers._
 
 class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with GuiceOneServerPerSuite {
 
-  private val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
   private val wsClient: WSClient = app.injector.instanceOf[WSClient]
 
   private val notificationUrl = s"http://localhost:$port/internal/notification"
-
-  private val authToken = appConfig.notifications.authToken
 
   private val validNotification =
     <Root>
@@ -67,7 +63,7 @@ class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with Guice
       val response = await(
         wsClient
           .url(notificationUrl)
-          .withHttpHeaders("Content-Type" -> "application/xml", "Authorization" -> authToken)
+          .withHttpHeaders("Content-Type" -> "application/xml")
           .post(invalidNotification)
       )
 
@@ -79,7 +75,7 @@ class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with Guice
       val response = await(
         wsClient
           .url(notificationUrl)
-          .withHttpHeaders("Content-Type" -> "application/xml", "Authorization" -> authToken)
+          .withHttpHeaders("Content-Type" -> "application/xml")
           .post(notificationWithEmptyFileReference)
       )
 
@@ -91,7 +87,7 @@ class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with Guice
       val response = await(
         wsClient
           .url(notificationUrl)
-          .withHttpHeaders("Content-Type" -> "application/xml", "Authorization" -> authToken)
+          .withHttpHeaders("Content-Type" -> "application/xml")
           .post(notificationWithEmptyOutcome)
       )
 
@@ -103,7 +99,7 @@ class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with Guice
       val response = await(
         wsClient
           .url(notificationUrl)
-          .withHttpHeaders("Content-Type" -> "application/xml", "Authorization" -> authToken)
+          .withHttpHeaders("Content-Type" -> "application/xml")
           .post(validNotification)
       )
 
