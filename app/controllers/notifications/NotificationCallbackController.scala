@@ -16,15 +16,13 @@
 
 package controllers.notifications
 
-import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.mvc.{Action, ControllerComponents}
 import services.NotificationService
-import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.play.bootstrap.controller.BackendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 @Singleton
@@ -38,9 +36,6 @@ class NotificationCallbackController @Inject()(notificationsService: Notificatio
 
     notificationsService.save(notification).map {
       case Right(_) => Accepted
-      case Left(e: BadRequestException) =>
-        logger.warn(s"Failed to save invalid notification: $notification", e)
-        Accepted
       case Left(e) =>
         logger.warn(s"Failed to save notification: $notification", e)
         InternalServerError

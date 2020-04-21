@@ -44,6 +44,7 @@ lazy val microservice = (project in file("."))
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false
   )
+  .settings(scoverageSettings)
 
 val compileDependencies = Seq(
   "com.github.pureconfig"   %% "pureconfig"               % "0.12.2",
@@ -64,3 +65,19 @@ val testDependencies = Seq(
 )
 
 libraryDependencies ++= compileDependencies ++ testDependencies
+
+lazy val scoverageSettings: Seq[Setting[_]] = Seq(
+  coverageExcludedPackages := List(
+    "<empty>",
+    "Reverse.*",
+    "metrics\\..*",
+    "features\\..*",
+    "test\\..*",
+    ".*(BuildInfo|Routes|Options|TestingUtilitiesController).*",
+    "logger.*\\(.*\\)"
+  ).mkString(";"),
+  coverageMinimum := 84,
+  coverageFailOnMinimum := true,
+  coverageHighlighting := true,
+  parallelExecution in Test := false
+)
