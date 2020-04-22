@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package base
 
-import pureconfig.generic.ProductHint
-import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
+import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.api.test.FakeRequest
 
-import scala.concurrent.duration.Duration
+class ControllerUnitSpec extends UnitSpec {
 
-case class AppConfig(mongodb: Mongo, notifications: Notifications)
+  def getRequest(headers: (String, String)*): Request[AnyContentAsEmpty.type] =
+    FakeRequest("GET", "").withHeaders(headers: _*)
 
-object AppConfig {
-  implicit val hint: ProductHint[AppConfig] = ProductHint(new ConfigFieldMapping {
-    def apply(fieldName: String): String =
-      KebabCase.fromTokens(CamelCase.toTokens(fieldName))
-  })
+  def postRequest[A](body: A, headers: (String, String)*): Request[A] =
+    FakeRequest("POST", "").withHeaders(headers: _*).withBody(body)
 }
-
-case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
-
-case class Notifications(maxRetries: Int, retryPauseMillis: Int, ttlSeconds: Int)

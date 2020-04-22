@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package config
+package base
 
-import pureconfig.generic.ProductHint
-import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatest.{MustMatchers, WordSpec}
 
-import scala.concurrent.duration.Duration
-
-case class AppConfig(mongodb: Mongo, notifications: Notifications)
-
-object AppConfig {
-  implicit val hint: ProductHint[AppConfig] = ProductHint(new ConfigFieldMapping {
-    def apply(fieldName: String): String =
-      KebabCase.fromTokens(CamelCase.toTokens(fieldName))
-  })
-}
-
-case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
-
-case class Notifications(maxRetries: Int, retryPauseMillis: Int, ttlSeconds: Int)
+trait UnitSpec extends WordSpec with MustMatchers with MockitoSugar
