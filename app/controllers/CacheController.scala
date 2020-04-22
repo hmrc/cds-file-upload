@@ -36,7 +36,7 @@ class CacheController @Inject()(authorise: AuthAction, cache: BatchFileUploadRep
     }
   }
 
-  def getAll(eori: EORI): Action[AnyContent] = authorise.async { implicit request =>
+  def getAll(eori: EORI): Action[AnyContent] = authorise.async {
     cache.getAll(eori).map(result => Ok(Json.toJson(result)))
   }
 }

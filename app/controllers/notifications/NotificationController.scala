@@ -30,7 +30,7 @@ class NotificationController @Inject()(authorise: AuthAction, notificationServic
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
 
-  def getNotification(reference: String): Action[AnyContent] = authorise.async { implicit request =>
+  def getNotification(reference: String): Action[AnyContent] = authorise.async {
     notificationService.findNotificationByReference(reference).map { notificationOpt =>
       notificationOpt match {
         case Some(notification) => Ok(Json.toJson(notification))

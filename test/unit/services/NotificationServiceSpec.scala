@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
-import reactivemongo.api.commands.DefaultWriteResult
+import reactivemongo.api.commands.UpdateWriteResult
 import repositories.NotificationsRepository
 import uk.gov.hmrc.time.DateTimeUtils
 
@@ -57,7 +57,7 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
     "save a success notification with timestamp for TTL" in {
       when(mockRepository.insert(any[Notification])(any[ExecutionContext]))
-        .thenReturn(Future.successful(DefaultWriteResult(ok = true, 1, Seq.empty, None, None, None)))
+        .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq.empty, Seq.empty, None, None, None)))
 
       await(service.save(SuccessNotification))
 
