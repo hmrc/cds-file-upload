@@ -28,7 +28,7 @@ import services.NotificationService
 import base.ControllerUnitSpec
 
 import scala.concurrent.ExecutionContext.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.xml.NodeSeq
 
 class NotificationCallbackControllerSpec extends ControllerUnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
