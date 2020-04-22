@@ -32,4 +32,4 @@ object AppConfig {
 
 case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
 
-case class Notifications(maxRetries: Int, retryPauseMillis: Int, ttlSeconds: Int)
+case class Notifications(ttlSeconds: Int)
