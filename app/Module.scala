@@ -16,7 +16,6 @@
 
 import config.AppConfig
 import play.api.{inject, Configuration, Environment}
-import uk.gov.hmrc.crypto.ApplicationCrypto
 
 class Module extends inject.Module {
 
@@ -26,5 +25,5 @@ class Module extends inject.Module {
   val cfg = ConfigSource.default.loadOrThrow[AppConfig]
 
   def bindings(environment: Environment, configuration: Configuration): Seq[inject.Binding[_]] =
-    Seq(bind[ApplicationCrypto].toInstance(new ApplicationCrypto(configuration.underlying)), bind[AppConfig].toInstance(cfg))
+    Seq(bind[AppConfig].toInstance(cfg))
 }
