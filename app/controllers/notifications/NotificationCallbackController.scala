@@ -17,6 +17,8 @@
 package controllers.notifications
 
 import javax.inject.{Inject, Singleton}
+import metrics.SfusMetrics
+import metrics.MetricIdentifiers.notificationMetric
 import play.api.Logger
 import play.api.mvc.{Action, ControllerComponents}
 import services.NotificationService
@@ -26,16 +28,21 @@ import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationCallbackController @Inject()(notificationsService: NotificationService, cc: ControllerComponents)(implicit ec: ExecutionContext)
-    extends BackendController(cc) {
+class NotificationCallbackController @Inject()(notificationsService: NotificationService, metrics: SfusMetrics, cc: ControllerComponents)(
+  implicit ec: ExecutionContext
+) extends BackendController(cc) {
 
   private val logger = Logger(this.getClass)
 
   def onNotify: Action[NodeSeq] = Action.async(parse.xml) { implicit req =>
+    val timer = metrics.startTimer(notificationMetric)
     val notification = req.body
 
     notificationsService.save(notification).map {
-      case Right(_) => Accepted
+      case Right(_) =>
+        timer.stop()
+        metrics.incrementCounter(notificationMetric)
+        Accepted
       case Left(e) =>
         logger.warn(s"Failed to save notification: $notification", e)
         InternalServerError
