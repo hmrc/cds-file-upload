@@ -19,22 +19,22 @@ package controllers.notifications
 import java.io.IOException
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.NotificationService
-import base.ControllerUnitSpec
+import base.{ControllerUnitSpec, SfusMetricsMock}
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 
-class NotificationCallbackControllerSpec extends ControllerUnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class NotificationCallbackControllerSpec extends ControllerUnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with SfusMetricsMock {
 
   val mockNotificationsService = mock[NotificationService]
-  val controller = new NotificationCallbackController(mockNotificationsService, stubControllerComponents())(global)
+  val controller = new NotificationCallbackController(mockNotificationsService, sfusMetrics, stubControllerComponents())(global)
   val expectedAuthToken = "authToken"
 
   override def afterEach(): Unit = {
@@ -45,6 +45,16 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
 
   "NotificationCallbackController" should {
 
+    "return Accepted when the notification has been saved with susccess" in {
+
+      when(mockNotificationsService.save(any())).thenReturn(Future.successful(Right(())))
+
+      val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> expectedAuthToken))
+
+      status(result) mustBe ACCEPTED
+      verify(sfusMetrics, times(1)).incrementCounter(any())
+    }
+
     "return internal server error when there is a downstream failure" in {
 
       when(mockNotificationsService.save(any[NodeSeq])).thenReturn(Future.successful(Left(new IOException("Server error"))))
@@ -52,6 +62,7 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
       val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> expectedAuthToken))
 
       status(result) mustBe INTERNAL_SERVER_ERROR
+      verify(sfusMetrics, times(0)).incrementCounter(any())
     }
   }
 }
