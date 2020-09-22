@@ -48,18 +48,18 @@ lazy val microservice = (project in file("."))
   .settings(silencerSettings)
 
 val compileDependencies = Seq(
-  "com.github.pureconfig"   %% "pureconfig"               % "0.12.3",
-  "uk.gov.hmrc"             %% "bootstrap-play-26"        % "1.7.0",
-  "uk.gov.hmrc"             %% "simple-reactivemongo"     % "7.26.0-play-26"
+  "com.github.pureconfig"   %% "pureconfig"                   % "0.12.3",
+  "uk.gov.hmrc"             %% "bootstrap-backend-play-26"    % "2.24.0",
+  "uk.gov.hmrc"             %% "simple-reactivemongo"         % "7.26.0-play-26"
 )
 
 val testDependencies = Seq(
-  "org.scalatest"           %% "scalatest"                % "3.0.5"                 % "test",
+  "org.scalatest"           %% "scalatest"                % "3.0.8"                 % "test",
   "com.typesafe.play"       %% "play-test"                % PlayVersion.current     % "test",
-  "org.mockito"             %  "mockito-core"             % "2.27.0"                % "test",
+  "org.mockito"             %  "mockito-core"             % "3.5.7"                 % "test",
   "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test",
   "uk.gov.hmrc"             %% "service-integration-test" % "0.11.0-play-26"        % "test",
-  "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.2"                 % "test",
+  "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.3"                 % "test",
   "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % "test"
 )
 

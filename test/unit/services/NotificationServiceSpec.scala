@@ -20,6 +20,7 @@ import java.io.IOException
 
 import base.UnitSpec
 import models.Notification
+import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, verify, when}
@@ -27,7 +28,6 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import reactivemongo.api.commands.UpdateWriteResult
 import repositories.NotificationsRepository
-import uk.gov.hmrc.time.DateTimeUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,7 +67,7 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
       notification.fileReference mustBe "e4d94295-52b1-4837-bdc0-7ab8d7b0f1af"
       notification.outcome mustBe "SUCCESS"
-      notification.createdAt.withTimeAtStartOfDay() mustBe DateTimeUtils.now.withTimeAtStartOfDay()
+      notification.createdAt.withTimeAtStartOfDay() mustBe DateTime.now.withZone(DateTimeZone.UTC).withTimeAtStartOfDay()
     }
 
     "return an exception when insert fails" in {
