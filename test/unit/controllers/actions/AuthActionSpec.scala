@@ -18,19 +18,19 @@ package controllers.actions
 
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.play.bootstrap.controller.BackendController
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AuthActionSpec extends PlaySpec with PropertyChecks with MockitoSugar {
+class AuthActionSpec extends PlaySpec with ScalaCheckPropertyChecks with MockitoSugar {
 
   val mockAuthConnector = mock[AuthConnector]
   def authAction = new AuthActionImpl(mockAuthConnector, stubControllerComponents())

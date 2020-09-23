@@ -18,14 +18,14 @@ package controllers.notifications
 
 import java.io.IOException
 
+import base.{ControllerUnitSpec, SfusMetricsMock}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import services.NotificationService
-import base.{ControllerUnitSpec, SfusMetricsMock}
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
