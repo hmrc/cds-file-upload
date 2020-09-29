@@ -1,27 +1,19 @@
 import play.core.PlayVersion
-import sbt.Keys._
-import sbt.Tests.{Group, SubProcess}
-import sbt._
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.versioning.SbtGitVersioning
-import uk.gov.hmrc.{SbtArtifactory, SbtAutoBuildPlugin}
+import uk.gov.hmrc.{ForkedJvmPerTestSettings, SbtArtifactory, SbtAutoBuildPlugin}
 
 name := "cds-file-upload"
 majorVersion := 0
 
 PlayKeys.devSettings := Seq("play.server.http.port" -> "6795")
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = {
-  tests map {
-    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
-  }
-}
-
 lazy val IntegrationTest = config("it") extend Test
 
 lazy val microservice = (project in file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .settings(libraryDependencies ++= compileDependencies ++ testDependencies)
   .settings(publishingSettings: _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(scalaVersion := "2.12.12")
@@ -41,11 +33,12 @@ lazy val microservice = (project in file("."))
       (baseDirectory in IntegrationTest).value / "test/utils"
     ),
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
+    testGrouping in IntegrationTest := ForkedJvmPerTestSettings.oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false
   )
   .settings(scoverageSettings)
   .settings(silencerSettings)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
 
 val compileDependencies = Seq(
   "com.github.pureconfig"   %% "pureconfig"                   % "0.12.3",
@@ -62,8 +55,6 @@ val testDependencies = Seq(
   "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.3"                 % "test",
   "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % "test"
 )
-
-libraryDependencies ++= compileDependencies ++ testDependencies
 
 lazy val scoverageSettings: Seq[Setting[_]] = Seq(
   coverageExcludedPackages := List(
