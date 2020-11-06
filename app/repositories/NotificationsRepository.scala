@@ -23,19 +23,23 @@ import play.api.Logger
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
+import reactivemongo.play.json.collection.JSONCollection
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NotificationsRepository @Inject()(mongo: ReactiveMongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
+class NotificationsRepository @Inject()(mc: ReactiveMongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
     extends ReactiveRepository[Notification, BSONObjectID](
       collectionName = "notifications",
-      mongo = mongo.mongoConnector.db,
+      mongo = mc.mongoConnector.db,
       domainFormat = Notification.notificationFormat,
       idFormat = ReactiveMongoFormats.objectIdFormats
     ) {
+
+  override lazy val collection: JSONCollection =
+    mongo().collection[JSONCollection](collectionName, failoverStrategy = RepositorySettings.failoverStrategy)
 
   override def indexes: Seq[Index] = Seq(
     Index(key = Seq(("fileReference", IndexType.Ascending)), name = Some("fileReferenceIndex")),
