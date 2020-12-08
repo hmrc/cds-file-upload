@@ -43,7 +43,9 @@ lazy val microservice = (project in file("."))
 val compileDependencies = Seq(
   "com.github.pureconfig"   %% "pureconfig"                   % "0.12.3",
   "uk.gov.hmrc"             %% "bootstrap-backend-play-26"    % "2.24.0",
-  "uk.gov.hmrc"             %% "simple-reactivemongo"         % "7.26.0-play-26"
+  "uk.gov.hmrc"             %% "simple-reactivemongo"         % "7.30.0-play-26",
+  "org.mongodb.scala"       %% "mongo-scala-driver"           % "2.9.0",
+  "org.mongodb"             %  "mongo-java-driver"            % "3.5.0"
 )
 
 val testDependencies = Seq(
