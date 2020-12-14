@@ -20,6 +20,7 @@ import com.google.inject.Singleton
 import com.mongodb.{MongoClient, MongoClientURI}
 import config.AppConfig
 import javax.inject.Inject
+import migrations.changelogs.notification.MakeParsedDetailsOptional
 import play.api.Logger
 import uk.gov.hmrc.exports.routines.{Routine, RoutinesExecutionContext}
 
@@ -42,6 +43,7 @@ class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExe
   private def migrateWithExportsMigrationTool(): Unit = {
     val lockManagerConfig = LockManagerConfig(lockMaxTries = 10, lockMaxWaitMillis = minutesToMillis(5), lockAcquiredForMillis = minutesToMillis(3))
     val migrationsRegistry = MigrationsRegistry()
+      .register(new MakeParsedDetailsOptional())
     val migrationTool = ExportsMigrationTool(db, migrationsRegistry, lockManagerConfig)
 
     migrationTool.execute()

@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.NotificationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import models.Notification.FrontendFormat._
 
 import scala.concurrent.ExecutionContext
 
@@ -31,7 +32,7 @@ class NotificationController @Inject()(authorise: AuthAction, notificationServic
 ) extends BackendController(cc) {
 
   def getNotification(reference: String): Action[AnyContent] = authorise.async {
-    notificationService.findNotificationByReference(reference).map {
+    notificationService.getNotificationForReference(reference).map {
       case Some(notification) => Ok(Json.toJson(notification))
       case None               => NotFound
     }

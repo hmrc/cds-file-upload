@@ -18,19 +18,19 @@ package services
 
 import java.io.IOException
 
+import base.TestData._
 import base.UnitSpec
-import models.Notification
-import org.joda.time.{DateTime, DateTimeZone}
+import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, verify, when}
+import org.mockito.Mockito.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
-import reactivemongo.api.commands.UpdateWriteResult
+import reactivemongo.bson.BSONObjectID
 import repositories.NotificationsRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
@@ -38,14 +38,14 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
   private val service = new NotificationService(mockRepository)
 
-  private val SuccessNotification =
-    <Root>
-      <FileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</FileReference>
-      <BatchId>5e634e09-77f6-4ff1-b92a-8a9676c715c4</BatchId>
-      <FileName>sample.pdf</FileName>
-      <Outcome>SUCCESS</Outcome>
-      <Details>[detail block]</Details>
-    </Root>
+  private val SuccessNotificationXml =
+    getNotificationXml(fileReference, outcomeSuccess, filename, batchId)
+
+  val parsedNotification =
+    Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
+
+  val unParsedNotification =
+    Notification(BSONObjectID.generate(), getNotificationXml(fileReference, outcomeSuccess, filename, "1").toString(), None, dateTime)
 
   override protected def afterEach(): Unit = {
     reset(mockRepository)
@@ -53,49 +53,128 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
     super.afterEach()
   }
 
-  "Notification service" should {
+  "NotificationService on parseAndSave" should {
 
     "save a success notification with timestamp for TTL" in {
-      when(mockRepository.insert(any[Notification])(any[ExecutionContext]))
-        .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq.empty, Seq.empty, None, None, None)))
+      when(mockRepository.save(any())).thenReturn(Future.successful(Right(())))
 
-      await(service.save(SuccessNotification))
+      await(service.parseAndSave(SuccessNotificationXml))
 
       val captor: ArgumentCaptor[Notification] = ArgumentCaptor.forClass(classOf[Notification])
-      verify(mockRepository).insert(captor.capture())(any[ExecutionContext])
+
+      verify(mockRepository, times(1)).save(captor.capture())
       val notification = captor.getValue
 
-      notification.fileReference mustBe "e4d94295-52b1-4837-bdc0-7ab8d7b0f1af"
-      notification.outcome mustBe "SUCCESS"
-      notification.createdAt.withTimeAtStartOfDay() mustBe DateTime.now.withZone(DateTimeZone.UTC).withTimeAtStartOfDay()
+      notification.details.isDefined mustBe true
+      notification.details.get.fileReference mustBe fileReference
+      notification.details.get.outcome mustBe outcomeSuccess
+      notification.createdAt.withTimeAtStartOfDay() mustBe dateTime.withTimeAtStartOfDay()
     }
 
     "return an exception when insert fails" in {
       val exception = new IOException("downstream failure")
-      when(mockRepository.insert(any[Notification])(any[ExecutionContext])).thenReturn(Future.failed(exception))
 
-      val result = await(service.save(SuccessNotification))
+      when(mockRepository.save(any())).thenReturn(Future.successful(Left(exception)))
+
+      val result = await(service.parseAndSave(SuccessNotificationXml))
 
       result mustBe Left(exception)
     }
 
     "return notification if exists based on the reference" in {
-      val notification = Notification("e4d94295-52b1-4837-bdc0-7ab8d7b0f1af", "SUCCESS", "sample.pdf")
+      when(mockRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List(parsedNotification)))
 
-      when(mockRepository.find(any())(any())).thenReturn(Future.successful(List(notification)))
+      val result = await(service.getNotificationForReference(fileReference))
 
-      val result = await(service.findNotificationByReference("e4d94295-52b1-4837-bdc0-7ab8d7b0f1af"))
-
-      result mustBe Some(notification)
+      result mustBe Some(parsedNotification)
     }
 
     "return None if notification doesn't exist" in {
 
-      when(mockRepository.find(any())(any())).thenReturn(Future.successful(List.empty))
+      when(mockRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List.empty))
 
-      val result = await(service.findNotificationByReference("reference"))
+      val result = await(service.getNotificationForReference("reference"))
 
       result mustBe None
+    }
+  }
+
+  "NotificationService on reattemptParsingUnparsedNotifications" should {
+    "do nothing if no unparsed notifications exist" in {
+      when(mockRepository.findUnparsedNotifications())
+        .thenReturn(Future.successful(Seq()))
+
+      await(service.reattemptParsingUnparsedNotifications())
+
+      verify(mockRepository, times(0)).updateNotification(any())
+    }
+
+    "reparse single unparsed notification that still can not be parsed" in {
+      when(mockRepository.findUnparsedNotifications())
+        .thenReturn(Future.successful(Seq(unParsedNotification.copy(payload = "<Root></Root>"))))
+
+      await(service.reattemptParsingUnparsedNotifications())
+
+      verify(mockRepository, times(0)).updateNotification(any())
+    }
+
+    "reparse single unparsed notification that can now be parsed" in {
+      when(mockRepository.findUnparsedNotifications())
+        .thenReturn(Future.successful(Seq(unParsedNotification)))
+
+      await(service.reattemptParsingUnparsedNotifications())
+
+      verify(mockRepository, times(1)).updateNotification(any())
+    }
+  }
+
+  "NotificationService on parseNotificationsPayload" should {
+    "return a parsed Notification when all required element are present" in {
+      val payload = getNotificationXml(fileReference, outcomeSuccess, filename, batchId)
+
+      service.parseNotificationsPayload(payload).details.isDefined mustBe true
+    }
+
+    "return unparsed Notification when FileReference element is missing" in {
+      val payload = <Root>
+       <XFileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</XFileReference>
+       <BatchId>1</BatchId>
+       <FileName>sample.pdf</FileName>
+       <Outcome>SUCCESS</Outcome>
+       <Details>[detail block]</Details>
+     </Root>
+
+      service.parseNotificationsPayload(payload).details.isDefined mustBe false
+    }
+
+    "return unparsed Notification when FileName element is missing" in {
+      val payload = <Root>
+        <FileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</FileReference>
+        <BatchId>1</BatchId>
+        <XFileName>sample.pdf</XFileName>
+        <Outcome>SUCCESS</Outcome>
+        <Details>[detail block]</Details>
+      </Root>
+
+      service.parseNotificationsPayload(payload).details.isDefined mustBe false
+    }
+
+    "return unparsed Notification when Outcome element is missing" in {
+      val payload = <Root>
+        <FileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</FileReference>
+        <BatchId>1</BatchId>
+        <FileName>sample.pdf</FileName>
+        <XOutcome>SUCCESS</XOutcome>
+        <Details>[detail block]</Details>
+      </Root>
+
+      service.parseNotificationsPayload(payload).details.isDefined mustBe false
+    }
+
+    "return unparsed Notification when xml is bad" in {
+      val payload = <xml></xml>
+
+      service.parseNotificationsPayload(payload).details.isDefined mustBe false
     }
   }
 }

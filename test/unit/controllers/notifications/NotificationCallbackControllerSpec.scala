@@ -47,7 +47,7 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
 
     "return Accepted when the notification has been saved with susccess" in {
 
-      when(mockNotificationsService.save(any())).thenReturn(Future.successful(Right(())))
+      when(mockNotificationsService.parseAndSave(any())).thenReturn(Future.successful(Right(())))
 
       val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> expectedAuthToken))
 
@@ -57,7 +57,7 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
 
     "return internal server error when there is a downstream failure" in {
 
-      when(mockNotificationsService.save(any[NodeSeq])).thenReturn(Future.successful(Left(new IOException("Server error"))))
+      when(mockNotificationsService.parseAndSave(any[NodeSeq])).thenReturn(Future.successful(Left(new IOException("Server error"))))
 
       val result = controller.onNotify()(postRequest(<notification/>, "Authorization" -> expectedAuthToken))
 
