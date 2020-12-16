@@ -17,11 +17,13 @@
 package controllers.notifications
 
 import base.{AuthActionMock, ControllerUnitSpec}
-import models.Notification
+import base.TestData._
+import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
+import reactivemongo.bson.BSONObjectID
 import services.NotificationService
 
 import scala.concurrent.ExecutionContext.global
@@ -49,17 +51,18 @@ class NotificationControllerSpec extends ControllerUnitSpec with AuthActionMock 
 
     "return OK (200)" when {
 
-      "notification with specific reference ahs been found" in {
+      "notification with specific reference has been found" in {
 
-        val notification = Notification("fileReference", "outcome", "filename")
+        val notification =
+          Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
 
-        when(notificationService.findNotificationByReference(any()))
+        when(notificationService.getNotificationForReference(any()))
           .thenReturn(Future.successful(Some(notification)))
 
-        val result = controller.getNotification(notification.fileReference)(getRequest())
+        val result = controller.getNotification(fileReference)(getRequest())
 
         status(result) mustBe OK
-        Notification.notificationFormat.reads(contentAsJson(result)).get mustBe notification
+        contentAsString(result) mustBe s"""{"fileReference":"$fileReference","outcome":"$outcomeSuccess","filename":"$filename","createdAt":{"$$date":${dateTime.getMillis}}}"""
       }
     }
 
@@ -67,10 +70,10 @@ class NotificationControllerSpec extends ControllerUnitSpec with AuthActionMock 
 
       "there is no notification related with file reference" in {
 
-        when(notificationService.findNotificationByReference(any()))
+        when(notificationService.getNotificationForReference(any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.getNotification("fileReference")(getRequest())
+        val result = controller.getNotification(fileReference)(getRequest())
 
         status(result) mustBe NOT_FOUND
       }

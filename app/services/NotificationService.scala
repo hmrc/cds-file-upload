@@ -17,35 +17,66 @@
 package services
 
 import javax.inject.{Inject, Singleton}
-import models.Notification
+import models.{Notification, NotificationDetails}
 import play.api.Logger
+import reactivemongo.bson.BSONObjectID
 import repositories.NotificationsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.NodeSeq
+import scala.xml.{NodeSeq, XML}
 
 @Singleton
 class NotificationService @Inject()(repository: NotificationsRepository)(implicit ec: ExecutionContext) {
 
   private val logger = Logger(this.getClass)
 
-  def save(notification: NodeSeq): Future[Either[Throwable, Unit]] = {
-    val fileReference = (notification \\ "FileReference").text
-    val filename = (notification \\ "FileName").text
-    val outcome = (notification \\ "Outcome").text
+  def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
+    logger.info("Notification payload: " + notificationXml)
 
-    logger.info("Notification payload: " + notification)
-
-    repository
-      .insert(Notification(fileReference, outcome, filename))
-      .map(_ => Right(()))
-      .recover { case e => Left(e) }
+    repository.save(parseNotificationsPayload(notificationXml))
   }
 
-  def findNotificationByReference(reference: String): Future[Option[Notification]] =
-    repository.find("fileReference" -> reference).map { notifications =>
+  def getNotificationForReference(reference: String): Future[Option[Notification]] =
+    repository.findNotificationsByReference(reference).map { notifications =>
       logger.info(s"Found ${notifications.length} notifications for reference $reference")
 
       notifications.headOption
     }
+
+  def parseNotificationsPayload(notificationXml: NodeSeq, mongoId: BSONObjectID = BSONObjectID.generate()): Notification = {
+    val maybeParsedNotification = for {
+      fileReference <- (notificationXml \ "FileReference").headOption
+      filename <- (notificationXml \ "FileName").headOption
+      outcome <- (notificationXml \ "Outcome").headOption
+    } yield {
+      Notification(mongoId, notificationXml.toString(), Some(NotificationDetails(fileReference.text, outcome.text, filename.text)))
+    }
+
+    maybeParsedNotification.getOrElse {
+      logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Payload did not contain the required values!")
+      Notification(BSONObjectID.generate(), notificationXml.toString())
+    }
+  }
+
+  def reattemptParsingUnparsedNotifications(): Future[Unit] =
+    repository.findUnparsedNotifications().map { unparsedNotifications =>
+      logger.info(s"Found ${unparsedNotifications.size} unparsedNotifications. Processing...")
+
+      unparsedNotifications.foreach { unparsedNotification =>
+        try {
+          val notification = parseNotificationsPayload(XML.loadString(unparsedNotification.payload), unparsedNotification._id)
+
+          for {
+            _ <- notification.details
+          } yield {
+            //successfully parsed the previously unparsable notification
+            repository.updateNotification(notification)
+          }
+        } catch {
+          case exc: Throwable => logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Exception thrown: ${exc.getMessage}")
+        }
+      }
+    }
+
+  val logParseExceptionAtPagerDutyLevelMessage = "There was a problem during parsing notification"
 }

@@ -9,6 +9,11 @@ import scala.reflect.ClassTag
 
 trait IntegrationSpec extends WordSpec with MustMatchers with ScalaFutures with IntegrationPatience with OptionValues {
 
+  val Port = 27017
+  val DatabaseName = "test-cds-file-upload"
+  val MongoURI = s"mongodb://localhost:$Port/$DatabaseName"
+  val CollectionName = "notifications"
+
   /**
     * Builder which provides test database for the service to not use the main one.
     */
@@ -16,7 +21,7 @@ trait IntegrationSpec extends WordSpec with MustMatchers with ScalaFutures with 
     new GuiceApplicationBuilder()
       .overrides(modules: _*)
       .configure(config: _*)
-      .configure(("mongodb.uri", "mongodb://localhost:27017/test-cds-file-upload"))
+      .configure(("mongodb.uri", MongoURI))
 
   def testApp: Application = builderWithTestMongo(Seq.empty).build()
 

@@ -19,18 +19,23 @@ package uk.gov.hmrc.exports.routines
 import akka.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
 import play.api.inject.ApplicationLifecycle
+import routines.ReattemptNotificationParsingRoutine
 import uk.gov.hmrc.exports.migrations.MigrationRoutine
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class RoutineRunner @Inject()(migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
-  implicit mec: RoutinesExecutionContext
-) {
+class RoutineRunner @Inject()(
+  migrationRunner: MigrationRoutine,
+  reattemptParsing: ReattemptNotificationParsingRoutine,
+  actorSystem: ActorSystem,
+  applicationLifecycle: ApplicationLifecycle
+)(implicit mec: RoutinesExecutionContext) {
 
   val migrationTask: Cancellable = actorSystem.scheduler.scheduleOnce(0.seconds) {
     for {
       _ <- migrationRunner.execute()
+      _ <- reattemptParsing.execute()
     } yield (())
   }
 

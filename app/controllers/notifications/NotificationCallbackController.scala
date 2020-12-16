@@ -38,7 +38,7 @@ class NotificationCallbackController @Inject()(notificationsService: Notificatio
     val timer = metrics.startTimer(notificationMetric)
     val notification = req.body
 
-    notificationsService.save(notification).map {
+    notificationsService.parseAndSave(notification).map {
       case Right(_) =>
         timer.stop()
         metrics.incrementCounter(notificationMetric)
