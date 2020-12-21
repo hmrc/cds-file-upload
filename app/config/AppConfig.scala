@@ -21,7 +21,7 @@ import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
 
 import scala.concurrent.duration.Duration
 
-case class AppConfig(mongodb: Mongo, notifications: Notifications)
+case class AppConfig(mongodb: Mongo, notifications: Notifications, microservice: Microservice)
 
 object AppConfig {
   implicit val hint: ProductHint[AppConfig] = ProductHint(new ConfigFieldMapping {
@@ -33,3 +33,16 @@ object AppConfig {
 case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
 
 case class Notifications(ttlSeconds: Int)
+
+case class Microservice(services: Services)
+
+case class Services(customsDeclarationsInformation: CustomsDeclarationsInformation)
+
+case class CustomsDeclarationsInformation(
+  host: String,
+  port: Option[Int],
+  fetchMrnStatussdfsdf: String,
+  apiVersion: String,
+  bearerToken: String,
+  clientId: String
+)
