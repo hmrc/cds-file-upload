@@ -31,7 +31,7 @@ class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExe
 
   private val logger = Logger(this.getClass)
 
-  private val uri = new MongoClientURI(appConfig.mongodb.uri.replaceAllLiterally("sslEnabled", "ssl"))
+  private val uri = new MongoClientURI(appConfig.mongodb.uri)
   private val client = new MongoClient(uri)
   private val db = client.getDatabase(uri.getDatabase)
 
