@@ -1,28 +1,34 @@
 package repositories
 
-import base.IntegrationSpec
-import base.TestData._
-import models.{Notification, NotificationDetails}
+import base.{IntegrationSpec, TestMongoDB}
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
+import testdata.notifications.NotificationsTestData._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NotificationsRepositoryIntegrationSpec extends IntegrationSpec with BeforeAndAfterEach {
+class NotificationsRepositoryIntegrationSpec extends IntegrationSpec with GuiceOneAppPerSuite with BeforeAndAfterEach {
 
-  private val exampleParsedNotification =
-    Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
+  override def fakeApplication(): Application =
+    new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(TestMongoDB.mongoConfiguration)
+      .build()
 
-  private val exampleUnparsedNotification =
-    Notification(BSONObjectID.generate(), payload, None, dateTime)
-
-  private val notificationsRepository = instanceOfWithTestDb[NotificationsRepository]
+  private val notificationsRepository = fakeApplication().injector.instanceOf[NotificationsRepository]
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-
     notificationsRepository.removeAll().futureValue
+  }
+
+  override def afterEach(): Unit = {
+    notificationsRepository.removeAll().futureValue
+    super.afterEach()
   }
 
   "Notification repository" should {

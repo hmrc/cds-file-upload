@@ -45,7 +45,7 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with Mockito
 
   "NotificationCallbackController" should {
 
-    "return Accepted when the notification has been saved with susccess" in {
+    "return Accepted when the notification has been saved with success" in {
 
       when(mockNotificationsService.parseAndSave(any())).thenReturn(Future.successful(Right(())))
 
