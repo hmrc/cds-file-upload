@@ -23,4 +23,3 @@ case class PreviousDocument(id: String, typeCode: String)
 object PreviousDocument {
   implicit val formats: OFormat[PreviousDocument] = Json.format[PreviousDocument]
 }
-

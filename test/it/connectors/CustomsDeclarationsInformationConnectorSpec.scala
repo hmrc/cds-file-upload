@@ -8,6 +8,7 @@ import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import stubs.CustomsDeclarationsInformationAPIService._
 import stubs.{CustomsDeclarationsInformationAPIService, WireMockRunner}
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import testdata.TestData.mrn
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -33,20 +34,18 @@ class CustomsDeclarationsInformationConnectorSpec
 
   "CustomsDeclarationsInformationConnector" when {
 
-    val testMrn = "18GB9JLC3CU1LFGVR2"
-
     "customs-declarations-information service responds with 200 (Ok) response" should {
 
       "return the response parsed" in {
 
-        startService(OK, testMrn)
+        startService(OK, mrn)
 
-        val declarationStatus = connector.getDeclarationStatus(testMrn).futureValue
+        val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
         declarationStatus mustBe defined
-        declarationStatus.get.mrn mustBe testMrn
+        declarationStatus.get.mrn mustBe mrn
         declarationStatus.get.eori mustBe "GB123456789012000"
-        verifyDecServiceWasCalledCorrectly(testMrn, expectedApiVersion = apiVersion, bearerToken)
+        verifyDecServiceWasCalledCorrectly(mrn, expectedApiVersion = apiVersion, bearerToken)
       }
     }
 
@@ -54,9 +53,9 @@ class CustomsDeclarationsInformationConnectorSpec
 
       "return empty Option" in {
 
-        startService(NOT_FOUND, testMrn)
+        startService(NOT_FOUND, mrn)
 
-        val declarationStatus = connector.getDeclarationStatus(testMrn).futureValue
+        val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
         declarationStatus mustNot be(defined)
       }
@@ -66,10 +65,10 @@ class CustomsDeclarationsInformationConnectorSpec
 
       "throw InternalServerException" in {
 
-        startService(INTERNAL_SERVER_ERROR, testMrn)
+        startService(INTERNAL_SERVER_ERROR, mrn)
 
         intercept[InternalServerException] {
-          Await.result(connector.getDeclarationStatus(testMrn), 5 seconds)
+          Await.result(connector.getDeclarationStatus(mrn), 5 seconds)
         }
       }
     }

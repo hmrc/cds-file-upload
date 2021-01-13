@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package base
+package testdata
 
 import org.joda.time.{DateTime, DateTimeZone}
 
@@ -34,4 +34,9 @@ object TestData {
       <Outcome>{outcome}</Outcome>
       <Details>[detail block]</Details>
     </Root>
+
+  val mrn: String = "18GB9JLC3CU1LFGVR2"
+  val eori: String = "GB123456789012000"
+  val ucr: String = "20GBAKZ81EQJ2WXYZ"
+
 }

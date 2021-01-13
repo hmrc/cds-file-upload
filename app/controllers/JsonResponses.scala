@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import config.AppConfig
-import play.api.{inject, Configuration, Environment}
+package controllers
 
-class Module extends inject.Module {
+import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
+import play.api.libs.json.Writes
 
-  import pureconfig.ConfigSource
-  import pureconfig.generic.auto._
+trait JsonResponses {
 
-  val cfg = ConfigSource.default.loadOrThrow[AppConfig]
+  implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
+    implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))
+    Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
+  }
 
-  def bindings(environment: Environment, configuration: Configuration): Seq[inject.Binding[_]] =
-    Seq(bind[AppConfig].toInstance(cfg))
 }

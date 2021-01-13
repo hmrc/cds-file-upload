@@ -38,7 +38,7 @@ trait CustomsDeclarationsInformationAPIService extends WireMockRunner {
   }
 
   private def buildResponseBody(status: Int, mrn: String): Elem = status match {
-    case OK        => declarationStatusWithAllData(mrn)
+    case OK        => DeclarationStatusWithAllData(mrn).xml
     case NOT_FOUND => declarationStatusNotFoundResponse
     case _         => declarationStatusInternalServerErrorResponse
   }

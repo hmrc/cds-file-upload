@@ -16,7 +16,7 @@
 
 package testdata.notifications
 
-import base.TestData._
+import testdata.TestData._
 import models.{Notification, NotificationDetails}
 import reactivemongo.bson.BSONObjectID
 

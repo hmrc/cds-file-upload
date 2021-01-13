@@ -4,7 +4,7 @@ import com.codahale.metrics.SharedMetricRegistries
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import stubs.WireMockRunner
 
-trait WireMockIntegrationSpec extends IntegrationSpec with WireMockRunner with BeforeAndAfterEach with BeforeAndAfterAll  {
+trait WireMockIntegrationSpec extends IntegrationSpec with WireMockRunner with BeforeAndAfterEach with BeforeAndAfterAll {
 
   SharedMetricRegistries.clear()
 

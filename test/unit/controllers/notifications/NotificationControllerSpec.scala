@@ -17,7 +17,7 @@
 package controllers.notifications
 
 import base.{AuthActionMock, ControllerUnitSpec}
-import base.TestData._
+import testdata.TestData._
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
@@ -66,7 +66,7 @@ class NotificationControllerSpec extends ControllerUnitSpec with AuthActionMock 
       }
     }
 
-    "return NotFound (204)" when {
+    "return NotFound (404)" when {
 
       "there is no notification related with file reference" in {
 
