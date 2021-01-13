@@ -55,7 +55,8 @@ val testDependencies = Seq(
   "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % "test",
   "uk.gov.hmrc"             %% "service-integration-test" % "0.11.0-play-26"        % "test",
   "org.scalatestplus.play"  %% "scalatestplus-play"       % "3.1.3"                 % "test",
-  "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % "test"
+  "org.scalacheck"          %% "scalacheck"               % "1.14.0"                % "test",
+  "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.27.1"                % "test"
 )
 
 lazy val scoverageSettings: Seq[Setting[_]] = Seq(

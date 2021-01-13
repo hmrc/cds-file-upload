@@ -38,13 +38,16 @@ class NotificationsRepositoryIntegrationSpec extends IntegrationSpec with GuiceO
       val Seq(firstIndex, secondIndex, thirdIndex) = notificationsRepository.indexes
 
       firstIndex.key mustBe Seq(("details.fileReference", IndexType.Ascending))
-      firstIndex.name.value mustBe "detailsFileReferenceIdx"
+      firstIndex.name mustBe defined
+      firstIndex.name.get mustBe "detailsFileReferenceIdx"
 
       secondIndex.key mustBe Seq(("createdAt", IndexType.Ascending))
-      secondIndex.name.value mustBe "createdAtIndex"
+      secondIndex.name mustBe defined
+      secondIndex.name.get mustBe "createdAtIndex"
 
       thirdIndex.key mustBe Seq(("details", IndexType.Ascending))
-      thirdIndex.name.value mustBe "detailsMissingIdx"
+      thirdIndex.name mustBe defined
+      thirdIndex.name.get mustBe "detailsMissingIdx"
     }
   }
 
