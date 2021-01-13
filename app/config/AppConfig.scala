@@ -16,20 +16,24 @@
 
 package config
 
-import pureconfig.generic.ProductHint
-import pureconfig.{CamelCase, ConfigFieldMapping, KebabCase}
+import com.google.inject.Inject
+import javax.inject.Singleton
+import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import scala.concurrent.duration.Duration
+@Singleton
+class AppConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
 
-case class AppConfig(mongodb: Mongo, notifications: Notifications)
+  val mongodbUri: String = configuration.get[String]("mongodb.uri")
 
-object AppConfig {
-  implicit val hint: ProductHint[AppConfig] = ProductHint(new ConfigFieldMapping {
-    def apply(fieldName: String): String =
-      KebabCase.fromTokens(CamelCase.toTokens(fieldName))
-  })
+  val notificationsTtlSeconds: Int = configuration.get[Int]("notifications.ttl-seconds")
+
+  val customsDeclarationsInformationBaseUrl = servicesConfig.baseUrl("customs-declarations-information")
+
+  val fetchMrnStatus = servicesConfig.getString("microservice.services.customs-declarations-information.declaration-status-mrn")
+
+  val cdiApiVersion = servicesConfig.getString("microservice.services.customs-declarations-information.api-version")
+
+  val cdiClientId = servicesConfig.getString("microservice.services.customs-declarations-information.client-id")
+
 }
-
-case class Mongo(uri: String, encryptionEnabled: Boolean, ttl: Duration)
-
-case class Notifications(ttlSeconds: Int)
