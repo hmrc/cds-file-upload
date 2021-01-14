@@ -34,6 +34,6 @@ class AppConfig @Inject()(configuration: Configuration, servicesConfig: Services
 
   val cdiApiVersion = servicesConfig.getString("microservice.services.customs-declarations-information.api-version")
 
-  val cdiClientId = servicesConfig.getString("microservice.services.customs-declarations-information.client-id")
+  val cdiClientId = servicesConfig.getString("developerHubClientId")
 
 }
