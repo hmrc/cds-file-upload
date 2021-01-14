@@ -38,7 +38,7 @@ class CustomsDeclarationsInformationConnector @Inject()(
 
   def getDeclarationStatus(mrn: String)(implicit hc: HeaderCarrier): Future[Option[DeclarationStatus]] =
     httpClient
-      .doGet(url = s"${appConfig.customsDeclarationsInformationBaseUrl}${appConfig.fetchMrnStatus.replace(XmlTags.id, mrn)}", headers = headers())
+      .doGet(url = url(mrn), headers = headers())
       .map { response =>
         response.status match {
           case OK =>
@@ -52,6 +52,8 @@ class CustomsDeclarationsInformationConnector @Inject()(
             throw new InternalServerException(s"Customs Declarations Information Service returned [$status]")
         }
       }
+
+  private def url(mrn: String): String = s"${appConfig.customsDeclarationsInformationBaseUrl}${appConfig.fetchMrnStatus.replace(XmlTags.id, mrn)}"
 
   private def headers(): Seq[(String, String)] = Seq(
     "X-Client-ID" -> appConfig.cdiClientId,
