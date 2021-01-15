@@ -47,7 +47,7 @@ class NotificationsRepository @Inject()(mc: ReactiveMongoComponent, appConfig: A
     Index(
       key = Seq(("createdAt", IndexType.Ascending)),
       name = Some("createdAtIndex"),
-      options = BSONDocument("expireAfterSeconds" -> appConfig.notifications.ttlSeconds)
+      options = BSONDocument("expireAfterSeconds" -> appConfig.notificationsTtlSeconds)
     ),
     Index(Seq("details" -> IndexType.Ascending), name = Some("detailsMissingIdx"), partialFilter = Some(BSONDocument("details" -> BSONNull)))
   )

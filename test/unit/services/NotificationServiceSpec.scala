@@ -18,7 +18,7 @@ package services
 
 import java.io.IOException
 
-import base.TestData._
+import testdata.TestData._
 import base.UnitSpec
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentCaptor

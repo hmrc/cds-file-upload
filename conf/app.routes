@@ -1,3 +1,5 @@
 # microservice specific routes
 
-GET     /notification/:reference    controllers.notifications.NotificationController.getNotification(reference: String)
+GET     /notification/:reference          controllers.notifications.NotificationController.getNotification(reference: String)
+
+GET     /declaration-information/:mrn     controllers.declarations.DeclarationInformationController.getDeclarationInformation(mrn: String)

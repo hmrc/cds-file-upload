@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package utils
+package stubs
 
 import com.codahale.metrics.SharedMetricRegistries
 import play.api.inject.guice.GuiceApplicationBuilder

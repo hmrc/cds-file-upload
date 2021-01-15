@@ -1,6 +1,7 @@
 package migrations.changelogs.notification
 
-import base.IntegrationSpec
+import base.TestMongoDB.mongoConfiguration
+import base.{IntegrationSpec, TestMongoDB}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.mongodb.{MongoClient, MongoClientURI}
 import com.mongodb.client.{MongoCollection, MongoDatabase}
@@ -11,10 +12,19 @@ import org.mongodb.scala.model.IndexOptions
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 
 class MakeParsedDetailsOptionalIntegrationSpec extends IntegrationSpec with GuiceOneServerPerSuite with BeforeAndAfterEach {
 
-  override def fakeApplication(): Application = testApp
+  override def fakeApplication(): Application =
+    new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .configure(mongoConfiguration)
+      .build()
+
+  private val MongoURI = mongoConfiguration.get[String]("mongodb.uri")
+  private val DatabaseName = TestMongoDB.DatabaseName
+  private val CollectionName = "notifications"
 
   private implicit val mongoDatabase: MongoDatabase = {
     val uri = new MongoClientURI(MongoURI.replaceAllLiterally("sslEnabled", "ssl"))

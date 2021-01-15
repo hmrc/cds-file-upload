@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import config.AppConfig
-import play.api.{inject, Configuration, Environment}
+package models.dis
 
-class Module extends inject.Module {
+import play.api.libs.json.{Json, OFormat}
 
-  import pureconfig.ConfigSource
-  import pureconfig.generic.auto._
+case class PreviousDocument(id: String, typeCode: String)
 
-  val cfg = ConfigSource.default.loadOrThrow[AppConfig]
-
-  def bindings(environment: Environment, configuration: Configuration): Seq[inject.Binding[_]] =
-    Seq(bind[AppConfig].toInstance(cfg))
+object PreviousDocument {
+  implicit val formats: OFormat[PreviousDocument] = Json.format[PreviousDocument]
 }
