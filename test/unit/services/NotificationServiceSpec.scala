@@ -99,35 +99,6 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
     }
   }
 
-  "NotificationService on reattemptParsingUnparsedNotifications" should {
-    "do nothing if no unparsed notifications exist" in {
-      when(mockRepository.findUnparsedNotifications())
-        .thenReturn(Future.successful(Seq()))
-
-      await(service.reattemptParsingUnparsedNotifications())
-
-      verify(mockRepository, times(0)).updateNotification(any())
-    }
-
-    "reparse single unparsed notification that still can not be parsed" in {
-      when(mockRepository.findUnparsedNotifications())
-        .thenReturn(Future.successful(Seq(unParsedNotification.copy(payload = "<Root></Root>"))))
-
-      await(service.reattemptParsingUnparsedNotifications())
-
-      verify(mockRepository, times(0)).updateNotification(any())
-    }
-
-    "reparse single unparsed notification that can now be parsed" in {
-      when(mockRepository.findUnparsedNotifications())
-        .thenReturn(Future.successful(Seq(unParsedNotification)))
-
-      await(service.reattemptParsingUnparsedNotifications())
-
-      verify(mockRepository, times(1)).updateNotification(any())
-    }
-  }
-
   "NotificationService on parseNotificationsPayload" should {
     "return a parsed Notification when all required element are present" in {
       val payload = getNotificationXml(fileReference, outcomeSuccess, filename, batchId)

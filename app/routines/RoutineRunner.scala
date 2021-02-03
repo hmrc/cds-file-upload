@@ -24,17 +24,13 @@ import play.api.inject.ApplicationLifecycle
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class RoutineRunner @Inject()(
-  migrationRunner: MigrationRoutine,
-  reattemptParsing: ReattemptNotificationParsingRoutine,
-  actorSystem: ActorSystem,
-  applicationLifecycle: ApplicationLifecycle
-)(implicit mec: RoutinesExecutionContext) {
+class RoutineRunner @Inject()(migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
+  implicit mec: RoutinesExecutionContext
+) {
 
   val migrationTask: Cancellable = actorSystem.scheduler.scheduleOnce(0.seconds) {
     for {
       _ <- migrationRunner.execute()
-      _ <- reattemptParsing.execute()
     } yield (())
   }
 
