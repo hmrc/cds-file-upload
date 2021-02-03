@@ -24,7 +24,7 @@ import org.mockito.Mockito.{reset, when}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
-import services.NotificationService
+import services.notifications.NotificationService
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future

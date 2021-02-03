@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services
+package services.notifications
 
 import javax.inject.{Inject, Singleton}
 import models.{Notification, NotificationDetails}
@@ -33,7 +33,8 @@ class NotificationService @Inject()(repository: NotificationsRepository)(implici
   def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
     logger.info("Notification payload: " + notificationXml)
 
-    repository.save(parseNotificationsPayload(notificationXml))
+    val parsedNotification = parseNotificationsPayload(notificationXml)
+    repository.save(parsedNotification)
   }
 
   def getNotificationForReference(reference: String): Future[Option[Notification]] =

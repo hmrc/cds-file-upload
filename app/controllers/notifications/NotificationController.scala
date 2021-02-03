@@ -20,9 +20,9 @@ import controllers.actions.AuthAction
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import services.NotificationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import models.Notification.FrontendFormat._
+import services.notifications.NotificationService
 
 import scala.concurrent.ExecutionContext
 

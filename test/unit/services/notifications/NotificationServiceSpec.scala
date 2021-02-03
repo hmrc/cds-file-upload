@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package services
+package services.notifications
 
 import java.io.IOException
 
-import testdata.TestData._
 import base.UnitSpec
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentCaptor
@@ -28,6 +27,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
 import repositories.NotificationsRepository
+import testdata.TestData.{payload, _}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
