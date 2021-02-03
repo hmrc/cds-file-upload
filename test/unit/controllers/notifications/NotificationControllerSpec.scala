@@ -17,7 +17,6 @@
 package controllers.notifications
 
 import base.{AuthActionMock, ControllerUnitSpec}
-import testdata.TestData._
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
@@ -25,6 +24,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
 import services.notifications.NotificationService
+import testdata.notifications.NotificationsTestData._
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future

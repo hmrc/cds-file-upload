@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package testdata
+package services.notifications
 
-object TestData {
+import models.NotificationDetails
 
-  val mrn: String = "18GB9JLC3CU1LFGVR2"
-  val eori: String = "GB123456789012000"
-  val ucr: String = "20GBAKZ81EQJ2WXYZ"
+import scala.xml.NodeSeq
 
+class NotificationParser {
+
+  def parse(notificationXml: NodeSeq): NotificationDetails = {
+    val fileReference = (notificationXml \ "FileReference").head
+    val filename = (notificationXml \ "FileName").head
+    val outcome = (notificationXml \ "Outcome").head
+
+    NotificationDetails(fileReference.text, outcome.text, filename.text)
+  }
 }

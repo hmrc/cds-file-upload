@@ -18,7 +18,7 @@ package models
 
 import java.time.format.DateTimeFormatter
 
-import testdata.TestData._
+import testdata.notifications.NotificationsTestData._
 import org.joda.time.DateTime
 import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
