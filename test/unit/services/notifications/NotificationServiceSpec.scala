@@ -20,42 +20,74 @@ import java.io.IOException
 
 import base.UnitSpec
 import models.Notification
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
+import org.mockito.Mockito.{reset, verify, when}
+import org.mockito.{ArgumentCaptor, InOrder, Mockito}
 import org.scalatest.BeforeAndAfterEach
-import play.api.test.Helpers._
+import org.scalatest.concurrent.ScalaFutures
 import repositories.NotificationsRepository
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 import testdata.notifications.NotificationsTestData._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.xml.NodeSeq
 
-class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
+class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach with ScalaFutures {
 
   private val notificationsRepository = mock[NotificationsRepository]
+  private val notificationFactory = mock[NotificationFactory]
 
-  private val notificationService = new NotificationService(notificationsRepository)
+  private val notificationService = new NotificationService(notificationsRepository, notificationFactory)
 
   private val SuccessNotificationXml = exampleNotification(fileReference, outcomeSuccess, filename, batchId).asXml
 
   override protected def afterEach(): Unit = {
-    reset(notificationsRepository)
+    reset(notificationsRepository, notificationFactory)
 
     super.afterEach()
   }
 
   "NotificationService on parseAndSave" should {
 
-    "save a success notification with timestamp for TTL" in {
-      when(notificationsRepository.save(any())).thenReturn(Future.successful(Right(())))
+    "call NotificationFactory and NotificationRepository in order" in {
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
+      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
 
-      await(notificationService.parseAndSave(SuccessNotificationXml))
+      notificationService.parseAndSave(SuccessNotificationXml).futureValue
+
+      val inOrder: InOrder = Mockito.inOrder(notificationFactory, notificationsRepository)
+      inOrder.verify(notificationFactory).buildNotification(any[NodeSeq])
+      inOrder.verify(notificationsRepository).save(any[Notification])
+    }
+
+    "call NotificationFactory passing XML provided" in {
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
+      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+
+      notificationService.parseAndSave(SuccessNotificationXml).futureValue
+
+      verify(notificationFactory).buildNotification(meq(SuccessNotificationXml))
+    }
+
+    "call NotificationRepository passing notification returned by NotificationFactory" in {
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
+      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+
+      notificationService.parseAndSave(SuccessNotificationXml).futureValue
+
+      verify(notificationsRepository).save(meq(exampleParsedNotification))
+    }
+
+    "save a success notification with timestamp for TTL" in {
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
+      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+
+      notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
       val captor: ArgumentCaptor[Notification] = ArgumentCaptor.forClass(classOf[Notification])
 
-      verify(notificationsRepository, times(1)).save(captor.capture())
+      verify(notificationsRepository).save(captor.capture())
       val notification = captor.getValue
 
       notification.details.isDefined mustBe true
@@ -65,19 +97,22 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
     }
 
     "return an exception when insert fails" in {
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
       val exception = new IOException("downstream failure")
-
       when(notificationsRepository.save(any())).thenReturn(Future.successful(Left(exception)))
 
-      val result = await(notificationService.parseAndSave(SuccessNotificationXml))
+      val result = notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
       result mustBe Left(exception)
     }
+  }
+
+  "NotificationService on getNotificationForReference" should {
 
     "return notification if exists based on the reference" in {
       when(notificationsRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List(exampleParsedNotification)))
 
-      val result = await(notificationService.getNotificationForReference(fileReference))
+      val result = notificationService.getNotificationForReference(fileReference).futureValue
 
       result mustBe Some(exampleParsedNotification)
     }
@@ -86,59 +121,10 @@ class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach {
 
       when(notificationsRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List.empty))
 
-      val result = await(notificationService.getNotificationForReference("reference"))
+      val result = notificationService.getNotificationForReference("reference").futureValue
 
       result mustBe None
     }
   }
 
-  "NotificationService on parseNotificationsPayload" should {
-    "return a parsed Notification when all required element are present" in {
-      val payload = exampleNotification(fileReference, outcomeSuccess, filename, batchId).asXml
-
-      notificationService.parseNotificationsPayload(payload).details.isDefined mustBe true
-    }
-
-    "return unparsed Notification when FileReference element is missing" in {
-      val payload = <Root>
-       <XFileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</XFileReference>
-       <BatchId>1</BatchId>
-       <FileName>sample.pdf</FileName>
-       <Outcome>SUCCESS</Outcome>
-       <Details>[detail block]</Details>
-     </Root>
-
-      notificationService.parseNotificationsPayload(payload).details.isDefined mustBe false
-    }
-
-    "return unparsed Notification when FileName element is missing" in {
-      val payload = <Root>
-        <FileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</FileReference>
-        <BatchId>1</BatchId>
-        <XFileName>sample.pdf</XFileName>
-        <Outcome>SUCCESS</Outcome>
-        <Details>[detail block]</Details>
-      </Root>
-
-      notificationService.parseNotificationsPayload(payload).details.isDefined mustBe false
-    }
-
-    "return unparsed Notification when Outcome element is missing" in {
-      val payload = <Root>
-        <FileReference>e4d94295-52b1-4837-bdc0-7ab8d7b0f1af</FileReference>
-        <BatchId>1</BatchId>
-        <FileName>sample.pdf</FileName>
-        <XOutcome>SUCCESS</XOutcome>
-        <Details>[detail block]</Details>
-      </Root>
-
-      notificationService.parseNotificationsPayload(payload).details.isDefined mustBe false
-    }
-
-    "return unparsed Notification when xml is bad" in {
-      val payload = <xml></xml>
-
-      notificationService.parseNotificationsPayload(payload).details.isDefined mustBe false
-    }
-  }
 }

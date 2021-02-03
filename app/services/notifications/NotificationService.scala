@@ -17,23 +17,22 @@
 package services.notifications
 
 import javax.inject.{Inject, Singleton}
-import models.{Notification, NotificationDetails}
+import models.Notification
 import play.api.Logger
-import reactivemongo.bson.BSONObjectID
 import repositories.NotificationsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationService @Inject()(repository: NotificationsRepository)(implicit ec: ExecutionContext) {
+class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext) {
 
   private val logger = Logger(this.getClass)
 
   def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
     logger.info("Notification payload: " + notificationXml)
 
-    val parsedNotification = parseNotificationsPayload(notificationXml)
+    val parsedNotification = notificationFactory.buildNotification(notificationXml)
     repository.save(parsedNotification)
   }
 
@@ -44,20 +43,4 @@ class NotificationService @Inject()(repository: NotificationsRepository)(implici
       notifications.headOption
     }
 
-  def parseNotificationsPayload(notificationXml: NodeSeq, mongoId: BSONObjectID = BSONObjectID.generate()): Notification = {
-    val maybeParsedNotification = for {
-      fileReference <- (notificationXml \ "FileReference").headOption
-      filename <- (notificationXml \ "FileName").headOption
-      outcome <- (notificationXml \ "Outcome").headOption
-    } yield {
-      Notification(mongoId, notificationXml.toString(), Some(NotificationDetails(fileReference.text, outcome.text, filename.text)))
-    }
-
-    maybeParsedNotification.getOrElse {
-      logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Payload did not contain the required values!")
-      Notification(BSONObjectID.generate(), notificationXml.toString())
-    }
-  }
-
-  val logParseExceptionAtPagerDutyLevelMessage = "There was a problem during parsing notification"
 }
