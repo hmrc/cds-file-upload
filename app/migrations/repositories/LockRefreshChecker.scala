@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import java.util.Date
 
-import uk.gov.hmrc.exports.migrations.LockManager.LockRefreshMarginMillis
-import uk.gov.hmrc.exports.migrations.TimeUtils
+import migrations.TimeUtils
+import migrations.LockManager.LockRefreshMarginMillis
 
 class LockRefreshChecker(private val timeUtils: TimeUtils) {
   def needsRefreshLock(lockExpiresAt: Date): Boolean =

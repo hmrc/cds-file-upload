@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import java.util.Date
 
 import org.bson.Document
-import uk.gov.hmrc.exports.migrations.repositories.LockEntry._
+import migrations.repositories.LockEntry._
 
 object LockEntry {
   private[migrations] val KeyField: String = "key"

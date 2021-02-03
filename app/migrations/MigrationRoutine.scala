@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
 import com.google.inject.Singleton
 import com.mongodb.{MongoClient, MongoClientURI}
@@ -22,7 +22,7 @@ import config.AppConfig
 import javax.inject.Inject
 import migrations.changelogs.notification.MakeParsedDetailsOptional
 import play.api.Logger
-import uk.gov.hmrc.exports.routines.{Routine, RoutinesExecutionContext}
+import routines.{Routine, RoutinesExecutionContext}
 
 import scala.concurrent.Future
 

@@ -23,7 +23,7 @@ import reactivemongo.bson.BSONObjectID
 import repositories.NotificationsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.{NodeSeq, XML}
+import scala.xml.NodeSeq
 
 @Singleton
 class NotificationService @Inject()(repository: NotificationsRepository)(implicit ec: ExecutionContext) {
@@ -57,26 +57,6 @@ class NotificationService @Inject()(repository: NotificationsRepository)(implici
       Notification(BSONObjectID.generate(), notificationXml.toString())
     }
   }
-
-  def reattemptParsingUnparsedNotifications(): Future[Unit] =
-    repository.findUnparsedNotifications().map { unparsedNotifications =>
-      logger.info(s"Found ${unparsedNotifications.size} unparsedNotifications. Processing...")
-
-      unparsedNotifications.foreach { unparsedNotification =>
-        try {
-          val notification = parseNotificationsPayload(XML.loadString(unparsedNotification.payload), unparsedNotification._id)
-
-          for {
-            _ <- notification.details
-          } yield {
-            //successfully parsed the previously unparsable notification
-            repository.updateNotification(notification)
-          }
-        } catch {
-          case exc: Throwable => logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Exception thrown: ${exc.getMessage}")
-        }
-      }
-    }
 
   val logParseExceptionAtPagerDutyLevelMessage = "There was a problem during parsing notification"
 }

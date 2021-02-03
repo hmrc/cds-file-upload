@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
-import uk.gov.hmrc.exports.migrations.LockManager.{MinLockAcquiredForMillis, MinimumSleepThreadMillisDefault}
+import migrations.LockManager.{MinLockAcquiredForMillis, MinimumSleepThreadMillisDefault}
 
 case class LockManagerConfig(
   lockMaxTries: Int = 1,

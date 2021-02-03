@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import java.util.Date
 
@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.exports.migrations.repositories.TestObjectsBuilder.buildMongoCursor
+import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 
 class ChangeEntryRepositorySpec extends WordSpec with MockitoSugar with BeforeAndAfterEach with MustMatchers {
 

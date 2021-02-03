@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
-import uk.gov.hmrc.exports.migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
+import migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
 
 import scala.collection.JavaConverters.asScalaIterator
 

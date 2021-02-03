@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.routines
+package routines
 
 import akka.actor.ActorSystem
 import javax.inject.{Inject, Singleton}

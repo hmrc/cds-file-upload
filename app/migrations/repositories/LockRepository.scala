@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import java.util.Date
 
@@ -25,8 +25,8 @@ import com.mongodb.client.result.UpdateResult
 import com.mongodb.{DuplicateKeyException, ErrorCategory, MongoWriteException}
 import org.bson.Document
 import org.bson.conversions.Bson
-import uk.gov.hmrc.exports.migrations.exceptions.LockPersistenceException
-import uk.gov.hmrc.exports.migrations.repositories.LockEntry.{ExpiresAtField, KeyField, OwnerField, StatusField}
+import migrations.exceptions.LockPersistenceException
+import migrations.repositories.LockEntry.{ExpiresAtField, KeyField, OwnerField, StatusField}
 
 import scala.collection.JavaConverters.asScalaIterator
 
