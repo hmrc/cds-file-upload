@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.exceptions
+package migrations.exceptions
 
 class ExportsMigrationException(message: String) extends RuntimeException(message)

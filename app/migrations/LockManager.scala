@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
 import java.util.{Date, UUID}
 
 import play.api.Logger
-import uk.gov.hmrc.exports.migrations.LockManager._
-import uk.gov.hmrc.exports.migrations.exceptions.{LockManagerException, LockPersistenceException}
-import uk.gov.hmrc.exports.migrations.repositories.{LockEntry, LockRefreshChecker, LockRepository, LockStatus}
+import migrations.LockManager._
+import migrations.exceptions.{LockManagerException, LockPersistenceException}
+import migrations.repositories.{LockEntry, LockRefreshChecker, LockRepository, LockStatus}
 
 object LockManager {
   val DefaultKey: String = "DEFAULT_LOCK"

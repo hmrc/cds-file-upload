@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
 import com.mongodb.client.MongoDatabase
+import migrations.changelogs.MigrationDefinition
+import migrations.exceptions.{ExportsMigrationException, LockManagerException}
+import migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
+import migrations.repositories.{ChangeEntry, ChangeEntryRepository, LockRefreshChecker, LockRepository}
 import play.api.Logger
-import uk.gov.hmrc.exports.migrations.changelogs.MigrationDefinition
-import uk.gov.hmrc.exports.migrations.exceptions.{ExportsMigrationException, LockManagerException}
-import uk.gov.hmrc.exports.migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
-import uk.gov.hmrc.exports.migrations.repositories.{ChangeEntry, ChangeEntryRepository, LockRefreshChecker, LockRepository}
 
 object ExportsMigrationTool {
 

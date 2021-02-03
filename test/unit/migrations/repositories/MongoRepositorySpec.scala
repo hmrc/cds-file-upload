@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import com.mongodb.MongoNamespace
 import com.mongodb.client.model.IndexOptions
@@ -25,7 +25,7 @@ import org.mockito.Mockito._
 import org.scalatest.{BeforeAndAfterEach, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import uk.gov.hmrc.exports.migrations.repositories.TestObjectsBuilder.buildMongoCursor
+import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 
 import scala.collection.JavaConverters._
 

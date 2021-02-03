@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
 import com.mongodb.client.MongoDatabase
 import org.scalatest.{MustMatchers, WordSpec}
-import uk.gov.hmrc.exports.migrations.changelogs.{MigrationDefinition, MigrationInformation}
+import migrations.changelogs.{MigrationDefinition, MigrationInformation}
 
 class MigrationsRegistrySpec extends WordSpec with MustMatchers {
 

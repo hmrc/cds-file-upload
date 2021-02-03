@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.routines
+package routines
 
 import akka.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
+import migrations.MigrationRoutine
 import play.api.inject.ApplicationLifecycle
-import routines.ReattemptNotificationParsingRoutine
-import uk.gov.hmrc.exports.migrations.MigrationRoutine
 
 import scala.concurrent.Future
 import scala.concurrent.duration._

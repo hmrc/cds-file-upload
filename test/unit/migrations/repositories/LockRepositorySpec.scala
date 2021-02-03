@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import java.util.Date
 
@@ -33,9 +33,9 @@ import org.mockito.Mockito._
 import org.mongodb.scala.bson.BsonString
 import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
 import org.scalatestplus.mockito.MockitoSugar
-import uk.gov.hmrc.exports.migrations.exceptions.LockPersistenceException
-import uk.gov.hmrc.exports.migrations.repositories.LockEntry._
-import uk.gov.hmrc.exports.migrations.repositories.TestObjectsBuilder.buildMongoCursor
+import migrations.exceptions.LockPersistenceException
+import migrations.repositories.LockEntry._
+import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 
 import scala.collection.JavaConverters.mapAsJavaMap
 

@@ -19,7 +19,6 @@ package routines
 import javax.inject.Inject
 import play.api.Logger
 import services.NotificationService
-import uk.gov.hmrc.exports.routines.{Routine, RoutinesExecutionContext}
 
 import scala.concurrent.Future
 

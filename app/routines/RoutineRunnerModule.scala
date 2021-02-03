@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.routines
+package routines
 
 import play.api.inject._
 

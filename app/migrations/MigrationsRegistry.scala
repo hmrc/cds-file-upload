@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations
+package migrations
 
-import uk.gov.hmrc.exports.migrations.changelogs.MigrationDefinition
+import migrations.changelogs.MigrationDefinition
 
 case class MigrationsRegistry(migrations: Seq[MigrationDefinition] = Seq.empty) {
 

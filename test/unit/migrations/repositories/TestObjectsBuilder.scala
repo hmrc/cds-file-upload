@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.repositories
+package migrations.repositories
 
 import com.mongodb.client.MongoCursor
 import com.mongodb.{ServerAddress, ServerCursor}

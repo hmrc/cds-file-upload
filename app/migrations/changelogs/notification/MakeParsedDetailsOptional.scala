@@ -23,7 +23,7 @@ import org.mongodb.scala.model.Filters.{and, exists, or, eq => feq}
 import org.mongodb.scala.model.UpdateOneModel
 import org.mongodb.scala.model.Updates.{combine, set, unset}
 import play.api.Logger
-import uk.gov.hmrc.exports.migrations.changelogs.{MigrationDefinition, MigrationInformation}
+import migrations.changelogs.{MigrationDefinition, MigrationInformation}
 
 import scala.collection.JavaConverters._
 

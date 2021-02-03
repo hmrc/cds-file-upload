@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.migrations.changelogs
+package migrations.changelogs
 
 case class MigrationInformation(id: String, order: Int, author: String, runAlways: Boolean = false)
 
