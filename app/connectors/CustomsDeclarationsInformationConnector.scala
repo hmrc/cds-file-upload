@@ -20,7 +20,7 @@ import config.AppConfig
 import javax.inject.Inject
 import models.dis.parsers.DeclarationStatusParser
 import models.dis.{DeclarationStatus, XmlTags}
-import play.api.Logger
+import play.api.Logging
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.mvc.Codec
 import play.mvc.Http.Status.{NOT_FOUND, OK}
@@ -32,9 +32,8 @@ class CustomsDeclarationsInformationConnector @Inject()(
   declarationStatusParser: DeclarationStatusParser,
   appConfig: AppConfig,
   httpClient: HttpClient
-)(implicit ec: ExecutionContext) {
-
-  private val logger = Logger(this.getClass)
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getDeclarationStatus(mrn: String)(implicit hc: HeaderCarrier): Future[Option[DeclarationStatus]] =
     httpClient

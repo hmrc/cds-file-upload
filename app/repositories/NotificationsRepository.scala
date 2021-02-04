@@ -19,7 +19,6 @@ package repositories
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.Notification
-import play.api.Logger
 import play.api.libs.json.{JsNull, JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import reactivemongo.api.indexes.{Index, IndexType}

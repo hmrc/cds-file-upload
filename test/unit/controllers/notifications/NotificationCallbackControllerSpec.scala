@@ -25,7 +25,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
-import services.NotificationService
+import services.notifications.NotificationService
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future

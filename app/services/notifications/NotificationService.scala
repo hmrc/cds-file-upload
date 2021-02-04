@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-package services
+package services.notifications
 
 import javax.inject.{Inject, Singleton}
-import models.{Notification, NotificationDetails}
-import play.api.Logger
-import reactivemongo.bson.BSONObjectID
+import models.Notification
+import play.api.Logging
 import repositories.NotificationsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationService @Inject()(repository: NotificationsRepository)(implicit ec: ExecutionContext) {
-
-  private val logger = Logger(this.getClass)
+class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
     logger.info("Notification payload: " + notificationXml)
 
-    repository.save(parseNotificationsPayload(notificationXml))
+    val parsedNotification = notificationFactory.buildNotification(notificationXml)
+    repository.save(parsedNotification)
   }
 
   def getNotificationForReference(reference: String): Future[Option[Notification]] =
@@ -43,20 +42,4 @@ class NotificationService @Inject()(repository: NotificationsRepository)(implici
       notifications.headOption
     }
 
-  def parseNotificationsPayload(notificationXml: NodeSeq, mongoId: BSONObjectID = BSONObjectID.generate()): Notification = {
-    val maybeParsedNotification = for {
-      fileReference <- (notificationXml \ "FileReference").headOption
-      filename <- (notificationXml \ "FileName").headOption
-      outcome <- (notificationXml \ "Outcome").headOption
-    } yield {
-      Notification(mongoId, notificationXml.toString(), Some(NotificationDetails(fileReference.text, outcome.text, filename.text)))
-    }
-
-    maybeParsedNotification.getOrElse {
-      logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Payload did not contain the required values!")
-      Notification(BSONObjectID.generate(), notificationXml.toString())
-    }
-  }
-
-  val logParseExceptionAtPagerDutyLevelMessage = "There was a problem during parsing notification"
 }

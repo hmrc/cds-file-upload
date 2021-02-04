@@ -19,13 +19,13 @@ package migrations.repositories
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.IndexOptions
 import org.bson.Document
-import play.api.Logger
+import play.api.Logging
 
 import scala.collection.JavaConverters.asScalaIterator
 
-abstract class MongoRepository private[migrations] (val mongoDatabase: MongoDatabase, val collectionName: String, val uniqueFields: Array[String]) {
+abstract class MongoRepository private[migrations] (val mongoDatabase: MongoDatabase, val collectionName: String, val uniqueFields: Array[String])
+    extends Logging {
 
-  private val logger = Logger(this.getClass)
   private var ensuredCollectionIndex = false
 
   private[migrations] val collection = mongoDatabase.getCollection(collectionName)

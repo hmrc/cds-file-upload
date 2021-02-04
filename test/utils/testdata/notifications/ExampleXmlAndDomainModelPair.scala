@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package testdata
+package testdata.notifications
 
-object TestData {
+import scala.xml.Elem
 
-  val mrn: String = "18GB9JLC3CU1LFGVR2"
-  val eori: String = "GB123456789012000"
-  val ucr: String = "20GBAKZ81EQJ2WXYZ"
-
+trait ExampleXmlAndDomainModelPair[T] {
+  val asXml: Elem
+  val asDomainModel: T
 }
