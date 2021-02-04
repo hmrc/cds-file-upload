@@ -18,16 +18,15 @@ package services.notifications
 
 import javax.inject.{Inject, Singleton}
 import models.Notification
-import play.api.Logger
+import play.api.Logging
 import repositories.NotificationsRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext) {
-
-  private val logger = Logger(this.getClass)
+class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
     logger.info("Notification payload: " + notificationXml)

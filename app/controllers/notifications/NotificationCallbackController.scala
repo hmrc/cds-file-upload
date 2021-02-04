@@ -17,9 +17,9 @@
 package controllers.notifications
 
 import javax.inject.{Inject, Singleton}
-import metrics.SfusMetrics
 import metrics.MetricIdentifiers.notificationMetric
-import play.api.Logger
+import metrics.SfusMetrics
+import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
 import services.notifications.NotificationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -30,9 +30,7 @@ import scala.xml.NodeSeq
 @Singleton
 class NotificationCallbackController @Inject()(notificationsService: NotificationService, metrics: SfusMetrics, cc: ControllerComponents)(
   implicit ec: ExecutionContext
-) extends BackendController(cc) {
-
-  private val logger = Logger(this.getClass)
+) extends BackendController(cc) with Logging {
 
   def onNotify: Action[NodeSeq] = Action.async(parse.xml) { implicit req =>
     val timer = metrics.startTimer(notificationMetric)

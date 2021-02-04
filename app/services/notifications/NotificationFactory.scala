@@ -18,15 +18,13 @@ package services.notifications
 
 import javax.inject.Inject
 import models.Notification
-import play.api.Logger
+import play.api.Logging
 import reactivemongo.bson.BSONObjectID
 
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
-class NotificationFactory @Inject()(notificationParser: NotificationParser) {
-
-  private val logger = Logger(this.getClass)
+class NotificationFactory @Inject()(notificationParser: NotificationParser) extends Logging {
 
   def buildNotification(notificationXml: NodeSeq) = Try(notificationParser.parse(notificationXml)) match {
     case Success(notificationDetails) =>

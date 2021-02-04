@@ -18,10 +18,10 @@ package migrations
 
 import java.util.{Date, UUID}
 
-import play.api.Logger
 import migrations.LockManager._
 import migrations.exceptions.{LockManagerException, LockPersistenceException}
 import migrations.repositories.{LockEntry, LockRefreshChecker, LockRepository, LockStatus}
+import play.api.Logging
 
 object LockManager {
   val DefaultKey: String = "DEFAULT_LOCK"
@@ -30,14 +30,9 @@ object LockManager {
   val MinimumSleepThreadMillisDefault: Long = 500L
 }
 
-class LockManager(
-  val repository: LockRepository,
-  val lockRefreshChecker: LockRefreshChecker,
-  val timeUtils: TimeUtils,
-  val config: LockManagerConfig
-) {
+class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRefreshChecker, val timeUtils: TimeUtils, val config: LockManagerConfig)
+    extends Logging {
 
-  private val logger = Logger(this.getClass)
   private val lockOwner = UUID.randomUUID.toString
 
   private var lockExpiresAt: Date = _

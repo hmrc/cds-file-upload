@@ -21,7 +21,7 @@ import migrations.changelogs.MigrationDefinition
 import migrations.exceptions.{ExportsMigrationException, LockManagerException}
 import migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
 import migrations.repositories.{ChangeEntry, ChangeEntryRepository, LockRefreshChecker, LockRepository}
-import play.api.Logger
+import play.api.Logging
 
 object ExportsMigrationTool {
 
@@ -48,9 +48,7 @@ class ExportsMigrationTool(
   val changeEntryRepository: ChangeEntryRepository,
   val database: MongoDatabase,
   val throwExceptionIfCannotObtainLock: Boolean = false
-) {
-
-  private val logger = Logger(this.getClass)
+) extends Logging {
 
   private var enabled: Boolean = true
 

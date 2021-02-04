@@ -21,15 +21,13 @@ import com.mongodb.{MongoClient, MongoClientURI}
 import config.AppConfig
 import javax.inject.Inject
 import migrations.changelogs.notification.MakeParsedDetailsOptional
-import play.api.Logger
+import play.api.Logging
 import routines.{Routine, RoutinesExecutionContext}
 
 import scala.concurrent.Future
 
 @Singleton
-class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExecutionContext) extends Routine {
-
-  private val logger = Logger(this.getClass)
+class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExecutionContext) extends Routine with Logging {
 
   private val uri = new MongoClientURI(appConfig.mongodbUri)
   private val client = new MongoClient(uri)
