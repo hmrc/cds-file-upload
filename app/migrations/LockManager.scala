@@ -35,7 +35,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
 
   private val lockOwner = UUID.randomUUID.toString
 
-  private var lockExpiresAt: Date = _
+  private var lockExpiresAt: Option[Date] = _
   private var tries = 0
 
   def acquireLockDefault(): Unit = acquireLock(DefaultKey)
@@ -47,7 +47,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
       val newLockExpiresAt = timeUtils.currentTimePlusMillis(config.lockAcquiredForMillis)
       val lockEntry = new LockEntry(lockKey, LockStatus.LockHeld.name, lockOwner, newLockExpiresAt)
       repository.insertUpdate(lockEntry)
-      updateStatus(newLockExpiresAt)
+      updateStatus(Some(newLockExpiresAt))
       logger.info(s"ExportsMigrationTool acquired the lock until: ${newLockExpiresAt}")
       keepLooping = false
     } catch {
@@ -69,7 +69,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
       val lockExpiresAtTemp = timeUtils.currentTimePlusMillis(config.lockAcquiredForMillis)
       val lockEntry = new LockEntry(lockKey, LockStatus.LockHeld.name, lockOwner, lockExpiresAtTemp)
       repository.updateIfSameOwner(lockEntry)
-      updateStatus(lockExpiresAtTemp)
+      updateStatus(Some(lockExpiresAtTemp))
       logger.info(s"ExportsMigrationTool refreshed the lock until: ${lockExpiresAtTemp}")
       keepLooping = false
     } catch {
@@ -80,7 +80,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
     })
   }
 
-  private def updateStatus(lockExpiresAt: Date): Unit = {
+  private def updateStatus(lockExpiresAt: Option[Date]): Unit = {
     this.lockExpiresAt = lockExpiresAt
     this.tries = 0
   }
@@ -88,7 +88,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
   private def handleLockException(acquiringLock: Boolean): Unit = {
     this.tries += 1
     if (this.tries >= config.lockMaxTries) {
-      updateStatus(null)
+      updateStatus(None)
       throw new LockManagerException("MaxTries(" + config.lockMaxTries + ") reached")
     }
     val currentLockOpt = repository.findByKey(DefaultKey)
@@ -128,7 +128,7 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
   private def releaseLock(lockKey: String): Unit = {
     logger.info("ExportsMigrationTool is trying to release the lock.")
     repository.removeByKeyAndOwner(lockKey, this.lockOwner)
-    this.lockExpiresAt = null
+    this.lockExpiresAt = None
     logger.info("ExportsMigrationTool released the lock")
   }
 

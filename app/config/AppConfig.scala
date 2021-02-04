@@ -34,6 +34,10 @@ class AppConfig @Inject()(configuration: Configuration, servicesConfig: Services
 
   val cdiApiVersion = servicesConfig.getString("microservice.services.customs-declarations-information.api-version")
 
+  val customsDataStoreBaseUrl: String = servicesConfig.baseUrl("customs-data-store")
+
+  val customsDataStoreContext: String = configuration.get[String]("microservice.services.customs-data-store.context")
+
   val cdiClientId = servicesConfig.getString("developerHubClientId")
 
 }

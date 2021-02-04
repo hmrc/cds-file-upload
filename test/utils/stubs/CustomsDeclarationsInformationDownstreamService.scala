@@ -21,14 +21,14 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.ContentTypes
 import play.api.mvc.Codec
 import play.api.test.Helpers._
-import stubs.CustomsDeclarationsInformationAPIService._
+import stubs.CustomsDeclarationsInformationDownstreamService._
 import testdata.declarationinformation.DeclarationStatusTestData._
 
 import scala.xml.Elem
 
-trait CustomsDeclarationsInformationAPIService extends WireMockRunner {
+trait CustomsDeclarationsInformationDownstreamService extends WireMockRunner {
 
-  def startService(status: Int, mrn: String, delay: Int = 0): StubMapping = {
+  def stubForDownstreamService(status: Int, mrn: String, delay: Int = 0): StubMapping = {
     val basicResponse = aResponse()
       .withStatus(status)
       .withFixedDelay(delay)
@@ -43,7 +43,7 @@ trait CustomsDeclarationsInformationAPIService extends WireMockRunner {
     case _         => declarationStatusInternalServerErrorResponse
   }
 
-  def verifyDecServiceWasCalledCorrectly(mrn: String, expectedApiVersion: String, expectedBearerToken: String) {
+  def verifyDecServiceWasCalledCorrectly(mrn: String, expectedApiVersion: String) {
     verify(
       getRequestedFor(urlMatching(fetchMrnStatusUrl.replace(id, mrn)))
         .withHeader(CONTENT_TYPE, equalTo(ContentTypes.XML(Codec.utf_8)))
@@ -52,7 +52,7 @@ trait CustomsDeclarationsInformationAPIService extends WireMockRunner {
   }
 }
 
-object CustomsDeclarationsInformationAPIService {
+object CustomsDeclarationsInformationDownstreamService {
   val apiVersion: String = "1.0"
   val bearerToken: String = "Bearer authToken"
 

@@ -38,8 +38,12 @@ class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExe
     migrateWithExportsMigrationTool()
   }
 
+  val lockMaxTries = 10
+  val lockMaxWaitMillis = minutesToMillis(5)
+  val lockAcquiredForMillis = minutesToMillis(3)
+
   private def migrateWithExportsMigrationTool(): Unit = {
-    val lockManagerConfig = LockManagerConfig(lockMaxTries = 10, lockMaxWaitMillis = minutesToMillis(5), lockAcquiredForMillis = minutesToMillis(3))
+    val lockManagerConfig = LockManagerConfig(lockMaxTries, lockMaxWaitMillis, lockAcquiredForMillis)
     val migrationsRegistry = MigrationsRegistry()
       .register(new MakeParsedDetailsOptional())
     val migrationTool = ExportsMigrationTool(db, migrationsRegistry, lockManagerConfig)
