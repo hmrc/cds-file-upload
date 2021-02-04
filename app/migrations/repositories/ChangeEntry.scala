@@ -18,9 +18,9 @@ package migrations.repositories
 
 import java.util.Date
 
-import org.bson.Document
 import migrations.changelogs.MigrationDefinition
 import migrations.repositories.ChangeEntry._
+import org.bson.Document
 
 object ChangeEntry {
   private[migrations] val KeyChangeId: String = "changeId"

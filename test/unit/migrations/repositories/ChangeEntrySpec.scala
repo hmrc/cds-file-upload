@@ -18,12 +18,11 @@ package migrations.repositories
 
 import java.util.Date
 
+import base.UnitSpec
 import org.bson.Document
-import org.scalatest.{MustMatchers, WordSpec}
-
 import scala.collection.JavaConverters.mapAsJavaMap
 
-class ChangeEntrySpec extends WordSpec with MustMatchers {
+class ChangeEntrySpec extends UnitSpec {
 
   "ChangeEntry on buildFullDBObject" should {
 

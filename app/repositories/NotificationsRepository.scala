@@ -16,6 +16,8 @@
 
 package repositories
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.Notification
@@ -26,8 +28,6 @@ import reactivemongo.bson.{BSONDocument, BSONNull, BSONObjectID}
 import reactivemongo.play.json.collection._
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
-
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NotificationsRepository @Inject()(mc: ReactiveMongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)

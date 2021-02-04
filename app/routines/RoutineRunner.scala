@@ -16,13 +16,13 @@
 
 package routines
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
+
 import akka.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
 import migrations.MigrationRoutine
 import play.api.inject.ApplicationLifecycle
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
 
 class RoutineRunner @Inject()(migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
   implicit mec: RoutinesExecutionContext

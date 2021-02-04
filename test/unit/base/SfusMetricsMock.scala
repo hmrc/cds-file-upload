@@ -20,10 +20,8 @@ import com.codahale.metrics.{Counter, Timer}
 import metrics.SfusMetrics
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{doNothing, reset, when}
-import org.scalatest.{BeforeAndAfterEach, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 
-trait SfusMetricsMock extends WordSpec with MockitoSugar with BeforeAndAfterEach {
+trait SfusMetricsMock extends UnitSpec {
 
   val sfusMetrics = mock[SfusMetrics]
 

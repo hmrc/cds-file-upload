@@ -23,10 +23,10 @@ import com.mongodb.client.model.Filters.{and, lt, or, eq => feq}
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.result.UpdateResult
 import com.mongodb.{DuplicateKeyException, ErrorCategory, MongoWriteException}
-import org.bson.Document
-import org.bson.conversions.Bson
 import migrations.exceptions.LockPersistenceException
 import migrations.repositories.LockEntry.{ExpiresAtField, KeyField, OwnerField, StatusField}
+import org.bson.Document
+import org.bson.conversions.Bson
 
 import scala.collection.JavaConverters.asScalaIterator
 

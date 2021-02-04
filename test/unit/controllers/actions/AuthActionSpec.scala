@@ -16,21 +16,20 @@
 
 package controllers.actions
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import base.UnitSpec
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.scalacheck.{Checkers, ScalaCheckPropertyChecks}
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class AuthActionSpec extends PlaySpec with ScalaCheckPropertyChecks with MockitoSugar {
+class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyChecks {
 
   val mockAuthConnector = mock[AuthConnector]
   def authAction = new AuthActionImpl(mockAuthConnector, stubControllerComponents())
@@ -69,7 +68,7 @@ class AuthActionSpec extends PlaySpec with ScalaCheckPropertyChecks with Mockito
       "authorise returns an error" in {
 
         when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
-          .thenReturn(Future.failed(new Exception()))
+          .thenReturn(Future.failed(new RuntimeException("")))
 
         val result = authController.action(FakeRequest())
 

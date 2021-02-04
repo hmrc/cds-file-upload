@@ -18,17 +18,16 @@ package migrations
 
 import java.util.Date
 
+import base.UnitSpec
 import com.mongodb.client.MongoDatabase
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 import migrations.changelogs.{MigrationDefinition, MigrationInformation}
 import migrations.exceptions.{ExportsMigrationException, LockManagerException}
 import migrations.repositories.{ChangeEntry, ChangeEntryRepository}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito._
 
-class ExportsMigrationToolSpec extends WordSpec with MockitoSugar with MustMatchers with BeforeAndAfterEach {
+class ExportsMigrationToolSpec extends UnitSpec {
 
   private val lockManager: LockManager = mock[LockManager]
   private val migrationsRegistry: MigrationsRegistry = mock[MigrationsRegistry]

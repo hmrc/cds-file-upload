@@ -18,13 +18,13 @@ package models
 
 import java.time.format.DateTimeFormatter
 
-import testdata.notifications.NotificationsTestData._
+import base.UnitSpec
 import org.joda.time.DateTime
-import org.scalatest.{MustMatchers, WordSpec}
 import play.api.libs.json.Json
 import reactivemongo.bson.BSONObjectID
+import testdata.notifications.NotificationsTestData._
 
-class NotificationSpec extends WordSpec with MustMatchers {
+class NotificationSpec extends UnitSpec {
   val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
   val idVal = BSONObjectID.generate()
 

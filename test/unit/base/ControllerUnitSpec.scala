@@ -19,7 +19,7 @@ package base
 import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 
-class ControllerUnitSpec extends UnitSpec {
+class ControllerUnitSpec extends AuthActionMock {
 
   def getRequest(headers: (String, String)*): Request[AnyContentAsEmpty.type] =
     FakeRequest("GET", "").withHeaders(headers: _*)

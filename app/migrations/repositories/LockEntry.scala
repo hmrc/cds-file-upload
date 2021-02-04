@@ -18,8 +18,8 @@ package migrations.repositories
 
 import java.util.Date
 
-import org.bson.Document
 import migrations.repositories.LockEntry._
+import org.bson.Document
 
 object LockEntry {
   private[migrations] val KeyField: String = "key"

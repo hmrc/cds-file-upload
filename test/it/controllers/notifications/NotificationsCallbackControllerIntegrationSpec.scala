@@ -16,12 +16,12 @@
 
 package controllers.notifications
 
-import org.scalatestplus.play.PlaySpec
+import base.UnitSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 
-class NotificationsCallbackControllerIntegrationSpec extends PlaySpec with GuiceOneServerPerSuite {
+class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with GuiceOneServerPerSuite {
 
   private val wsClient: WSClient = app.injector.instanceOf[WSClient]
 

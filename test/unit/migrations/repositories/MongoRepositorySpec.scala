@@ -16,20 +16,18 @@
 
 package migrations.repositories
 
+import base.UnitSpec
 import com.mongodb.MongoNamespace
 import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.{ListIndexesIterable, MongoCollection, MongoDatabase}
+import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 import org.bson.Document
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
 import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterEach, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import migrations.repositories.TestObjectsBuilder.buildMongoCursor
-
 import scala.collection.JavaConverters._
 
-class MongoRepositorySpec extends WordSpec with MockitoSugar with BeforeAndAfterEach {
+class MongoRepositorySpec extends UnitSpec {
 
   private val databaseName = "testDatabase"
   private val collectionName = "testCollection"
