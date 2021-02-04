@@ -16,10 +16,9 @@
 
 package migrations
 
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
+import base.UnitSpec
 
-class TimeUtilsSpec extends WordSpec with MustMatchers with MockitoSugar {
+class TimeUtilsSpec extends UnitSpec {
 
   private val timeUtils = new TimeUtils
 

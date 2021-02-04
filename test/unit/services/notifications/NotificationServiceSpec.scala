@@ -18,22 +18,21 @@ package services.notifications
 
 import java.io.IOException
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.xml.NodeSeq
+
 import base.UnitSpec
 import models.Notification
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, verify, when}
 import org.mockito.{ArgumentCaptor, InOrder, Mockito}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import repositories.NotificationsRepository
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 import testdata.notifications.NotificationsTestData._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.xml.NodeSeq
-
-class NotificationServiceSpec extends UnitSpec with BeforeAndAfterEach with ScalaFutures {
+class NotificationServiceSpec extends UnitSpec with ScalaFutures {
 
   private val notificationsRepository = mock[NotificationsRepository]
   private val notificationFactory = mock[NotificationFactory]

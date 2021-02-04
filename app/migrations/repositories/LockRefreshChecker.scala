@@ -18,8 +18,8 @@ package migrations.repositories
 
 import java.util.Date
 
-import migrations.TimeUtils
 import migrations.LockManager.LockRefreshMarginMillis
+import migrations.TimeUtils
 
 class LockRefreshChecker(private val timeUtils: TimeUtils) {
   def needsRefreshLock(lockExpiresAt: Date): Boolean =

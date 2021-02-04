@@ -18,12 +18,11 @@ package migrations.repositories
 
 import java.util.Date
 
+import base.UnitSpec
 import org.bson.Document
-import org.scalatest.{MustMatchers, WordSpec}
-
 import scala.collection.JavaConverters.mapAsJavaMap
 
-class LockEntrySpec extends WordSpec with MustMatchers {
+class LockEntrySpec extends UnitSpec {
 
   "LockEntry on buildFullDBObject" should {
 

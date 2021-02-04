@@ -18,20 +18,17 @@ package controllers.notifications
 
 import java.io.IOException
 
-import base.{ControllerUnitSpec, SfusMetricsMock}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.test.Helpers._
-import services.notifications.NotificationService
-
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 
-class NotificationCallbackControllerSpec extends ControllerUnitSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach with SfusMetricsMock {
+import base.{ControllerUnitSpec, SfusMetricsMock}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.{reset, times, verify, when}
+import play.api.test.Helpers._
+import services.notifications.NotificationService
+
+class NotificationCallbackControllerSpec extends ControllerUnitSpec with SfusMetricsMock {
 
   val mockNotificationsService = mock[NotificationService]
   val controller = new NotificationCallbackController(mockNotificationsService, sfusMetrics, stubControllerComponents())(global)

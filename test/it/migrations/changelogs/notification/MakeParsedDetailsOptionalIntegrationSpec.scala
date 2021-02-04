@@ -1,20 +1,19 @@
 package migrations.changelogs.notification
 
 import base.TestMongoDB.mongoConfiguration
-import base.{IntegrationSpec, TestMongoDB}
+import base.{TestMongoDB, UnitSpec}
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.mongodb.{MongoClient, MongoClientURI}
-import com.mongodb.client.{MongoCollection, MongoDatabase}
 import com.mongodb.client.model.Indexes
+import com.mongodb.client.{MongoCollection, MongoDatabase}
+import com.mongodb.{MongoClient, MongoClientURI}
 import migrations.changelogs.notification.MakeParsedDetailsOptionalIntegrationSpec._
 import org.bson.Document
 import org.mongodb.scala.model.IndexOptions
-import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class MakeParsedDetailsOptionalIntegrationSpec extends IntegrationSpec with GuiceOneServerPerSuite with BeforeAndAfterEach {
+class MakeParsedDetailsOptionalIntegrationSpec extends UnitSpec with GuiceOneServerPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

@@ -16,17 +16,14 @@
 
 package services.notifications
 
-import base.UnitSpec
-import models.NotificationDetails
-import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito
-import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
-import testdata.notifications.ExampleXmlAndNotificationDetailsPair
-
 import scala.xml.NodeSeq
 
-class NotificationFactorySpec extends UnitSpec with BeforeAndAfterEach {
+import base.UnitSpec
+import org.mockito.ArgumentMatchers.{any, eq => meq}
+import org.mockito.Mockito._
+import testdata.notifications.ExampleXmlAndNotificationDetailsPair
+
+class NotificationFactorySpec extends UnitSpec {
 
   private val notificationParser = mock[NotificationParser]
 

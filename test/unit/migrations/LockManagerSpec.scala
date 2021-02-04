@@ -18,16 +18,15 @@ package migrations
 
 import java.util.Date
 
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
-import org.mockito.Mockito._
-import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
+import base.UnitSpec
 import migrations.LockManager.DefaultKey
 import migrations.exceptions.{LockManagerException, LockPersistenceException}
 import migrations.repositories.{LockEntry, LockRefreshChecker, LockRepository, LockStatus}
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
+import org.mockito.Mockito._
 
-class LockManagerSpec extends WordSpec with MockitoSugar with MustMatchers with BeforeAndAfterEach {
+class LockManagerSpec extends UnitSpec {
 
   private val lockRepository = mock[LockRepository]
   private val lockRefreshChecker = mock[LockRefreshChecker]

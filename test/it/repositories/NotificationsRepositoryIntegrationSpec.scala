@@ -1,17 +1,15 @@
 package repositories
 
-import base.{IntegrationSpec, TestMongoDB}
-import org.scalatest.BeforeAndAfterEach
+import base.{TestMongoDB, UnitSpec}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
 import testdata.notifications.NotificationsTestData._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NotificationsRepositoryIntegrationSpec extends IntegrationSpec with GuiceOneAppPerSuite with BeforeAndAfterEach {
+class NotificationsRepositoryIntegrationSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()

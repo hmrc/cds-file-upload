@@ -16,11 +16,11 @@
 
 package migrations
 
+import base.UnitSpec
 import com.mongodb.client.MongoDatabase
-import org.scalatest.{MustMatchers, WordSpec}
 import migrations.changelogs.{MigrationDefinition, MigrationInformation}
 
-class MigrationsRegistrySpec extends WordSpec with MustMatchers {
+class MigrationsRegistrySpec extends UnitSpec {
 
   private def buildMigrationDefinition(migrationInfo: MigrationInformation): MigrationDefinition = new MigrationDefinition {
     override val migrationInformation: MigrationInformation = migrationInfo

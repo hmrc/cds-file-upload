@@ -17,9 +17,8 @@
 package migrations.repositories
 
 import com.mongodb.client.MongoDatabase
-import org.bson.Document
 import migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
-
+import org.bson.Document
 import scala.collection.JavaConverters.asScalaIterator
 
 class ChangeEntryRepository(collectionName: String, mongoDatabase: MongoDatabase)

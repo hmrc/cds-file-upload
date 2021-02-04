@@ -18,11 +18,15 @@ package migrations.repositories
 
 import java.util.Date
 
+import base.UnitSpec
 import com.mongodb._
 import com.mongodb.client.model.Filters.{and, eq => feq}
 import com.mongodb.client.model.UpdateOptions
 import com.mongodb.client.result.{DeleteResult, UpdateResult}
 import com.mongodb.client.{FindIterable, MongoCollection, MongoDatabase}
+import migrations.exceptions.LockPersistenceException
+import migrations.repositories.LockEntry._
+import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.{DateCodec, DocumentCodec, StringCodec}
 import org.bson.conversions.Bson
@@ -31,15 +35,9 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
 import org.mockito.Mockito._
 import org.mongodb.scala.bson.BsonString
-import org.scalatest.{BeforeAndAfterEach, MustMatchers, WordSpec}
-import org.scalatestplus.mockito.MockitoSugar
-import migrations.exceptions.LockPersistenceException
-import migrations.repositories.LockEntry._
-import migrations.repositories.TestObjectsBuilder.buildMongoCursor
-
 import scala.collection.JavaConverters.mapAsJavaMap
 
-class LockRepositorySpec extends WordSpec with MockitoSugar with BeforeAndAfterEach with MustMatchers {
+class LockRepositorySpec extends UnitSpec {
 
   private val databaseName = "testDatabase"
   private val collectionName = "testCollection"

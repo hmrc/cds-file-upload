@@ -16,18 +16,17 @@
 
 package base
 
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.Future
+
 import controllers.actions.AuthActionImpl
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import org.mockito.stubbing.OngoingStubbing
-import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 
-import scala.concurrent.ExecutionContext.global
-import scala.concurrent.Future
-
-trait AuthActionMock extends UnitSpec with BeforeAndAfterEach {
+trait AuthActionMock extends UnitSpec {
 
   private val internalId = "internalId"
   private val authConnector = mock[AuthConnector]

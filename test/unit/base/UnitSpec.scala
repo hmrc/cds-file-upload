@@ -16,7 +16,10 @@
 
 package base
 
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, OptionValues}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatest.{MustMatchers, WordSpec}
 
-trait UnitSpec extends WordSpec with MustMatchers with MockitoSugar
+trait UnitSpec extends AnyWordSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with MockitoSugar with OptionValues with ScalaFutures

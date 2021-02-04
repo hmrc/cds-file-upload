@@ -16,22 +16,20 @@
 
 package controllers.declarations
 
-import base.{AuthActionMock, ControllerUnitSpec}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+import base.ControllerUnitSpec
 import connectors.CustomsDeclarationsInformationConnector
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.mvc.Http.Status.{NOT_FOUND, OK}
 import testdata.TestData._
 import testdata.declarationinformation.DeclarationStatusTestData.DeclarationStatusWithAllData
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class DeclarationInformationControllerSpec extends ControllerUnitSpec with AuthActionMock with BeforeAndAfterEach with ScalaFutures {
+class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
   private val cdiConnector = mock[CustomsDeclarationsInformationConnector]
 
