@@ -21,20 +21,17 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.ContentTypes
 import play.api.mvc.Codec
 import play.api.test.Helpers._
-import stubs.CustomsDeclarationsInformationDownstreamService._
+import stubs.CustomsDeclarationsInformationService._
 import testdata.declarationinformation.DeclarationStatusTestData._
 
 import scala.xml.Elem
 
-trait CustomsDeclarationsInformationDownstreamService extends WireMockRunner {
+trait CustomsDeclarationsInformationService extends MockGenericDownstreamService {
 
-  def stubForDownstreamService(status: Int, mrn: String, delay: Int = 0): StubMapping = {
-    val basicResponse = aResponse()
-      .withStatus(status)
-      .withFixedDelay(delay)
-      .withBody(buildResponseBody(status, mrn).toString())
-
-    stubFor(get(urlMatching(fetchMrnStatusUrl.replace(id, mrn))).willReturn(basicResponse))
+  def getFromCDIService(status: Int, mrn: String, delay: Int = 0): StubMapping = {
+    val url = fetchMrnStatusUrl.replace(id, mrn)
+    val body = buildResponseBody(status, mrn).toString()
+    getFromDownstreamService(url, status, Some(body), delay)
   }
 
   private def buildResponseBody(status: Int, mrn: String): Elem = status match {
@@ -52,11 +49,10 @@ trait CustomsDeclarationsInformationDownstreamService extends WireMockRunner {
   }
 }
 
-object CustomsDeclarationsInformationDownstreamService {
+object CustomsDeclarationsInformationService {
   val apiVersion: String = "1.0"
   val bearerToken: String = "Bearer authToken"
 
   val id: String = "ID"
   val fetchMrnStatusUrl: String = "/mrn/" + id + "/status"
-
 }

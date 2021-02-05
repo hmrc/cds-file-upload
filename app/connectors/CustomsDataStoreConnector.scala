@@ -20,7 +20,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import config.AppConfig
 import javax.inject.Inject
-import models.EmailAddress
+import models.VerifiedEmailAddress
 import play.api.http.Status.NOT_FOUND
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream4xxResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
@@ -29,8 +29,8 @@ class CustomsDataStoreConnector @Inject()(http: HttpClient)(implicit appConfig: 
 
   import CustomsDataStoreConnector._
 
-  def getEmailAddress(eori: String)(implicit hc: HeaderCarrier): Future[Option[EmailAddress]] =
-    http.GET[EmailAddress](verifiedEmailUrl(eori)).map(Some(_)).recover {
+  def getEmailAddress(eori: String)(implicit hc: HeaderCarrier): Future[Option[VerifiedEmailAddress]] =
+    http.GET[VerifiedEmailAddress](verifiedEmailUrl(eori)).map(Some(_)).recover {
       case Upstream4xxResponse(_, NOT_FOUND, _, _) => None
     }
 }

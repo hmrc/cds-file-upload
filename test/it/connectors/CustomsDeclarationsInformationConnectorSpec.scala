@@ -5,12 +5,12 @@ import scala.concurrent.duration._
 
 import base.WireMockIntegrationSpec
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
-import stubs.CustomsDeclarationsInformationDownstreamService
-import stubs.CustomsDeclarationsInformationDownstreamService._
+import stubs.CustomsDeclarationsInformationService
+import stubs.CustomsDeclarationsInformationService._
 import testdata.TestData.mrn
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
-class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpec with CustomsDeclarationsInformationDownstreamService {
+class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpec with CustomsDeclarationsInformationService {
 
   private lazy val connector = inject[CustomsDeclarationsInformationConnector]
 
@@ -22,7 +22,7 @@ class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpe
 
       "return the response parsed" in {
 
-        stubForDownstreamService(OK, mrn)
+        getFromCDIService(OK, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
@@ -37,7 +37,7 @@ class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpe
 
       "return empty Option" in {
 
-        stubForDownstreamService(NOT_FOUND, mrn)
+        getFromCDIService(NOT_FOUND, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
@@ -49,7 +49,7 @@ class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpe
 
       "throw InternalServerException" in {
 
-        stubForDownstreamService(INTERNAL_SERVER_ERROR, mrn)
+        getFromCDIService(INTERNAL_SERVER_ERROR, mrn)
 
         intercept[InternalServerException] {
           Await.result(connector.getDeclarationStatus(mrn), 5 seconds)

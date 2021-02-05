@@ -23,7 +23,8 @@ import migrations.TimeUtils
 
 class LockRefreshChecker(private val timeUtils: TimeUtils) {
   def needsRefreshLock(lockExpiresAt: Option[Date]): Boolean =
-    lockExpiresAt.isEmpty ||
-      timeUtils.currentTime.compareTo(new Date(lockExpiresAt.get.getTime - timeUtils.minutesToMillis(LockRefreshMarginMillis))) >= 0
-
+    lockExpiresAt.fold(true) { dt =>
+      val date = new Date(dt.getTime - timeUtils.minutesToMillis(LockRefreshMarginMillis))
+      timeUtils.currentTime.compareTo(date) >= 0
+    }
 }

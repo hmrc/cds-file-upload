@@ -20,8 +20,8 @@ import java.time.ZonedDateTime
 
 import play.api.libs.json.Json
 
-case class EmailAddress(address: String, timestamp: ZonedDateTime)
+case class VerifiedEmailAddress(address: String, timestamp: ZonedDateTime)
 
-object EmailAddress {
-  implicit val format = Json.format[EmailAddress]
+object VerifiedEmailAddress {
+  implicit val format = Json.format[VerifiedEmailAddress]
 }
