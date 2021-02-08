@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package flows
 
-import base.WireMockIntegrationSpec
+import base.IntegrationSpec
 import config.AppConfig
 import connectors.CustomsDataStoreConnector
+import controllers.routes
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import stubs.MockGenericDownstreamService
 import testdata.TestData
 
-class EmailByEoriControllerSpec extends WireMockIntegrationSpec with MockGenericDownstreamService {
+class VerifiedEmailByEoriFlowSpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
   val customsDataStoreUrl = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)

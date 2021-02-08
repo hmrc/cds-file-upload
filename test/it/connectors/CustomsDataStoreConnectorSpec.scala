@@ -16,26 +16,38 @@
 
 package connectors
 
-import base.UnitSpec
-import config.AppConfig
-import org.scalatest.GivenWhenThen
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.test.Injecting
-import testdata.TestData
+import java.time.ZonedDateTime
 
-class CustomsDataStoreConnectorSpec extends UnitSpec with GivenWhenThen with GuiceOneAppPerSuite with Injecting {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import base.IntegrationSpec
+import config.AppConfig
+import models.VerifiedEmailAddress
+import play.api.libs.json.Json
+import play.api.test.Helpers.OK
+import testdata.TestData
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+
+class CustomsDataStoreConnectorSpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
 
-  "CustomsDataStoreConnector.url" should {
-    "correctly compose the url to verify and retrieve the email address" in {
-      Given("a given EORI number")
-      val eori = TestData.eori
+  val connector = new CustomsDataStoreConnector(inject[HttpClient])(appConfig, global)
 
-      val expectedUrl = s"http://localhost:6790/customs-data-store/eori/$eori/verified-email"
+  "CustomsDeclarationsInformationConnector.getEmailAddress" should {
 
-      Then(s"then the resulting url should be equal to $expectedUrl")
-      CustomsDataStoreConnector.verifiedEmailUrl(eori) mustBe expectedUrl
+    "return a valid VerifiedEmailAddress instance when successful" in {
+      val expectedEmailAddress = VerifiedEmailAddress("some@email.com", ZonedDateTime.now)
+      val expectedPath = s"/customs-data-store/eori/${TestData.eori}/verified-email"
+
+      val actualPath = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
+      actualPath mustBe expectedPath
+      getFromDownstreamService(actualPath, OK, Some(Json.toJson(expectedEmailAddress).toString))
+
+      val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
+      response mustBe Some(expectedEmailAddress)
+
+      verifyGetFromDownStreamService(actualPath)
     }
   }
 }

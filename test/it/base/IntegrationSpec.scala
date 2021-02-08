@@ -1,13 +1,14 @@
 package base
 
 import com.codahale.metrics.SharedMetricRegistries
-import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import org.scalatest.concurrent.IntegrationPatience
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Injecting
-import stubs.WireMockRunner
+import stubs.{MockGenericDownstreamService, WireMockRunner}
 
-trait WireMockIntegrationSpec extends UnitSpec with GuiceOneServerPerSuite with Injecting with WireMockRunner {
+trait IntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting with IntegrationPatience with MockGenericDownstreamService {
 
   override implicit lazy val app: Application =
     GuiceApplicationBuilder()

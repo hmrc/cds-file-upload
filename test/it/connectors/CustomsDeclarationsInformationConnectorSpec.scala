@@ -3,14 +3,14 @@ package connectors
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-import base.WireMockIntegrationSpec
+import base.IntegrationSpec
 import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import stubs.CustomsDeclarationsInformationService
 import stubs.CustomsDeclarationsInformationService._
 import testdata.TestData.mrn
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
-class CustomsDeclarationsInformationConnectorSpec extends WireMockIntegrationSpec with CustomsDeclarationsInformationService {
+class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with CustomsDeclarationsInformationService {
 
   private lazy val connector = inject[CustomsDeclarationsInformationConnector]
 
