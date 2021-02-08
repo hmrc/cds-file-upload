@@ -38,7 +38,7 @@ class CustomsDataStoreConnector @Inject()(http: HttpClient)(implicit appConfig: 
 object CustomsDataStoreConnector {
 
   def verifiedEmailPath(eori: String)(implicit appConfig: AppConfig): String =
-    s"/${appConfig.customsDataStoreContext}/eori/$eori/verified-email"
+    s"${appConfig.verifiedEmailPath.replace("EORI", eori)}"
 
   def verifiedEmailUrl(eori: String)(implicit appConfig: AppConfig): String =
     s"${appConfig.customsDataStoreBaseUrl}${verifiedEmailPath(eori)}"

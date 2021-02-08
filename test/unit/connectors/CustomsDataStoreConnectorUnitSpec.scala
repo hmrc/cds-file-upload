@@ -25,6 +25,7 @@ import base.UnitSpec
 import config.AppConfig
 import models.VerifiedEmailAddress
 import org.mockito.ArgumentMatchers.{any, anyString}
+import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import testdata.TestData
@@ -41,7 +42,11 @@ class CustomsDataStoreConnectorUnitSpec extends UnitSpec {
       when(httpClient.GET[VerifiedEmailAddress](anyString)(any[HttpReads[VerifiedEmailAddress]], any[HeaderCarrier], any[ExecutionContext]))
         .thenReturn(Future.successful(expectedEmailAddress))
 
-      val connector = new CustomsDataStoreConnector(httpClient)(mock[AppConfig], global)
+      val appConfig: AppConfig = mock[AppConfig]
+      given(appConfig.customsDataStoreBaseUrl) willReturn "a host"
+      given(appConfig.verifiedEmailPath) willReturn "a path"
+
+      val connector = new CustomsDataStoreConnector(httpClient)(appConfig, global)
 
       val response = await(connector.getEmailAddress(TestData.eori)(mock[HeaderCarrier]))
       response mustBe Some(expectedEmailAddress)
