@@ -1,34 +1,18 @@
 package connectors
 
-import base.WireMockIntegrationSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
-import stubs.CustomsDeclarationsInformationAPIService._
-import stubs.{CustomsDeclarationsInformationAPIService, WireMockRunner}
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
-import testdata.TestData.mrn
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class CustomsDeclarationsInformationConnectorSpec
-    extends WireMockIntegrationSpec with GuiceOneAppPerSuite with CustomsDeclarationsInformationAPIService {
+import base.IntegrationSpec
+import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
+import stubs.CustomsDeclarationsInformationService
+import stubs.CustomsDeclarationsInformationService._
+import testdata.TestData.mrn
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 
-  override implicit lazy val app: Application =
-    GuiceApplicationBuilder()
-      .configure(
-        Map(
-          "microservice.services.customs-declarations-information.host" -> WireMockRunner.Host,
-          "microservice.services.customs-declarations-information.port" -> WireMockRunner.Port,
-          "microservice.services.customs-declarations-information.submit-uri" -> "/mrn/ID/status",
-          "microservice.services.customs-declarations-information.api-version" -> "1.0"
-        )
-      )
-      .build()
+class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with CustomsDeclarationsInformationService {
 
-  private lazy val connector = app.injector.instanceOf[CustomsDeclarationsInformationConnector]
+  private lazy val connector = inject[CustomsDeclarationsInformationConnector]
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -38,14 +22,14 @@ class CustomsDeclarationsInformationConnectorSpec
 
       "return the response parsed" in {
 
-        startService(OK, mrn)
+        getFromCDIService(OK, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
-        declarationStatus mustBe defined
+        declarationStatus mustBe 'defined
         declarationStatus.get.mrn mustBe mrn
         declarationStatus.get.eori mustBe "GB123456789012000"
-        verifyDecServiceWasCalledCorrectly(mrn, expectedApiVersion = apiVersion, bearerToken)
+        verifyDecServiceWasCalledCorrectly(mrn, expectedApiVersion = apiVersion)
       }
     }
 
@@ -53,7 +37,7 @@ class CustomsDeclarationsInformationConnectorSpec
 
       "return empty Option" in {
 
-        startService(NOT_FOUND, mrn)
+        getFromCDIService(NOT_FOUND, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
 
@@ -65,7 +49,7 @@ class CustomsDeclarationsInformationConnectorSpec
 
       "throw InternalServerException" in {
 
-        startService(INTERNAL_SERVER_ERROR, mrn)
+        getFromCDIService(INTERNAL_SERVER_ERROR, mrn)
 
         intercept[InternalServerException] {
           Await.result(connector.getDeclarationStatus(mrn), 5 seconds)

@@ -57,17 +57,14 @@ abstract class MongoRepository private[migrations] (val mongoDatabase: MongoData
   // 2. Every uniqueField value is equal 1
   // 3. "ns" field contains fullCollectionName
   // 4. "unique" field is true
-  private def isIndexUnique(index: Document): Boolean = {
-    val key = index.get("key").asInstanceOf[Document]
-
-    if (index.getString("name").equals("_id_")) return true
-
-    for (uniqueField <- uniqueFields) {
-      if (key.getInteger(uniqueField, 0) != 1) return false
+  private def isIndexUnique(index: Document): Boolean =
+    if (index.getString("name").equals("_id_")) true
+    else {
+      val key = index.get("key").asInstanceOf[Document]
+      val notAllFieldsAreUnique = uniqueFields.find(key.getInteger(_, 0) != 1)
+      if (notAllFieldsAreUnique.isDefined) false
+      else fullCollectionName == index.getString("ns") && index.getBoolean("unique", false)
     }
-
-    fullCollectionName == index.getString("ns") && index.getBoolean("unique", false)
-  }
 
   private[migrations] def createRequiredUniqueIndex(): Unit =
     collection.createIndex(getIndexDocument(uniqueFields), new IndexOptions().unique(true))

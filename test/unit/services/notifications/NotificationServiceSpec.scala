@@ -27,12 +27,11 @@ import models.Notification
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito.{reset, verify, when}
 import org.mockito.{ArgumentCaptor, InOrder, Mockito}
-import org.scalatest.concurrent.ScalaFutures
 import repositories.NotificationsRepository
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 import testdata.notifications.NotificationsTestData._
 
-class NotificationServiceSpec extends UnitSpec with ScalaFutures {
+class NotificationServiceSpec extends UnitSpec {
 
   private val notificationsRepository = mock[NotificationsRepository]
   private val notificationFactory = mock[NotificationFactory]

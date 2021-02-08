@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package migrations.repositories
+package models
 
-import java.util.Date
+import java.time.ZonedDateTime
 
-import migrations.LockManager.LockRefreshMarginMillis
-import migrations.TimeUtils
+import play.api.libs.json.Json
 
-class LockRefreshChecker(private val timeUtils: TimeUtils) {
-  def needsRefreshLock(lockExpiresAt: Option[Date]): Boolean =
-    lockExpiresAt.fold(true) { dt =>
-      val date = new Date(dt.getTime - timeUtils.minutesToMillis(LockRefreshMarginMillis))
-      timeUtils.currentTime.compareTo(date) >= 0
-    }
+case class VerifiedEmailAddress(address: String, timestamp: ZonedDateTime)
+
+object VerifiedEmailAddress {
+  implicit val format = Json.format[VerifiedEmailAddress]
 }
