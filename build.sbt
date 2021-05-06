@@ -15,7 +15,6 @@ lazy val microservice = (project in file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
   .settings(libraryDependencies ++= compileDependencies ++ testDependencies)
   .settings(publishingSettings: _*)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(scalaVersion := "2.12.12")
   .settings(
     unmanagedSourceDirectories in Test := Seq(
