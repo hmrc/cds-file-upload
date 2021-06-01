@@ -33,7 +33,7 @@ class DeclarationInformationController @Inject()(
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) with JsonResponses {
 
-  def getDeclarationInformation(mrn: String): Action[AnyContent] = authorise.async { implicit request =>
+  def getDeclarationInformation(mrn: String): Action[AnyContent] = authorise.async {
     cdiConnector.getDeclarationStatus(mrn).map {
       case Some(declarationStatus) => Ok(declarationStatus)
       case None                    => NotFound
