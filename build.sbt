@@ -40,23 +40,24 @@ lazy val microservice = (project in file("."))
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
 
 val compileDependencies = Seq(
-  "com.github.pureconfig"   %% "pureconfig"                % "0.12.3",
-  "uk.gov.hmrc"             %% "bootstrap-backend-play-28" % "5.3.0",
-  "uk.gov.hmrc"             %% "simple-reactivemongo"      % "8.0.0-play-28",
-  "org.mongodb.scala"       %% "mongo-scala-driver"        % "2.9.0",
-  "org.mongodb"             %  "mongo-java-driver"         % "3.5.0"
+  "com.github.pureconfig"        %% "pureconfig"                % "0.15.0",
+  "uk.gov.hmrc"                  %% "bootstrap-backend-play-28" % "5.3.0",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.12.3",
+  "uk.gov.hmrc"                  %% "simple-reactivemongo"      % "8.0.0-play-28",
+  "org.mongodb.scala"            %% "mongo-scala-driver"        % "2.9.0",
+  "org.mongodb"                  %  "mongo-java-driver"         % "3.5.0"
 )
 
 val testDependencies = Seq(
   "org.scalatest"          %% "scalatest"                % "3.2.9"             % "test",
   "org.scalacheck"         %% "scalacheck"               % "1.15.4"            % "test",
   "com.typesafe.play"      %% "play-test"                % PlayVersion.current % "test",
-  "org.scalatestplus"      %% "mockito-3-4"              % "3.2.3.0"           % "test",
-  "org.scalatestplus"      %% "scalacheck-1-15"          % "3.2.3.0"           % "test",
+  "org.scalatestplus"      %% "mockito-3-4"              % "3.2.9.0"           % "test",
+  "org.scalatestplus"      %% "scalacheck-1-15"          % "3.2.9.0"           % "test",
   "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"             % "test",
   "uk.gov.hmrc"            %% "service-integration-test" % "1.1.0-play-28"     % "test",
   "com.vladsch.flexmark"   %  "flexmark-all"             % "0.36.8"            % "test",
-  "com.github.tomakehurst" %  "wiremock-jre8"            % "2.27.2"            % "test"
+  "com.github.tomakehurst" %  "wiremock-jre8"            % "2.28.0"            % "test"
 )
 
 lazy val scoverageSettings: Seq[Setting[_]] = Seq(
