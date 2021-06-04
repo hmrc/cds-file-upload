@@ -51,19 +51,19 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
     "call CustomsDeclarationsInformationConnector passing MRN provided" in {
 
-      when(cdiConnector.getDeclarationStatus(any())(any()))
+      when(cdiConnector.getDeclarationStatus(any()))
         .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
       controller.getDeclarationInformation(mrn)(getRequest()).futureValue
 
-      verify(cdiConnector).getDeclarationStatus(meq(mrn))(any())
+      verify(cdiConnector).getDeclarationStatus(meq(mrn))
     }
 
     "return Ok with DeclarationStatus received from CustomsDeclarationsInformationConnector" when {
 
       "CustomsDeclarationsInformationConnector responds with non-empty Option" in {
 
-        when(cdiConnector.getDeclarationStatus(any())(any()))
+        when(cdiConnector.getDeclarationStatus(any()))
           .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
         val result = controller.getDeclarationInformation(mrn)(getRequest())
@@ -77,7 +77,7 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
       "CustomsDeclarationsInformationConnector responds with empty Option" in {
 
-        when(cdiConnector.getDeclarationStatus(any())(any())).thenReturn(Future.successful(None))
+        when(cdiConnector.getDeclarationStatus(any())).thenReturn(Future.successful(None))
 
         val result = controller.getDeclarationInformation(mrn)(getRequest())
 

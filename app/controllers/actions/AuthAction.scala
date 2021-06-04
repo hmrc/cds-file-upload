@@ -22,7 +22,7 @@ import play.api.mvc.{ActionBuilder, ActionFilter, AnyContent, BodyParser, Contro
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,8 +31,7 @@ class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerC
   override val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
   override def filter[A](request: Request[A]): Future[Option[Result]] = {
-    implicit val hc: HeaderCarrier =
-      HeaderCarrierConverter.fromHeadersAndSessionAndRequest(request.headers, session = None, request = Some(request))
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
     authorised(Enrolment("HMRC-CUS-ORG"))
       .retrieve(internalId) {

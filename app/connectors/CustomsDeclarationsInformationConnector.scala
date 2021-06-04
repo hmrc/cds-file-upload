@@ -16,6 +16,8 @@
 
 package connectors
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import config.AppConfig
 import javax.inject.Inject
 import models.dis.parsers.DeclarationStatusParser
@@ -24,9 +26,7 @@ import play.api.Logging
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.mvc.Codec
 import play.mvc.Http.Status.{NOT_FOUND, OK}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
-
-import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{HttpClient, HttpResponse, InternalServerException}
 
 class CustomsDeclarationsInformationConnector @Inject()(
   declarationStatusParser: DeclarationStatusParser,
@@ -35,7 +35,7 @@ class CustomsDeclarationsInformationConnector @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getDeclarationStatus(mrn: String)(implicit hc: HeaderCarrier): Future[Option[DeclarationStatus]] =
+  def getDeclarationStatus(mrn: String): Future[Option[DeclarationStatus]] =
     httpClient
       .doGet(url = url(mrn), headers = headers())
       .map { response =>
