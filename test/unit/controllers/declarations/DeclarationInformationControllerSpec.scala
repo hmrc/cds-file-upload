@@ -28,12 +28,15 @@ import play.api.test.Helpers._
 import play.mvc.Http.Status.{NOT_FOUND, OK}
 import testdata.TestData._
 import testdata.declarationinformation.DeclarationStatusTestData.DeclarationStatusWithAllData
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 
 class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
   private val cdiConnector = mock[CustomsDeclarationsInformationConnector]
 
   private val controller = new DeclarationInformationController(authAction, cdiConnector, stubControllerComponents())
+
+  implicit val hc = HeaderCarrier(authorization = Some(Authorization("Bearer qwertyuiop")))
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -51,19 +54,19 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
     "call CustomsDeclarationsInformationConnector passing MRN provided" in {
 
-      when(cdiConnector.getDeclarationStatus(any()))
+      when(cdiConnector.getDeclarationStatus(any())(any()))
         .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
       controller.getDeclarationInformation(mrn)(getRequest()).futureValue
 
-      verify(cdiConnector).getDeclarationStatus(meq(mrn))
+      verify(cdiConnector).getDeclarationStatus(meq(mrn))(any())
     }
 
     "return Ok with DeclarationStatus received from CustomsDeclarationsInformationConnector" when {
 
       "CustomsDeclarationsInformationConnector responds with non-empty Option" in {
 
-        when(cdiConnector.getDeclarationStatus(any()))
+        when(cdiConnector.getDeclarationStatus(any())(any()))
           .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
         val result = controller.getDeclarationInformation(mrn)(getRequest())
@@ -77,7 +80,7 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
       "CustomsDeclarationsInformationConnector responds with empty Option" in {
 
-        when(cdiConnector.getDeclarationStatus(any())).thenReturn(Future.successful(None))
+        when(cdiConnector.getDeclarationStatus(any())(any())).thenReturn(Future.successful(None))
 
         val result = controller.getDeclarationInformation(mrn)(getRequest())
 
