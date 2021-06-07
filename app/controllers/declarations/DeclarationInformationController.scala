@@ -16,14 +16,15 @@
 
 package controllers.declarations
 
+import scala.concurrent.ExecutionContext
+
 import connectors.CustomsDeclarationsInformationConnector
+import controllers.JsonResponses
 import controllers.actions.AuthAction
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import controllers.JsonResponses
-
-import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 @Singleton
 class DeclarationInformationController @Inject()(
@@ -33,11 +34,11 @@ class DeclarationInformationController @Inject()(
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) with JsonResponses {
 
-  def getDeclarationInformation(mrn: String): Action[AnyContent] = authorise.async {
+  def getDeclarationInformation(mrn: String): Action[AnyContent] = authorise.async { request =>
+    implicit val hc = HeaderCarrierConverter.fromRequest(request)
     cdiConnector.getDeclarationStatus(mrn).map {
       case Some(declarationStatus) => Ok(declarationStatus)
       case None                    => NotFound
     }
   }
-
 }

@@ -1,8 +1,7 @@
 import play.core.PlayVersion
 import uk.gov.hmrc.DefaultBuildSettings._
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
-import uk.gov.hmrc.versioning.SbtGitVersioning
-import uk.gov.hmrc.{ForkedJvmPerTestSettings, SbtArtifactory, SbtAutoBuildPlugin}
+import uk.gov.hmrc.{ForkedJvmPerTestSettings, SbtAutoBuildPlugin}
 
 name := "cds-file-upload"
 majorVersion := 0
@@ -12,7 +11,7 @@ PlayKeys.devSettings := Seq("play.server.http.port" -> "6795")
 lazy val IntegrationTest = config("it") extend Test
 
 lazy val microservice = (project in file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory)
+  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
   .settings(libraryDependencies ++= compileDependencies ++ testDependencies)
   .settings(publishingSettings: _*)
   .settings(scalaVersion := "2.12.12")
@@ -70,7 +69,7 @@ lazy val scoverageSettings: Seq[Setting[_]] = Seq(
     ".*(BuildInfo|Routes|Options|TestingUtilitiesController).*",
     "logger.*\\(.*\\)"
   ).mkString(";"),
-  coverageMinimum := 84,
+  coverageMinimumStmtTotal := 84,
   coverageFailOnMinimum := true,
   coverageHighlighting := true,
   parallelExecution in Test := false

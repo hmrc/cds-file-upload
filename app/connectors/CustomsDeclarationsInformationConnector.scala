@@ -26,7 +26,7 @@ import play.api.Logging
 import play.api.http.{ContentTypes, HeaderNames}
 import play.api.mvc.Codec
 import play.mvc.Http.Status.{NOT_FOUND, OK}
-import uk.gov.hmrc.http.{HttpClient, HttpResponse, InternalServerException}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse, InternalServerException}
 
 class CustomsDeclarationsInformationConnector @Inject()(
   declarationStatusParser: DeclarationStatusParser,
@@ -35,9 +35,9 @@ class CustomsDeclarationsInformationConnector @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def getDeclarationStatus(mrn: String): Future[Option[DeclarationStatus]] =
+  def getDeclarationStatus(mrn: String)(implicit hc: HeaderCarrier): Future[Option[DeclarationStatus]] =
     httpClient
-      .doGet(url = url(mrn), headers = headers())
+      .doGet(url = url(mrn), headers = headers)
       .map { response =>
         response.status match {
           case OK =>
@@ -54,12 +54,21 @@ class CustomsDeclarationsInformationConnector @Inject()(
 
   private def url(mrn: String): String = s"${appConfig.customsDeclarationsInformationBaseUrl}${appConfig.fetchMrnStatus.replace(XmlTags.id, mrn)}"
 
-  private def headers(): Seq[(String, String)] = Seq(
-    "X-Client-ID" -> appConfig.cdiClientId,
-    HeaderNames.ACCEPT -> s"application/vnd.hmrc.${appConfig.cdiApiVersion}+xml",
-    HeaderNames.CONTENT_TYPE -> ContentTypes.XML(Codec.utf_8),
-    HeaderNames.CACHE_CONTROL -> "no-cache"
-  )
+  private def headers(implicit hc: HeaderCarrier): Seq[(String, String)] = {
+    val headers = Seq(
+      "X-Client-ID" -> appConfig.cdiClientId,
+      HeaderNames.ACCEPT -> s"application/vnd.hmrc.${appConfig.cdiApiVersion}+xml",
+      HeaderNames.CONTENT_TYPE -> ContentTypes.XML(Codec.utf_8),
+      HeaderNames.CACHE_CONTROL -> "no-cache"
+    )
+
+    hc.authorization.fold {
+      logger.error("Authorization header not provided while trying to retrieve the declaration's status")
+      headers
+    } { bearer =>
+      headers :+ (HeaderNames.AUTHORIZATION -> bearer.value)
+    }
+  }
 
   private def loggerMessage(response: HttpResponse): String =
     s"CUSTOMS_DECLARATIONS_INFORMATION respond with status: ${response.status}, body: ${response.body}"

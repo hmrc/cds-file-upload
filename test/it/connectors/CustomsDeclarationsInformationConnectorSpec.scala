@@ -8,11 +8,13 @@ import play.api.test.Helpers.{INTERNAL_SERVER_ERROR, NOT_FOUND, OK}
 import stubs.CustomsDeclarationsInformationService
 import stubs.CustomsDeclarationsInformationService._
 import testdata.TestData.mrn
-import uk.gov.hmrc.http.InternalServerException
+import uk.gov.hmrc.http.{Authorization, HeaderCarrier, InternalServerException}
 
 class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with CustomsDeclarationsInformationService {
 
   private lazy val connector = inject[CustomsDeclarationsInformationConnector]
+
+  implicit val hc = HeaderCarrier(authorization = Some(Authorization("Bearer qwertyuiop")))
 
   "CustomsDeclarationsInformationConnector" when {
 
