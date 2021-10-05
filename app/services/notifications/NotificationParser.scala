@@ -24,9 +24,9 @@ class NotificationParser {
 
   def parse(notificationXml: NodeSeq): NotificationDetails = {
     val fileReference = (notificationXml \ "FileReference").head
-    val filename = (notificationXml \ "FileName").head
     val outcome = (notificationXml \ "Outcome").head
+    val filename = (notificationXml \ "FileName").headOption
 
-    NotificationDetails(fileReference.text, outcome.text, filename.text)
+    NotificationDetails(fileReference.text, outcome.text, filename.map(_.text))
   }
 }

@@ -44,18 +44,23 @@ class NotificationParserSpec extends UnitSpec {
       }
     }
 
+    "return NotificationDetails containing all mandatory elements" when {
+
+      "FileName element is missing" in {
+        val testNotification = exampleNotificationMissingFileName()
+
+        val result = notificationParser.parse(testNotification.asXml)
+
+        result mustBe testNotification.asDomainModel
+      }
+    }
+
     "throw an Exception" when {
 
       "provided with Notification" which {
 
         "has FileReference element missing" in {
           val testNotification = exampleNotificationMissingFileReference()
-
-          an[Exception] mustBe thrownBy(notificationParser.parse(testNotification.asXml))
-        }
-
-        "has FileName element missing" in {
-          val testNotification = exampleNotificationMissingFileName()
 
           an[Exception] mustBe thrownBy(notificationParser.parse(testNotification.asXml))
         }

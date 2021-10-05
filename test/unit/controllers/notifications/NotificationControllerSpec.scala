@@ -16,9 +16,6 @@
 
 package controllers.notifications
 
-import scala.concurrent.ExecutionContext.global
-import scala.concurrent.Future
-
 import base.ControllerUnitSpec
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
@@ -27,6 +24,9 @@ import play.api.test.Helpers._
 import reactivemongo.bson.BSONObjectID
 import services.notifications.NotificationService
 import testdata.notifications.NotificationsTestData._
+
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.Future
 
 class NotificationControllerSpec extends ControllerUnitSpec {
 
@@ -53,7 +53,7 @@ class NotificationControllerSpec extends ControllerUnitSpec {
       "notification with specific reference has been found" in {
 
         val notification =
-          Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
+          Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
 
         when(notificationService.getNotificationForReference(any()))
           .thenReturn(Future.successful(Some(notification)))

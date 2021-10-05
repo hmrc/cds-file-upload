@@ -16,20 +16,20 @@
 
 package models
 
-import java.time.format.DateTimeFormatter
-
 import base.UnitSpec
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import reactivemongo.bson.BSONObjectID
 import testdata.notifications.NotificationsTestData._
 
+import java.time.format.DateTimeFormatter
+
 class NotificationSpec extends UnitSpec {
   val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
   val idVal = BSONObjectID.generate()
 
   "Notifications Spec DbFormat" must {
-    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
+    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
 
     "have json writes that produce a string which could be parsed by the database" in {
       val json = Json.toJson(notification)(Notification.DbFormat.notificationFormat)
@@ -48,7 +48,7 @@ class NotificationSpec extends UnitSpec {
   }
 
   "Notifications Spec FrontendFormat" must {
-    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, filename)), dateTime)
+    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
 
     "have json writes that produce a string which could be parsed by the SFUS frontend" in {
       val json = Json.toJson(notification)(Notification.FrontendFormat.writes)

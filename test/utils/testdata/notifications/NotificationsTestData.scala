@@ -34,12 +34,12 @@ object NotificationsTestData {
     Notification(
       BSONObjectID.generate(),
       exampleNotification(fileReference, outcomeSuccess, filename).toString,
-      Some(NotificationDetails(fileReference, outcomeSuccess, filename)),
+      Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))),
       dateTime
     )
 
   val exampleUnparsedNotification = Notification(BSONObjectID.generate(), payload, None, dateTime)
 
-  val emptyNotificationDetails = NotificationDetails("", "", "")
+  val emptyNotificationDetails = NotificationDetails("", "", None)
 
 }
