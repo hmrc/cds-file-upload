@@ -7,6 +7,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
 import testdata.notifications.NotificationsTestData._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationsRepositoryIntegrationSpec extends UnitSpec with GuiceOneAppPerSuite {
@@ -128,7 +129,7 @@ class NotificationsRepositoryIntegrationSpec extends UnitSpec with GuiceOneAppPe
     "update the notification with the same _id" in {
       notificationsRepository.save(exampleUnparsedNotification).futureValue mustBe Right(())
 
-      val modified = exampleUnparsedNotification.copy(details = exampleParsedNotification.details.map(_.copy(filename = "NEW.txt")))
+      val modified = exampleUnparsedNotification.copy(details = exampleParsedNotification.details.map(_.copy(filename = Some("NEW.txt"))))
 
       notificationsRepository.updateNotification(modified).futureValue
 

@@ -22,14 +22,14 @@ import play.api.libs.json._
 import reactivemongo.bson.BSONObjectID
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
-case class NotificationDetails(fileReference: String, outcome: String, filename: String)
+case class NotificationDetails(fileReference: String, outcome: String, filename: Option[String])
 
 object NotificationDetails {
   implicit val writes: OWrites[NotificationDetails] = Json.writes[NotificationDetails]
   implicit val reads: Reads[NotificationDetails] =
     ((__ \ "fileReference").read[String] and
       (__ \ "outcome").read[String] and
-      (__ \ "filename").read[String])(NotificationDetails.apply _)
+      (__ \ "filename").readNullable[String])(NotificationDetails.apply _)
 
   implicit val format: Format[NotificationDetails] = Format(reads, writes)
 }
