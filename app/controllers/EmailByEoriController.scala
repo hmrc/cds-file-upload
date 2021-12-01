@@ -24,6 +24,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.exports.models.emails.Email
 
 @Singleton
 class EmailByEoriController @Inject()(authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(
@@ -34,8 +35,8 @@ class EmailByEoriController @Inject()(authorise: AuthAction, customsDataStoreCon
     customsDataStoreConnector
       .getEmailAddress(eori)
       .map {
-        case Some(emailAddress) => Ok(Json.toJson(emailAddress))
-        case None               => NotFound
+        case Some(Email(email, deliverable)) => Ok(Json.toJson(Email(email, deliverable)))
+        case _                               => NotFound
       }
       .recover { case _ => InternalServerError }
   }

@@ -16,14 +16,12 @@
 
 package controllers
 
-import java.time.ZonedDateTime
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
-import models.VerifiedEmailAddress
+import uk.gov.hmrc.exports.models.emails.Email
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.libs.json.Json
@@ -49,8 +47,21 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
 
   "GET EmailIfVerified endpoint" should {
 
-    "return 200(OK) status if the email address for the given EORI is verified" in {
-      val expectedEmailAddress = VerifiedEmailAddress("some@email.com", ZonedDateTime.now)
+    "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
+      val expectedEmailAddress = Email("some@email.com", deliverable = true)
+
+      when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(expectedEmailAddress)))
+
+      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
+      status(response) mustBe OK
+      contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
+
+      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
+    }
+
+    "return 200(OK) status and deliverable = false if the email address for the given EORI is not deliverable" in {
+      val expectedEmailAddress = Email("some@email.com", deliverable = false)
 
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(expectedEmailAddress)))

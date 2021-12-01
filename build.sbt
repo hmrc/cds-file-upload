@@ -44,7 +44,8 @@ val compileDependencies = Seq(
   "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.12.3",
   "uk.gov.hmrc"                  %% "simple-reactivemongo"      % "8.0.0-play-28",
   "org.mongodb.scala"            %% "mongo-scala-driver"        % "2.9.0",
-  "org.mongodb"                  %  "mongo-java-driver"         % "3.5.0"
+  "org.mongodb"                  %  "mongo-java-driver"         % "3.5.0",
+  "com.typesafe.play"            %%  "play-json-joda"           % "2.6.14"
 )
 
 val testDependencies = Seq(
