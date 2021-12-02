@@ -38,10 +38,10 @@ class VerifiedEmailByEoriFlowSpec extends IntegrationSpec {
   "GET EmailIfVerified endpoint" should {
 
     "return 200(OK) status if the email address for the given EORI is verified" in {
-      val expectedEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
+      val testEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
       val expectedEmailAddress = """{"address":"some@email.com","deliverable":true}"""
 
-      getFromDownstreamService(customsDataStoreUrl, OK, Some(expectedEmailJson))
+      getFromDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
       val response = route(app, fakeRequest).get
       status(response) mustBe OK
       contentAsString(response) mustBe expectedEmailAddress
@@ -49,7 +49,7 @@ class VerifiedEmailByEoriFlowSpec extends IntegrationSpec {
     }
 
     "return 200(OK) status if the email address for the given EORI is undeliverable" in {
-      val expectedEmailJson = """{
+      val testEmailJson = """{
                                    |    "address": "some@email.com",
                                    |    "timestamp": "2020-03-20T01:02:03Z",
                                    |    "undeliverable": {
@@ -71,7 +71,7 @@ class VerifiedEmailByEoriFlowSpec extends IntegrationSpec {
 
       val expectedEmailAddress = """{"address":"some@email.com","deliverable":false}"""
 
-      getFromDownstreamService(customsDataStoreUrl, OK, Some(expectedEmailJson))
+      getFromDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
       val response = route(app, fakeRequest).get
       status(response) mustBe OK
       contentAsString(response) mustBe expectedEmailAddress

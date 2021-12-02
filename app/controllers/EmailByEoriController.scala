@@ -24,7 +24,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.exports.models.emails.Email
+import models.email.Email
 
 @Singleton
 class EmailByEoriController @Inject()(authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(

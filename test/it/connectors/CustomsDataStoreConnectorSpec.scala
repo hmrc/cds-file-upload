@@ -20,8 +20,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import base.IntegrationSpec
 import config.AppConfig
-import uk.gov.hmrc.exports.models.emails.Email
-import play.api.libs.json.Json
+import models.email.Email
 import play.api.test.Helpers._
 import testdata.TestData
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -38,13 +37,13 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
 
       "return a valid Email instance" in {
         val testVerifiedEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
-        val testVerifiedEmailAddress = Email("some@email.com", deliverable = true)
+        val expectedVerifiedEmailAddress = Email("some@email.com", deliverable = true)
         val path = s"/customs-data-store/eori/${TestData.eori}/verified-email"
         getFromDownstreamService(path, OK, Some(testVerifiedEmailJson))
 
         val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
 
-        response mustBe Some(testVerifiedEmailAddress)
+        response mustBe Some(expectedVerifiedEmailAddress)
         verifyGetFromDownStreamService(path)
       }
     }
@@ -72,13 +71,13 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
                                               |     }
                                               |}""".stripMargin
 
-        val testUndeliverableEmailAddress = Email("some@email.com", deliverable = false)
+        val expectedUndeliverableEmailAddress = Email("some@email.com", deliverable = false)
         val path = s"/customs-data-store/eori/${TestData.eori}/verified-email"
         getFromDownstreamService(path, OK, Some(testUndeliverableEmailJson))
 
         val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
 
-        response mustBe Some(testUndeliverableEmailAddress)
+        response mustBe Some(expectedUndeliverableEmailAddress)
         verifyGetFromDownStreamService(path)
       }
     }

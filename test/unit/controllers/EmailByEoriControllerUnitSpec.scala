@@ -21,7 +21,7 @@ import scala.concurrent.Future
 
 import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
-import uk.gov.hmrc.exports.models.emails.Email
+import models.email.Email
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.Mockito._
 import play.api.libs.json.Json

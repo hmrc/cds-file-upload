@@ -23,7 +23,7 @@ import javax.inject.Inject
 import play.api.http.Status.NOT_FOUND
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream4xxResponse}
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.exports.models.emails.{Email, EmailResponse}
+import models.email.{Email, EmailResponse}
 
 class CustomsDataStoreConnector @Inject()(http: HttpClient)(implicit appConfig: AppConfig, ec: ExecutionContext) {
 

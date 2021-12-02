@@ -14,33 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.exports.models.emails
+package models.email
 
-import org.joda.time.DateTime
+import play.api.libs.json.{Json, OWrites, Reads}
 
-import play.api.libs.json.{Json, OFormat, OWrites, Reads}
-
-case class Email(address: String, deliverable: Boolean)
-
-object Email {
-  implicit val writes: OWrites[Email] = Json.writes[Email]
-}
-
-case class EmailResponse(address: String, timestamp: Option[String], undeliverable: Option[UndeliverableInformation])
-
-object EmailResponse {
-  implicit val format: OFormat[EmailResponse] = Json.format[EmailResponse]
-}
-
-case class UndeliverableInformation(subject: String, eventId: String, groupId: String, timestamp: DateTime, event: UndeliverableInformationEvent)
-
-object UndeliverableInformation {
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
-  implicit val format: OFormat[UndeliverableInformation] = Json.format[UndeliverableInformation]
-}
-
-case class UndeliverableInformationEvent(
+final case class UndeliverableInformationEvent(
   id: String,
   event: String,
   emailAddress: String,
@@ -51,9 +29,6 @@ case class UndeliverableInformationEvent(
 )
 
 object UndeliverableInformationEvent {
-
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
 
   implicit val reads: Reads[UndeliverableInformationEvent] = Json.reads[UndeliverableInformationEvent]
   implicit val writes: OWrites[UndeliverableInformationEvent] = Json.writes[UndeliverableInformationEvent]
