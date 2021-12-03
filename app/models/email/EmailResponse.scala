@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.email
 
-import java.time.ZonedDateTime
+import play.api.libs.json.{Json, OFormat}
 
-import play.api.libs.json.Json
+final case class EmailResponse(address: String, timestamp: Option[String], undeliverable: Option[UndeliverableInformation])
 
-case class VerifiedEmailAddress(address: String, timestamp: ZonedDateTime)
-
-object VerifiedEmailAddress {
-  implicit val format = Json.format[VerifiedEmailAddress]
+object EmailResponse {
+  implicit val format: OFormat[EmailResponse] = Json.format[EmailResponse]
 }
