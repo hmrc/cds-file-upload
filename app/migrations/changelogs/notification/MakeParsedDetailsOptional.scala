@@ -98,7 +98,7 @@ class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
     logger.info(s"Applying '${migrationInformation.id}' db migration... Done.")
   }
 
-  private def getDocumentsToUpdate(db: MongoDatabase, filter: Bson, queryBatchSize: Int) =
+  private def getDocumentsToUpdate(db: MongoDatabase, filter: Bson, queryBatchSize: Int): Iterator[Document] =
     asScalaIterator(
       db.getCollection(collectionName)
         .find(filter)

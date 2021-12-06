@@ -16,10 +16,10 @@
 
 package models
 
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
-import reactivemongo.bson.BSONObjectID
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import repositories.ZonedDateTimeFormat.{zonedDateTimeReads, zonedDateTimeWrites}
+
+import java.time.{ZoneOffset, ZonedDateTime}
 
 case class NotificationDetails(fileReference: String, outcome: String, filename: Option[String])
 
@@ -27,22 +27,17 @@ object NotificationDetails {
   implicit val format: Format[NotificationDetails] = Json.format[NotificationDetails]
 }
 
-case class Notification(
-  _id: BSONObjectID,
-  payload: String,
-  details: Option[NotificationDetails] = None,
-  createdAt: DateTime = DateTime.now.withZone(DateTimeZone.UTC)
-)
+case class Notification(payload: String, details: Option[NotificationDetails] = None, createdAt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC))
 
 object Notification {
-  object DbFormat extends ReactiveMongoFormats {
-    implicit val notificationFormat: OFormat[Notification] = Json.format[Notification]
+  implicit val zonedDateTimeFormat: Format[ZonedDateTime] = Format(zonedDateTimeReads, zonedDateTimeWrites)
+
+  object MongoFormat {
+    val format: OFormat[Notification] = OFormat[Notification](Json.reads[Notification], Json.writes[Notification])
   }
 
   object FrontendFormat {
-    implicit val dateFormat: Format[DateTime] = ReactiveMongoFormats.dateTimeFormats
-
-    def writes(notification: Notification) =
+    def writes(notification: Notification): JsObject =
       notification.details.map { details =>
         Json.obj(
           "fileReference" -> details.fileReference,

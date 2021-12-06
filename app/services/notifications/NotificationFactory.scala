@@ -16,24 +16,24 @@
 
 package services.notifications
 
-import javax.inject.Inject
 import models.Notification
 import play.api.Logging
-import reactivemongo.bson.BSONObjectID
 
+import javax.inject.Inject
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
 class NotificationFactory @Inject()(notificationParser: NotificationParser) extends Logging {
 
-  def buildNotification(notificationXml: NodeSeq) = Try(notificationParser.parse(notificationXml)) match {
-    case Success(notificationDetails) =>
-      Notification(_id = BSONObjectID.generate(), payload = notificationXml.toString, details = Some(notificationDetails))
+  def buildNotification(notificationXml: NodeSeq) =
+    Try(notificationParser.parse(notificationXml)) match {
+      case Success(notificationDetails) =>
+        Notification(payload = notificationXml.toString, details = Some(notificationDetails))
 
-    case Failure(exc) =>
-      logParseExceptionAtPagerDutyLevel(exc)
-      Notification(_id = BSONObjectID.generate(), payload = notificationXml.toString)
-  }
+      case Failure(exc) =>
+        logParseExceptionAtPagerDutyLevel(exc)
+        Notification(payload = notificationXml.toString)
+    }
 
   private def logParseExceptionAtPagerDutyLevel(exc: Throwable): Unit =
     logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Payload did not contain the required values!")

@@ -17,9 +17,9 @@
 package testdata.notifications
 
 import models.{Notification, NotificationDetails}
-import org.joda.time.{DateTime, DateTimeZone}
-import reactivemongo.bson.BSONObjectID
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
+
+import java.time.{ZoneOffset, ZonedDateTime}
 
 object NotificationsTestData {
 
@@ -27,19 +27,17 @@ object NotificationsTestData {
   val outcomeSuccess = "SUCCESS"
   val filename = "sample.pdf"
   val payload = "<xml></xml>"
-  val dateTime: DateTime = DateTime.now.withZone(DateTimeZone.UTC)
+  val createdAt = ZonedDateTime.now(ZoneOffset.UTC)
   val batchId = "5e634e09-77f6-4ff1-b92a-8a9676c715c4"
 
-  val exampleParsedNotification =
+  val parsedNotification =
     Notification(
-      BSONObjectID.generate(),
       exampleNotification(fileReference, outcomeSuccess, filename).toString,
       Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))),
-      dateTime
+      createdAt
     )
 
-  val exampleUnparsedNotification = Notification(BSONObjectID.generate(), payload, None, dateTime)
+  val unparsedNotification = Notification(payload, None, createdAt)
 
   val emptyNotificationDetails = NotificationDetails("", "", None)
-
 }

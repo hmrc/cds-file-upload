@@ -39,9 +39,7 @@ class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyCheck
   "AuthAction" should {
 
     "return Ok" when {
-
       "user has internalId" in {
-
         forAll { internalId: String =>
           when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
             .thenReturn(Future.successful(Some(internalId)))
@@ -56,7 +54,6 @@ class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyCheck
     "return Unauthorized" when {
 
       "user doesn't have an internalId" in {
-
         when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
@@ -66,7 +63,6 @@ class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyCheck
       }
 
       "authorise returns an error" in {
-
         when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
           .thenReturn(Future.failed(new RuntimeException("")))
 

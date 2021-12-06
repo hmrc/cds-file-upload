@@ -10,7 +10,7 @@ import stubs.CustomsDeclarationsInformationService._
 import testdata.TestData.mrn
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier, InternalServerException}
 
-class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with CustomsDeclarationsInformationService {
+class CustomsDeclarationsInformationConnectorISpec extends IntegrationSpec with CustomsDeclarationsInformationService {
 
   private lazy val connector = inject[CustomsDeclarationsInformationConnector]
 
@@ -19,9 +19,7 @@ class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with C
   "CustomsDeclarationsInformationConnector" when {
 
     "customs-declarations-information service responds with 200 (Ok) response" should {
-
       "return the response parsed" in {
-
         getFromCDIService(OK, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
@@ -34,9 +32,7 @@ class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with C
     }
 
     "customs-declarations-information service responds with 404 (NotFound) response" should {
-
       "return empty Option" in {
-
         getFromCDIService(NOT_FOUND, mrn)
 
         val declarationStatus = connector.getDeclarationStatus(mrn).futureValue
@@ -46,9 +42,7 @@ class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with C
     }
 
     "customs-declarations-information service responds with 500 (InternalServerError) response" should {
-
       "throw InternalServerException" in {
-
         getFromCDIService(INTERNAL_SERVER_ERROR, mrn)
 
         intercept[InternalServerException] {
@@ -57,5 +51,4 @@ class CustomsDeclarationsInformationConnectorSpec extends IntegrationSpec with C
       }
     }
   }
-
 }

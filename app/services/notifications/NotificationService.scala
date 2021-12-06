@@ -16,11 +16,11 @@
 
 package services.notifications
 
-import javax.inject.{Inject, Singleton}
 import models.Notification
 import play.api.Logging
 import repositories.NotificationsRepository
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
@@ -28,18 +28,14 @@ import scala.xml.NodeSeq
 class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def parseAndSave(notificationXml: NodeSeq): Future[Either[Throwable, Unit]] = {
-    logger.info("Notification payload: " + notificationXml)
-
+  def parseAndSave(notificationXml: NodeSeq): Future[Boolean] = {
     val parsedNotification = notificationFactory.buildNotification(notificationXml)
-    repository.save(parsedNotification)
+    repository.insertOne(parsedNotification).map(_.isRight)
   }
 
-  def getNotificationForReference(reference: String): Future[Option[Notification]] =
-    repository.findNotificationsByReference(reference).map { notifications =>
-      logger.info(s"Found ${notifications.length} notifications for reference $reference")
-
+  def getNotificationForReference(fileReference: String): Future[Option[Notification]] =
+    repository.findNotificationsByReference(fileReference).map { notifications =>
+      logger.info(s"Found ${notifications.length} notifications for reference $fileReference")
       notifications.headOption
     }
-
 }

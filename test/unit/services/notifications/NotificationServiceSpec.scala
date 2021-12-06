@@ -16,12 +16,6 @@
 
 package services.notifications
 
-import java.io.IOException
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.xml.NodeSeq
-
 import base.UnitSpec
 import models.Notification
 import org.mockito.ArgumentMatchers.{any, eq => meq}
@@ -30,6 +24,11 @@ import org.mockito.{ArgumentCaptor, InOrder, Mockito}
 import repositories.NotificationsRepository
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 import testdata.notifications.NotificationsTestData._
+
+import java.time.ZoneId
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.xml.NodeSeq
 
 class NotificationServiceSpec extends UnitSpec {
 
@@ -49,19 +48,19 @@ class NotificationServiceSpec extends UnitSpec {
   "NotificationService on parseAndSave" should {
 
     "call NotificationFactory and NotificationRepository in order" in {
-      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
-      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(parsedNotification)
+      when(notificationsRepository.insertOne(any[Notification])).thenReturn(Future.successful(Right(parsedNotification)))
 
       notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
       val inOrder: InOrder = Mockito.inOrder(notificationFactory, notificationsRepository)
       inOrder.verify(notificationFactory).buildNotification(any[NodeSeq])
-      inOrder.verify(notificationsRepository).save(any[Notification])
+      inOrder.verify(notificationsRepository).insertOne(any[Notification])
     }
 
     "call NotificationFactory passing XML provided" in {
-      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
-      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(parsedNotification)
+      when(notificationsRepository.insertOne(any[Notification])).thenReturn(Future.successful(Right(parsedNotification)))
 
       notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
@@ -69,60 +68,57 @@ class NotificationServiceSpec extends UnitSpec {
     }
 
     "call NotificationRepository passing notification returned by NotificationFactory" in {
-      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
-      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(parsedNotification)
+      when(notificationsRepository.insertOne(any[Notification])).thenReturn(Future.successful(Right(parsedNotification)))
 
       notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
-      verify(notificationsRepository).save(meq(exampleParsedNotification))
+      verify(notificationsRepository).insertOne(meq(parsedNotification))
     }
 
     "save a success notification with timestamp for TTL" in {
-      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
-      when(notificationsRepository.save(any[Notification])).thenReturn(Future.successful(Right(())))
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(parsedNotification)
+      when(notificationsRepository.insertOne(any[Notification])).thenReturn(Future.successful(Right(parsedNotification)))
 
       notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
       val captor: ArgumentCaptor[Notification] = ArgumentCaptor.forClass(classOf[Notification])
 
-      verify(notificationsRepository).save(captor.capture())
+      verify(notificationsRepository).insertOne(captor.capture())
       val notification = captor.getValue
 
       notification.details.isDefined mustBe true
       notification.details.get.fileReference mustBe fileReference
       notification.details.get.outcome mustBe outcomeSuccess
-      notification.createdAt.withTimeAtStartOfDay() mustBe dateTime.withTimeAtStartOfDay()
+
+      val utc = ZoneId.of("UTC")
+      notification.createdAt.toLocalDate.atStartOfDay(utc) mustBe createdAt.toLocalDate.atStartOfDay(utc)
     }
 
     "return an exception when insert fails" in {
-      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(exampleParsedNotification)
-      val exception = new IOException("downstream failure")
-      when(notificationsRepository.save(any())).thenReturn(Future.successful(Left(exception)))
+      when(notificationFactory.buildNotification(any[NodeSeq])).thenReturn(parsedNotification)
+      when(notificationsRepository.insertOne(any[Notification])).thenThrow(new RuntimeException("Write error"))
 
-      val result = notificationService.parseAndSave(SuccessNotificationXml).futureValue
-
-      result mustBe Left(exception)
+      intercept[RuntimeException] {
+        notificationService.parseAndSave(SuccessNotificationXml).futureValue
+      }.getMessage mustBe "Write error"
     }
   }
 
   "NotificationService on getNotificationForReference" should {
 
     "return notification if exists based on the reference" in {
-      when(notificationsRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List(exampleParsedNotification)))
+      when(notificationsRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List(parsedNotification)))
 
       val result = notificationService.getNotificationForReference(fileReference).futureValue
-
-      result mustBe Some(exampleParsedNotification)
+      result mustBe Some(parsedNotification)
     }
 
     "return None if notification doesn't exist" in {
-
       when(notificationsRepository.findNotificationsByReference(any())).thenReturn(Future.successful(List.empty))
 
       val result = notificationService.getNotificationForReference("reference").futureValue
-
       result mustBe None
     }
   }
-
 }

@@ -16,68 +16,53 @@
 
 package repositories
 
-import scala.concurrent.{ExecutionContext, Future}
-
+import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
-import javax.inject.{Inject, Singleton}
 import models.Notification
-import play.api.libs.json.{JsNull, JsObject, Json}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONNull, BSONObjectID}
-import reactivemongo.play.json.collection._
-import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
+import models.Notification.MongoFormat
+import org.bson.BsonNull
+import org.mongodb.scala.bson.BsonDocument
+import org.mongodb.scala.model.{IndexModel, IndexOptions}
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
+
+import java.util.concurrent.TimeUnit
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
 
 @Singleton
-class NotificationsRepository @Inject()(mc: ReactiveMongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
-    extends ReactiveRepository[Notification, BSONObjectID](
+class NotificationsRepository @Inject()(mongoComponent: MongoComponent, appConfig: AppConfig)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[Notification](
+      mongoComponent = mongoComponent,
       collectionName = "notifications",
-      mongo = mc.mongoConnector.db,
-      domainFormat = Notification.DbFormat.notificationFormat,
-      idFormat = ReactiveMongoFormats.objectIdFormats
-    ) {
+      domainFormat = MongoFormat.format,
+      indexes = NotificationRepository.indexes(appConfig)
+    ) with RepositoryOps[Notification] {
 
-  override lazy val collection: JSONCollection =
-    mongo().collection[JSONCollection](collectionName, failoverStrategy = RepositorySettings.failoverStrategy)
+  override def classTag: ClassTag[Notification] = implicitly[ClassTag[Notification]]
+  implicit val executionContext = ec
 
-  override def indexes: Seq[Index] = Seq(
-    Index(key = Seq(("details.fileReference", IndexType.Ascending)), name = Some("detailsFileReferenceIdx")),
-    Index(
-      key = Seq(("createdAt", IndexType.Ascending)),
-      name = Some("createdAtIndex"),
-      options = BSONDocument("expireAfterSeconds" -> appConfig.notificationsTtlSeconds)
-    ),
-    Index(Seq("details" -> IndexType.Ascending), name = Some("detailsMissingIdx"), partialFilter = Some(BSONDocument("details" -> BSONNull)))
-  )
+  def findNotificationsByReference(fileReference: String): Future[Seq[Notification]] =
+    findAll("details.fileReference", fileReference)
+}
 
-  override def ensureIndexes(implicit ec: ExecutionContext): Future[Seq[Boolean]] = Future.successful(Seq.empty)
+object NotificationRepository {
 
-  def save(notification: Notification): Future[Either[Throwable, Unit]] =
-    insert(notification)
-      .map(_ => Right(()))
-      .recover { case e => Left(e) }
-
-  def updateNotification(notification: Notification): Future[Boolean] =
-    findAndUpdate(query = Json.obj("_id" -> notification._id), update = Json.toJson(notification).as[JsObject]).map { result =>
-      result.lastError.foreach(_.err.foreach(errorMsg => logger.error(s"Problem during database update: $errorMsg")))
-      result.lastError.isEmpty
-    }
-
-  def ensureIndex(index: Index)(implicit ec: ExecutionContext): Future[Unit] =
-    collection.indexesManager
-      .create(index)
-      .map(wr => logger.info(wr.toString))
-      .recover {
-        case t =>
-          logger.warn(s"$message (${index.eventualName})", t)
-      }
-
-  def findNotificationsByReference(reference: String): Future[Seq[Notification]] =
-    find("details.fileReference" -> reference)
-
-  def findUnparsedNotifications(): Future[Seq[Notification]] =
-    find("details" -> JsNull)
-
-  Future.sequence(indexes.map(ensureIndex))
+  def indexes(appConfig: AppConfig): Seq[IndexModel] =
+    List(
+      IndexModel(ascending("details.fileReference"), IndexOptions().name("detailsFileReferenceIdx")),
+      IndexModel(
+        ascending("details"),
+        IndexOptions()
+          .name("detailsMissingIdx")
+          .partialFilterExpression(BsonDocument("details" -> BsonNull.VALUE))
+      ),
+      IndexModel(
+        ascending("createdAt"),
+        IndexOptions()
+          .name("ttl")
+          .expireAfter(appConfig.notificationsTtlSeconds, TimeUnit.SECONDS)
+      )
+    )
 }

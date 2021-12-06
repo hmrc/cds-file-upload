@@ -4,16 +4,15 @@ import base.TestMongoDB.mongoConfiguration
 import base.{TestMongoDB, UnitSpec}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.mongodb.client.model.Indexes
-import com.mongodb.client.{MongoCollection, MongoDatabase}
-import com.mongodb.{MongoClient, MongoClientURI}
-import migrations.changelogs.notification.MakeParsedDetailsOptionalIntegrationSpec._
+import com.mongodb.client.{MongoClients, MongoCollection, MongoDatabase}
+import migrations.changelogs.notification.MakeParsedDetailsOptionalISpec._
 import org.bson.Document
 import org.mongodb.scala.model.IndexOptions
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class MakeParsedDetailsOptionalIntegrationSpec extends UnitSpec with GuiceOneServerPerSuite {
+class MakeParsedDetailsOptionalISpec extends UnitSpec with GuiceOneServerPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
@@ -21,30 +20,32 @@ class MakeParsedDetailsOptionalIntegrationSpec extends UnitSpec with GuiceOneSer
       .configure(mongoConfiguration)
       .build()
 
-  private val MongoURI = mongoConfiguration.get[String]("mongodb.uri")
-  private val DatabaseName = TestMongoDB.DatabaseName
-  private val CollectionName = "notifications"
+  private val mongodbUri = mongoConfiguration.get[String]("mongodb.uri")
+  private val collectionName = "notifications"
 
-  private implicit val mongoDatabase: MongoDatabase = {
-    val uri = new MongoClientURI(MongoURI.replaceAllLiterally("sslEnabled", "ssl"))
-    val client = new MongoClient(uri)
-
-    client.getDatabase(DatabaseName)
+  private implicit val db: MongoDatabase = {
+    val (mongoUri, sslParam) = {
+      val sslParamPos = mongodbUri.lastIndexOf('?'.toInt)
+      if (sslParamPos > 0) mongodbUri.splitAt(sslParamPos) else (mongodbUri, "")
+    }
+    val (mongoPath, _) = mongoUri.splitAt(mongoUri.lastIndexOf('/'.toInt))
+    val client = MongoClients.create(s"$mongoPath$sslParam")
+    client.getDatabase(TestMongoDB.DatabaseName)
   }
 
   private val changeLog = new MakeParsedDetailsOptional()
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    mongoDatabase.getCollection(CollectionName).drop()
+    db.getCollection(collectionName).drop()
   }
 
   override def afterEach(): Unit = {
-    mongoDatabase.getCollection(CollectionName).drop()
+    db.getCollection(collectionName).drop()
     super.afterEach()
   }
 
-  private def getDeclarationsCollection(db: MongoDatabase): MongoCollection[Document] = mongoDatabase.getCollection(CollectionName)
+  private def getDeclarationsCollection(db: MongoDatabase): MongoCollection[Document] = db.getCollection(collectionName)
 
   "MakeParsedDetailsOptional migration definition" should {
 
@@ -61,7 +62,7 @@ class MakeParsedDetailsOptionalIntegrationSpec extends UnitSpec with GuiceOneSer
     }
 
     "drop the decommissioned index" in {
-      val collection = getDeclarationsCollection(mongoDatabase)
+      val collection = getDeclarationsCollection(db)
       collection.createIndex(Indexes.ascending("fileReference"), IndexOptions().name("fileReferenceIndex"))
 
       runTest(testDataBeforeChangeSet_1, testDataAfterChangeSet_1)(changeLog.migrationFunction)
@@ -94,32 +95,32 @@ class MakeParsedDetailsOptionalIntegrationSpec extends UnitSpec with GuiceOneSer
   }
 }
 
-object MakeParsedDetailsOptionalIntegrationSpec {
+object MakeParsedDetailsOptionalISpec {
   val testDataBeforeChangeSet_1: String =
     """{
-      |    "_id" : "5fcfa669474b993df8c3058e",
-      |    "fileReference" : "3",
-      |    "outcome" : "SUCCESS",
-      |    "filename" : "File_3.pdf",
-      |    "createdAt" : "2020-12-08T16:14:33.043Z"
-      |}""".stripMargin
+       |  "_id" : "5fcfa669474b993df8c3058e",
+       |  "fileReference" : "3",
+       |  "outcome" : "SUCCESS",
+       |  "filename" : "File_3.pdf",
+       |  "createdAt" : "2020-12-08T16:14:33.043Z"
+       |}""".stripMargin
 
   val testDataAfterChangeSet_1: String =
     """{
-      |    "_id" : "5fcfa669474b993df8c3058e",
-      |    "payload" : "N/A",
-      |    "details" : {
-      |        "fileReference" : "3",
-      |        "outcome" : "SUCCESS",
-      |        "filename" : "File_3.pdf"
-      |    },
-      |    "createdAt" : "2020-12-08T16:14:33.043Z"
-      |}""".stripMargin
+       |  "_id" : "5fcfa669474b993df8c3058e",
+       |  "payload" : "N/A",
+       |  "details" : {
+       |    "fileReference" : "3",
+       |    "outcome" : "SUCCESS",
+       |    "filename" : "File_3.pdf"
+       |  },
+       |  "createdAt" : "2020-12-08T16:14:33.043Z"
+       |}""".stripMargin
 
   val testDataUnparsableNotification: String =
     """{
-      |    "_id" : "5fcfa75a474b993df8c309d7",
-      |    "payload" : "<Root><FileReference>3</FileReference><BatchId>5e634e09-77f6-4ff1-b92a-8a9676c715c4</BatchId><FileName>File_3.pdf</FileName><Outcome>SUCCESS</Outcome><Details>[detail block]</Details></Root>",
-      |    "createdAt" : "2020-12-08T16:18:34.328Z"
-      |}""".stripMargin
+       |  "_id" : "5fcfa75a474b993df8c309d7",
+       |  "payload" : "<Root><FileReference>3</FileReference><BatchId>5e634e09-77f6-4ff1-b92a-8a9676c715c4</BatchId><FileName>File_3.pdf</FileName><Outcome>SUCCESS</Outcome><Details>[detail block]</Details></Root>",
+       |  "createdAt" : "2020-12-08T16:18:34.328Z"
+       |}""".stripMargin
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
 
 package connectors
 
@@ -25,7 +26,7 @@ import play.api.test.Helpers._
 import testdata.TestData
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 
-class CustomsDataStoreConnectorSpec extends IntegrationSpec {
+class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
 
@@ -34,7 +35,6 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
   "CustomsDataStoreConnector.getEmailAddress" when {
 
     "email service responds with OK (200) and email is deliverable" should {
-
       "return a valid Email instance" in {
         val testVerifiedEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
         val expectedVerifiedEmailAddress = Email("some@email.com", deliverable = true)
@@ -49,27 +49,27 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
     }
 
     "email service responds with OK (200) and email is undeliverable" should {
-
       "return a valid Email instance" in {
-        val testUndeliverableEmailJson = """{
-                                              |    "address": "some@email.com",
-                                              |    "timestamp": "2020-03-20T01:02:03Z",
-                                              |    "undeliverable": {
-                                              |          "subject": "subject-example",
-                                              |          "eventId": "example-id",
-                                              |          "groupId": "example-group-id",
-                                              |          "timestamp": "2021-05-14T10:59:45.811+01:00",
-                                              |          "event": {
-                                              |                     "id": "example-id",
-                                              |                    "event": "someEvent",
-                                              |                    "emailAddress": "some@email.com",
-                                              |                    "detected": "2021-05-14T10:59:45.811+01:00",
-                                              |                    "code": 12,
-                                              |                    "reason": "Inbox full",
-                                              |                    "enrolment": "HMRC-CUS-ORG~EORINumber~testEori"
-                                              |        }
-                                              |     }
-                                              |}""".stripMargin
+        val testUndeliverableEmailJson =
+          """{
+             |  "address": "some@email.com",
+             |  "timestamp": "2020-03-20T01:02:03Z",
+             |  "undeliverable": {
+             |    "subject": "subject-example",
+             |    "eventId": "example-id",
+             |    "groupId": "example-group-id",
+             |    "timestamp": "2021-05-14T10:59:45.811+01:00",
+             |    "event": {
+             |      "id": "example-id",
+             |      "event": "someEvent",
+             |      "emailAddress": "some@email.com",
+             |      "detected": "2021-05-14T10:59:45.811+01:00",
+             |      "code": 12,
+             |      "reason": "Inbox full",
+             |      "enrolment": "HMRC-CUS-ORG~EORINumber~testEori"
+             |    }
+             |  }
+             |}""".stripMargin
 
         val expectedUndeliverableEmailAddress = Email("some@email.com", deliverable = false)
         val path = s"/customs-data-store/eori/${TestData.eori}/verified-email"
@@ -83,7 +83,6 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
     }
 
     "email service responds with NOT_FOUND (404)" should {
-
       "return empty Option" in {
         val path = s"/customs-data-store/eori/${TestData.eori}/verified-email"
         getFromDownstreamService(path, NOT_FOUND, None)
@@ -96,7 +95,6 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
     }
 
     "email service responds with any other error code" should {
-
       "return failed Future" in {
         val path = s"/customs-data-store/eori/${TestData.eori}/verified-email"
         val errorMsg = "Upstream service test error"
@@ -111,7 +109,6 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
   }
 
   "CustomsDataStoreConnector.verifiedEmailPath" should {
-
     "return correct path" in {
       val expectedPath = s"/customs-data-store/eori/${TestData.eori}/verified-email"
 
@@ -120,5 +117,5 @@ class CustomsDataStoreConnectorSpec extends IntegrationSpec {
       actualPath mustBe expectedPath
     }
   }
-
 }
+ */
