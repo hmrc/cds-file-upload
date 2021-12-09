@@ -16,8 +16,6 @@
 
 package migrations.repositories
 
-import java.util.Date
-
 import base.UnitSpec
 import com.mongodb._
 import com.mongodb.client.model.Filters.{and, eq => feq}
@@ -35,6 +33,8 @@ import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
 import org.mockito.Mockito._
 import org.mongodb.scala.bson.BsonString
+
+import java.util.Date
 import scala.collection.JavaConverters.mapAsJavaMap
 
 class LockRepositorySpec extends UnitSpec {
@@ -55,21 +55,21 @@ class LockRepositorySpec extends UnitSpec {
   private val lockKey = "lockKeyValue"
   private val status = LockStatus.LockHeld.name
   private val owner = "ownerValue"
-  private val date = new Date()
+  private val date = new Date
   private val lockEntry = LockEntry(lockKey, status, owner, date)
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
+  override def beforeEach: Unit = {
+    super.beforeEach
 
     reset(findIterable, mongoCollection, mongoDatabase)
 
     defineMocksBehaviourDefault()
   }
 
-  override def afterEach(): Unit = {
+  override def afterEach: Unit = {
     reset(findIterable, mongoCollection, mongoDatabase)
 
-    super.afterEach()
+    super.afterEach
   }
 
   private def defineMocksBehaviourDefault(): Unit = {
@@ -77,8 +77,7 @@ class LockRepositorySpec extends UnitSpec {
     when(mongoCollection.getNamespace).thenReturn(mongoNamespace)
     when(mongoCollection.find(any[Document])).thenReturn(findIterable)
     when(mongoCollection.deleteMany(any[Document])).thenReturn(DeleteResult.unacknowledged())
-    when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
-      .thenReturn(UpdateResult.unacknowledged())
+    when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions])).thenReturn(UpdateResult.unacknowledged())
     when(mongoDatabase.getCollection(anyString())).thenReturn(mongoCollection)
   }
 
@@ -90,36 +89,34 @@ class LockRepositorySpec extends UnitSpec {
 
   private def getUpdateManyFilterQuery: Bson = {
     val captor: ArgumentCaptor[Bson] = ArgumentCaptor.forClass(classOf[Bson])
-    verify(mongoCollection).updateMany(captor.capture(), any(), any())
+    verify(mongoCollection).updateMany(captor.capture, any[Bson], any[UpdateOptions])
     captor.getValue
   }
 
   private def getUpdateManyUpdateQuery: Bson = {
     val captor: ArgumentCaptor[Bson] = ArgumentCaptor.forClass(classOf[Bson])
-    verify(mongoCollection).updateMany(any(), captor.capture(), any())
+    verify(mongoCollection).updateMany(any[Bson], captor.capture, any[UpdateOptions])
     captor.getValue
   }
 
   private def getUpdateManyUpdateOptions: UpdateOptions = {
     val captor: ArgumentCaptor[UpdateOptions] = ArgumentCaptor.forClass(classOf[UpdateOptions])
-    verify(mongoCollection).updateMany(any(), any(), captor.capture())
+    verify(mongoCollection).updateMany(any[Bson], any[Bson], captor.capture())
     captor.getValue
   }
 
   private def bsonToDocument(bson: Bson) =
-    bson.toBsonDocument(classOf[Document], CodecRegistries.fromCodecs(new DocumentCodec(), new StringCodec(), new DateCodec()))
+    bson.toBsonDocument(classOf[Document], CodecRegistries.fromCodecs(new DocumentCodec, new StringCodec, new DateCodec()))
 
   "LockRepository on findByKey" should {
 
     "call MongoCollection" in {
-
       repo.findByKey("testKey")
 
       verify(mongoCollection).find(any[Bson])
     }
 
     "provide MongoCollection with correct query filter" in {
-
       repo.findByKey(lockKey)
 
       val expectedFilter = new Document(KeyField, lockKey)
@@ -136,7 +133,6 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "return LockEntry built from Document returned by MongoCollection" in {
-
       val elementInDb =
         new Document(mapAsJavaMap(Map(KeyField -> lockKey, StatusField -> "statusValue", OwnerField -> "ownerValue", ExpiresAtField -> date)))
       when(findIterable.iterator()).thenReturn(buildMongoCursor(Seq(elementInDb)))
@@ -152,28 +148,24 @@ class LockRepositorySpec extends UnitSpec {
   "LockRepository on removeByKeyAndOwner" should {
 
     "call MongoCollection" in {
-
       repo.removeByKeyAndOwner("lockKey", "owner")
 
       verify(mongoCollection).deleteMany(any[Bson])
     }
 
     "provide MongoCollection with correct query filter" in {
-
       repo.removeByKeyAndOwner(lockKey, owner)
 
       val expectedFilter = bsonToDocument(and(feq(KeyField, lockKey), feq(OwnerField, owner)))
       val bson = bsonToDocument(getDeleteManyFilterQuery)
 
-      bson.getString(KeyField) mustBe expectedFilter.getString(KeyField)
-      bson.getString(OwnerField) mustBe expectedFilter.getString(OwnerField)
+      bson.toJson mustBe expectedFilter.toJson
     }
   }
 
   "LockRepository on insertUpdate" should {
 
     "call MongoCollection" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -183,21 +175,21 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "provide MongoCollection with correct filter query" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
       repo.insertUpdate(lockEntry)
 
-      val bson = bsonToDocument(getUpdateManyFilterQuery)
-      bson.getString(KeyField).getValue mustBe lockEntry.key
-      bson.getString(StatusField).getValue mustBe lockEntry.status
-      bson.getArray("$or").get(0).asDocument().getDocument(ExpiresAtField).getDateTime("$lt") mustBe a[BsonDateTime]
-      bson.getArray("$or").get(1).asDocument().getString(OwnerField).getValue mustBe lockEntry.owner
+      val bsonAnd = bsonToDocument(getUpdateManyFilterQuery).getArray("$and")
+      bsonAnd.get(0).asDocument.getString(KeyField).getValue mustBe lockEntry.key
+      bsonAnd.get(1).asDocument.getString(StatusField).getValue mustBe lockEntry.status
+
+      val bsonOr = bsonAnd.get(2).asDocument.getArray("$or")
+      bsonOr.get(0).asDocument.getDocument(ExpiresAtField).getDateTime("$lt") mustBe a[BsonDateTime]
+      bsonOr.get(1).asDocument.getString(OwnerField).getValue mustBe lockEntry.owner
     }
 
     "provide MongoCollection with correct update query" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -211,7 +203,6 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "provide MongoCollection with correct UpdateOptions" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -224,15 +215,13 @@ class LockRepositorySpec extends UnitSpec {
     "throw LockPersistenceException" when {
 
       "MongoCollection throws DuplicateKeyException" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
-          .thenThrow(new DuplicateKeyException(new BsonDocument(), new ServerAddress(), WriteConcernResult.unacknowledged()))
+          .thenThrow(new DuplicateKeyException(new BsonDocument, new ServerAddress, WriteConcernResult.unacknowledged()))
 
         intercept[LockPersistenceException](repo.insertUpdate(lockEntry)).getMessage mustBe "Lock is held"
       }
 
       "MongoCollection throws MongoWriteException with error category Duplicate Key" in {
-
         val duplicateKeyErrorCode = 11000
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenThrow(new MongoWriteException(new WriteError(duplicateKeyErrorCode, "", new BsonDocument()), new ServerAddress()))
@@ -241,7 +230,6 @@ class LockRepositorySpec extends UnitSpec {
       }
 
       "MongoCollection returns UpdateResult with ModifiedCount == 0 and UpsertedId == null" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 0L, null))
 
@@ -252,7 +240,6 @@ class LockRepositorySpec extends UnitSpec {
     "throw MongoWriteException" when {
 
       "MongoCollection throws MongoWriteException with error category other than Duplicate Key" in {
-
         val UncategorizedErrorCode = 12345
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenThrow(new MongoWriteException(new WriteError(UncategorizedErrorCode, "", new BsonDocument()), new ServerAddress()))
@@ -264,7 +251,6 @@ class LockRepositorySpec extends UnitSpec {
     "not throw LockPersistenceException" when {
 
       "MongoCollection returns UpdateResult with ModifiedCount == 0 and defined UpsertedId" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 0L, BsonString("UpsertedId")))
 
@@ -272,7 +258,6 @@ class LockRepositorySpec extends UnitSpec {
       }
 
       "MongoCollection returns UpdateResult with ModifiedCount other than 0 and UpsertedId == null" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 1L, null))
 
@@ -284,7 +269,6 @@ class LockRepositorySpec extends UnitSpec {
   "LockRepository on updateIfSameOwner" should {
 
     "call MongoCollection" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -294,20 +278,20 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "provide MongoCollection with correct filter query" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
       repo.updateIfSameOwner(lockEntry)
 
-      val bson = bsonToDocument(getUpdateManyFilterQuery)
-      bson.getString(KeyField).getValue mustBe lockEntry.key
-      bson.getString(StatusField).getValue mustBe lockEntry.status
-      bson.getArray("$or").get(0).asDocument().getString(OwnerField).getValue mustBe lockEntry.owner
+      val bsonAnd = bsonToDocument(getUpdateManyFilterQuery).getArray("$and")
+      bsonAnd.get(0).asDocument.getString(KeyField).getValue mustBe lockEntry.key
+      bsonAnd.get(1).asDocument.getString(StatusField).getValue mustBe lockEntry.status
+
+      val bsonOr = bsonAnd.get(2).asDocument.getArray("$or")
+      bsonOr.get(0).asDocument.getString(OwnerField).getValue mustBe lockEntry.owner
     }
 
     "provide MongoCollection with correct update query" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -321,7 +305,6 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "provide MongoCollection with correct UpdateOptions" in {
-
       when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
         .thenReturn(UpdateResult.acknowledged(1, 1L, BsonString("UpsertedId")))
 
@@ -334,15 +317,13 @@ class LockRepositorySpec extends UnitSpec {
     "throw LockPersistenceException" when {
 
       "MongoCollection throws DuplicateKeyException" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
-          .thenThrow(new DuplicateKeyException(new BsonDocument(), new ServerAddress(), WriteConcernResult.unacknowledged()))
+          .thenThrow(new DuplicateKeyException(new BsonDocument, new ServerAddress, WriteConcernResult.unacknowledged()))
 
         intercept[LockPersistenceException](repo.updateIfSameOwner(lockEntry)).getMessage mustBe "Lock is held"
       }
 
       "MongoCollection throws MongoWriteException with error category Duplicate Key" in {
-
         val duplicateKeyErrorCode = 11000
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenThrow(new MongoWriteException(new WriteError(duplicateKeyErrorCode, "", new BsonDocument()), new ServerAddress()))
@@ -351,7 +332,6 @@ class LockRepositorySpec extends UnitSpec {
       }
 
       "MongoCollection returns UpdateResult with ModifiedCount == 0 and UpsertedId == null" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 0L, null))
 
@@ -360,9 +340,7 @@ class LockRepositorySpec extends UnitSpec {
     }
 
     "throw MongoWriteException" when {
-
       "MongoCollection throws MongoWriteException with error category other than Duplicate Key" in {
-
         val UncategorizedErrorCode = 12345
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenThrow(new MongoWriteException(new WriteError(UncategorizedErrorCode, "", new BsonDocument()), new ServerAddress()))
@@ -374,7 +352,6 @@ class LockRepositorySpec extends UnitSpec {
     "not throw LockPersistenceException" when {
 
       "MongoCollection returns UpdateResult with ModifiedCount == 0 and defined UpsertedId" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 0L, BsonString("UpsertedId")))
 
@@ -382,7 +359,6 @@ class LockRepositorySpec extends UnitSpec {
       }
 
       "MongoCollection returns UpdateResult with ModifiedCount other than 0 and UpsertedId == null" in {
-
         when(mongoCollection.updateMany(any[Document], any[Document], any[UpdateOptions]))
           .thenReturn(UpdateResult.acknowledged(1, 1L, null))
 

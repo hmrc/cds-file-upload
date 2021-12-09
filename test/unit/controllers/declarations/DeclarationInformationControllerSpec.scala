@@ -16,9 +16,6 @@
 
 package controllers.declarations
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 import base.ControllerUnitSpec
 import connectors.CustomsDeclarationsInformationConnector
 import org.mockito.ArgumentMatchers.{any, eq => meq}
@@ -29,6 +26,9 @@ import play.mvc.Http.Status.{NOT_FOUND, OK}
 import testdata.TestData._
 import testdata.declarationinformation.DeclarationStatusTestData.DeclarationStatusWithAllData
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class DeclarationInformationControllerSpec extends ControllerUnitSpec {
 
@@ -53,7 +53,6 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
   "DeclarationInformationController on getDeclarationInformation" should {
 
     "call CustomsDeclarationsInformationConnector passing MRN provided" in {
-
       when(cdiConnector.getDeclarationStatus(any())(any()))
         .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
@@ -63,9 +62,7 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
     }
 
     "return Ok with DeclarationStatus received from CustomsDeclarationsInformationConnector" when {
-
       "CustomsDeclarationsInformationConnector responds with non-empty Option" in {
-
         when(cdiConnector.getDeclarationStatus(any())(any()))
           .thenReturn(Future.successful(Some(DeclarationStatusWithAllData(mrn).model)))
 
@@ -77,9 +74,7 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
     }
 
     "return NotFound" when {
-
       "CustomsDeclarationsInformationConnector responds with empty Option" in {
-
         when(cdiConnector.getDeclarationStatus(any())(any())).thenReturn(Future.successful(None))
 
         val result = controller.getDeclarationInformation(mrn)(getRequest())
@@ -88,5 +83,4 @@ class DeclarationInformationControllerSpec extends ControllerUnitSpec {
       }
     }
   }
-
 }

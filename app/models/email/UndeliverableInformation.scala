@@ -16,20 +16,23 @@
 
 package models.email
 
-import org.joda.time.DateTime
+import play.api.libs.json.{Format, Json, OFormat}
+import repositories.ZonedDateTimeFormat.{zonedDateTimeReads, zonedDateTimeWrites}
 
-import play.api.libs.json.{Json, OFormat}
+import java.time.ZonedDateTime
 
 final case class UndeliverableInformation(
   subject: String,
   eventId: String,
   groupId: String,
-  timestamp: DateTime,
+  timestamp: ZonedDateTime,
   event: UndeliverableInformationEvent
 )
 
 object UndeliverableInformation {
-  import play.api.libs.json.JodaReads._
-  import play.api.libs.json.JodaWrites._
-  implicit val format: OFormat[UndeliverableInformation] = Json.format[UndeliverableInformation]
+
+  implicit val format = {
+    implicit val zonedDateTimeFormat: Format[ZonedDateTime] = Format(zonedDateTimeReads, zonedDateTimeWrites)
+    OFormat[UndeliverableInformation](Json.reads[UndeliverableInformation], Json.writes[UndeliverableInformation])
+  }
 }

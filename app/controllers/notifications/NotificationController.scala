@@ -37,5 +37,4 @@ class NotificationController @Inject()(authorise: AuthAction, notificationServic
       case None               => NotFound
     }
   }
-
 }

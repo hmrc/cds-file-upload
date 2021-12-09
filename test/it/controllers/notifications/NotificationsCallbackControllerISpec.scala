@@ -21,7 +21,7 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
 import play.api.test.Helpers._
 
-class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with GuiceOneServerPerSuite {
+class NotificationsCallbackControllerISpec extends UnitSpec with GuiceOneServerPerSuite {
 
   private val wsClient: WSClient = app.injector.instanceOf[WSClient]
 
@@ -59,7 +59,6 @@ class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with Guice
   "Notification endpoint" should {
 
     "return 202 (ACCEPTED) status on POST request for invalid xml" in {
-
       val response = await(
         wsClient
           .url(notificationUrl)
@@ -71,7 +70,6 @@ class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with Guice
     }
 
     "return 202 (ACCEPTED) status on POST request for xml with empty File Reference" in {
-
       val response = await(
         wsClient
           .url(notificationUrl)
@@ -83,7 +81,6 @@ class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with Guice
     }
 
     "return 202 (ACCEPTED) status on POST request for xml with empty Outcome" in {
-
       val response = await(
         wsClient
           .url(notificationUrl)
@@ -95,7 +92,6 @@ class NotificationsCallbackControllerIntegrationSpec extends UnitSpec with Guice
     }
 
     "return 202 Accepted on POST request for valid xml" in {
-
       val response = await(
         wsClient
           .url(notificationUrl)

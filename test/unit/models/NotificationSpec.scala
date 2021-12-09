@@ -17,51 +17,54 @@
 package models
 
 import base.UnitSpec
-import org.joda.time.DateTime
 import play.api.libs.json.Json
-import reactivemongo.bson.BSONObjectID
 import testdata.notifications.NotificationsTestData._
 
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class NotificationSpec extends UnitSpec {
   val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
-  val idVal = BSONObjectID.generate()
 
   "Notifications Spec DbFormat" must {
-    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
+    val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
     "have json writes that produce a string which could be parsed by the database" in {
-      val json = Json.toJson(notification)(Notification.DbFormat.notificationFormat)
+      val json = Json.toJson(notification)(Notification.MongoFormat.format)
 
-      json.toString() mustBe NotificationSpec.serialisedDbFormat(idVal, fileReference, outcomeSuccess, filename, dateTime, payload)
+      val serialisedNotification = NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload)
+      json.toString mustBe serialisedNotification
     }
 
     "have json reads that produce object from the serialized database format" in {
       val readNotification =
         Json
-          .parse(NotificationSpec.serialisedDbFormat(idVal, fileReference, outcomeSuccess, filename, dateTime, payload))
-          .as[Notification](Notification.DbFormat.notificationFormat)
+          .parse(NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload))
+          .as[Notification](Notification.MongoFormat.format)
 
       readNotification mustBe notification
     }
   }
 
   "Notifications Spec FrontendFormat" must {
-    val notification = Notification(idVal, payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
+    val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
     "have json writes that produce a string which could be parsed by the SFUS frontend" in {
       val json = Json.toJson(notification)(Notification.FrontendFormat.writes)
 
-      json.toString() mustBe NotificationSpec.serialisedFrontEndFormat(fileReference, outcomeSuccess, filename, dateTime)
+      json.toString mustBe NotificationSpec.serialisedFrontEndFormat(fileReference, outcomeSuccess, filename, createdAt)
     }
   }
 }
 
 object NotificationSpec {
-  def serialisedDbFormat(idVal: BSONObjectID, fileReference: String, outcome: String, filename: String, dateTime: DateTime, payload: String) =
-    s"""{"_id":{"$$oid":"${idVal.stringify}"},"payload":"${payload}","details":{"fileReference":"${fileReference}","outcome":"${outcome}","filename":"${filename}"},"createdAt":{"$$date":${dateTime.getMillis}}}"""
+  def serialisedDbFormat(ref: String, outcome: String, file: String, createdAt: ZonedDateTime, payload: String): String = {
+    val dateObj = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
+    s"""{"payload":"${payload}","details":{"fileReference":"${ref}","outcome":"${outcome}","filename":"${file}"},$dateObj}"""
+  }
 
-  def serialisedFrontEndFormat(ifileReference: String, outcome: String, filename: String, dateTime: DateTime) =
-    s"""{"fileReference":"${fileReference}","outcome":"${outcome}","filename":"${filename}","createdAt":{"$$date":${dateTime.getMillis}}}"""
+  def serialisedFrontEndFormat(ref: String, outcome: String, filename: String, createdAt: ZonedDateTime): String = {
+    val dateObj = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
+    s"""{"fileReference":"${ref}","outcome":"${outcome}","filename":"${filename}",$dateObj}"""
+  }
 }

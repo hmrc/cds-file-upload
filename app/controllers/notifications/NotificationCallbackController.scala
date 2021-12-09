@@ -16,7 +16,6 @@
 
 package controllers.notifications
 
-import javax.inject.{Inject, Singleton}
 import metrics.MetricIdentifiers.notificationMetric
 import metrics.SfusMetrics
 import play.api.Logging
@@ -24,25 +23,29 @@ import play.api.mvc.{Action, ControllerComponents}
 import services.notifications.NotificationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationCallbackController @Inject()(notificationsService: NotificationService, metrics: SfusMetrics, cc: ControllerComponents)(
+class NotificationCallbackController @Inject()(metrics: SfusMetrics, notificationsService: NotificationService, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) with Logging {
 
-  def onNotify: Action[NodeSeq] = Action.async(parse.xml) { implicit req =>
+  def onNotify: Action[NodeSeq] = Action.async(parse.xml) { implicit request =>
+    val notificationXml = request.body
+    logger.debug("Notification payload: " + notificationXml)
     val timer = metrics.startTimer(notificationMetric)
-    val notification = req.body
 
-    notificationsService.parseAndSave(notification).map {
-      case Right(_) =>
+    notificationsService.parseAndSave(notificationXml) map {
+      case true =>
         timer.stop()
         metrics.incrementCounter(notificationMetric)
         Accepted
-      case Left(e) =>
-        logger.warn(s"Failed to save notification: $notification", e)
+
+      case false =>
+        timer.stop()
+        logger.warn(s"Failed to save notification: $notificationXml")
         InternalServerError
     }
   }

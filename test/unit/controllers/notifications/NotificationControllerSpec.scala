@@ -21,7 +21,6 @@ import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{reset, when}
 import play.api.test.Helpers._
-import reactivemongo.bson.BSONObjectID
 import services.notifications.NotificationService
 import testdata.notifications.NotificationsTestData._
 
@@ -49,11 +48,8 @@ class NotificationControllerSpec extends ControllerUnitSpec {
   "Notification Controller" should {
 
     "return OK (200)" when {
-
       "notification with specific reference has been found" in {
-
-        val notification =
-          Notification(BSONObjectID.generate(), payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), dateTime)
+        val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
         when(notificationService.getNotificationForReference(any()))
           .thenReturn(Future.successful(Some(notification)))
@@ -61,14 +57,17 @@ class NotificationControllerSpec extends ControllerUnitSpec {
         val result = controller.getNotification(fileReference)(getRequest())
 
         status(result) mustBe OK
-        contentAsString(result) mustBe s"""{"fileReference":"$fileReference","outcome":"$outcomeSuccess","filename":"$filename","createdAt":{"$$date":${dateTime.getMillis}}}"""
+
+        val ref = s""""fileReference":"$fileReference""""
+        val outcome = s""""outcome":"$outcomeSuccess""""
+        val file = s""""filename":"$filename""""
+        val created = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
+        contentAsString(result) mustBe s"""{$ref,$outcome,$file,$created}"""
       }
     }
 
     "return NotFound (404)" when {
-
       "there is no notification related with file reference" in {
-
         when(notificationService.getNotificationForReference(any()))
           .thenReturn(Future.successful(None))
 

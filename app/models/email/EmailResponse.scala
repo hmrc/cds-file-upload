@@ -16,10 +16,10 @@
 
 package models.email
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.Json
 
 final case class EmailResponse(address: String, timestamp: Option[String], undeliverable: Option[UndeliverableInformation])
 
 object EmailResponse {
-  implicit val format: OFormat[EmailResponse] = Json.format[EmailResponse]
+  implicit val format = Json.format[EmailResponse]
 }

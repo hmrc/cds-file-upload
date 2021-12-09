@@ -17,25 +17,33 @@
 package migrations
 
 import com.google.inject.Singleton
-import com.mongodb.{MongoClient, MongoClientURI}
+import com.mongodb.client.{MongoClient, MongoClients}
 import config.AppConfig
-import javax.inject.Inject
 import migrations.changelogs.notification.MakeParsedDetailsOptional
 import play.api.Logging
 import routines.{Routine, RoutinesExecutionContext}
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 @Singleton
 class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExecutionContext) extends Routine with Logging {
 
-  private val uri = new MongoClientURI(appConfig.mongodbUri)
-  private val client = new MongoClient(uri)
-  private val db = client.getDatabase(uri.getDatabase)
+  private val (client, mongoDatabase) = createMongoClient
+  private val db = client.getDatabase(mongoDatabase)
 
   def execute(): Future[Unit] = Future {
     logger.info("Exports Migration feature enabled. Starting migration with ExportsMigrationTool")
     migrateWithExportsMigrationTool()
+  }
+
+  private def createMongoClient: (MongoClient, String) = {
+    val (mongoUri, sslParam) = {
+      val sslParamPos = appConfig.mongodbUri.lastIndexOf('?'.toInt)
+      if (sslParamPos > 0) appConfig.mongodbUri.splitAt(sslParamPos) else (appConfig.mongodbUri, "")
+    }
+    val (mongoPath, mongoDatabase) = mongoUri.splitAt(mongoUri.lastIndexOf('/'.toInt))
+    (MongoClients.create(s"$mongoPath$sslParam"), mongoDatabase.drop(1))
   }
 
   val lockMaxTries = 10
