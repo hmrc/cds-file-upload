@@ -38,12 +38,12 @@ class MigrationRoutine @Inject()(appConfig: AppConfig)(implicit mec: RoutinesExe
   }
 
   private def createMongoClient: (MongoClient, String) = {
-    val (mongoUri, sslParam) = {
+    val (mongoUri, _) = {
       val sslParamPos = appConfig.mongodbUri.lastIndexOf('?'.toInt)
       if (sslParamPos > 0) appConfig.mongodbUri.splitAt(sslParamPos) else (appConfig.mongodbUri, "")
     }
-    val (mongoPath, mongoDatabase) = mongoUri.splitAt(mongoUri.lastIndexOf('/'.toInt))
-    (MongoClients.create(s"$mongoPath$sslParam"), mongoDatabase.drop(1))
+    val (_, mongoDatabase) = mongoUri.splitAt(mongoUri.lastIndexOf('/'.toInt))
+    (MongoClients.create(appConfig.mongodbUri), mongoDatabase.drop(1))
   }
 
   val lockMaxTries = 10
