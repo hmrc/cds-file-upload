@@ -23,15 +23,7 @@ class MakeParsedDetailsOptionalISpec extends UnitSpec with GuiceOneServerPerSuit
   private val mongodbUri = mongoConfiguration.get[String]("mongodb.uri")
   private val collectionName = "notifications"
 
-  private implicit val db: MongoDatabase = {
-    val (mongoUri, sslParam) = {
-      val sslParamPos = mongodbUri.lastIndexOf('?'.toInt)
-      if (sslParamPos > 0) mongodbUri.splitAt(sslParamPos) else (mongodbUri, "")
-    }
-    val (mongoPath, _) = mongoUri.splitAt(mongoUri.lastIndexOf('/'.toInt))
-    val client = MongoClients.create(s"$mongoPath$sslParam")
-    client.getDatabase(TestMongoDB.DatabaseName)
-  }
+  private implicit val db: MongoDatabase = MongoClients.create(mongodbUri).getDatabase(TestMongoDB.DatabaseName)
 
   private val changeLog = new MakeParsedDetailsOptional()
 
