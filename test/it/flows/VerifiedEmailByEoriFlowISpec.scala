@@ -28,7 +28,8 @@ class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
   val customsDataStoreUrl = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
-  val fakeRequest = FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmailIfVerified(TestData.eori).url)
+  val fakeRequest =
+    FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmailIfVerified(TestData.eori).url).withHeaders("Authorization" -> "Bearer some-token")
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
