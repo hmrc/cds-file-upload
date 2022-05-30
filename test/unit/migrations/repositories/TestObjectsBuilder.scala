@@ -40,5 +40,6 @@ object TestObjectsBuilder {
     override def tryNext(): Document = ???
     override def getServerCursor: ServerCursor = ???
     override def getServerAddress: ServerAddress = ???
+    override def available(): Int = ???
   }
 }
