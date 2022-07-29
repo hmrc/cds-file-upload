@@ -24,7 +24,9 @@ object DateParser {
   val formatter304: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssz")
   val zoneUTC: ZoneId = ZoneId.of("UTC")
 
-  def zonedDateTime(datetime: String): ZonedDateTime = ZonedDateTime.of(LocalDateTime.parse(datetime, formatter304), zoneUTC)
+  def maybeZonedDateTime(datetime: String): Option[ZonedDateTime] =
+    if (datetime.trim.nonEmpty) Some(zonedDateTime(datetime)) else None
 
-  def optionZonedDateTime(datetime: String): Option[ZonedDateTime] = if (datetime.nonEmpty) Some(zonedDateTime(datetime)) else None
+  def zonedDateTime(datetime: String): ZonedDateTime =
+    ZonedDateTime.of(LocalDateTime.parse(datetime, formatter304), zoneUTC)
 }

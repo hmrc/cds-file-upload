@@ -16,8 +16,6 @@ trait IntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting w
         Map(
           "microservice.services.auth.host" -> WireMockRunner.Host,
           "microservice.services.auth.port" -> WireMockRunner.Port,
-          "microservice.services.customs-declarations-information.host" -> WireMockRunner.Host,
-          "microservice.services.customs-declarations-information.port" -> WireMockRunner.Port,
           "microservice.services.customs-data-store.host" -> WireMockRunner.Host,
           "microservice.services.customs-data-store.port" -> WireMockRunner.Port
         )

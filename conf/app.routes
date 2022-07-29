@@ -2,6 +2,4 @@
 
 GET     /notification/:reference          controllers.notifications.NotificationController.getNotification(reference: String)
 
-GET     /declaration-information/:mrn     controllers.declarations.DeclarationInformationController.getDeclarationInformation(mrn: String)
-
 GET     /eori-email/:eori                 controllers.EmailByEoriController.getEmailIfVerified(eori: String)

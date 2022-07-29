@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-package controllers
+package models.dis.parsers
 
-import play.api.http.{ContentTypeOf, ContentTypes, Writeable}
-import play.api.libs.json.Writes
+import base.UnitSpec
 
-trait JsonResponses {
+class StringOptionSpec extends UnitSpec {
 
-  implicit def writable[T](implicit writes: Writes[T]): Writeable[T] = {
-    implicit val contentType: ContentTypeOf[T] = ContentTypeOf[T](Some(ContentTypes.JSON))
-    Writeable(Writeable.writeableOf_JsValue.transform.compose(writes.writes))
+  "StringOption.empty" should {
+    "return None" in {
+      StringOption.empty mustBe None
+    }
   }
 
+  "StringOption.apply" should {
+
+    "return None" when {
+      "the input parameter is empty" in {
+        StringOption(" ") mustBe None
+      }
+    }
+
+    "return the expected Some(string) instance" when {
+      "the input parameter is NOT empty" in {
+        StringOption(" blabla ") mustBe Some("blabla")
+      }
+    }
+  }
 }
