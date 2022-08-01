@@ -117,5 +117,4 @@ class ExportsMigrationTool(
   }
 
   private def isRunAlways(migrationDefinition: MigrationDefinition): Boolean = migrationDefinition.migrationInformation.runAlways
-
 }

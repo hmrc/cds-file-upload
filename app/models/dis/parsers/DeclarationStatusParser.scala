@@ -16,11 +16,10 @@
 
 package models.dis.parsers
 
-import java.time.ZonedDateTime
-
-import models.dis.{DeclarationStatus, PreviousDocument, XmlTags}
 import models.dis.XmlTags._
+import models.dis.{DeclarationStatus, PreviousDocument, XmlTags}
 
+import java.time.ZonedDateTime
 import scala.xml.NodeSeq
 
 class DeclarationStatusParser {
@@ -40,9 +39,9 @@ class DeclarationStatusParser {
       ucr = mainUcr,
       receivedDateTime = DateParser.zonedDateTime((responseXml \ declarationStatusDetails \ declaration \ receivedDateTime \ dateTimeString).text),
       releasedDateTime =
-        DateParser.optionZonedDateTime((responseXml \ declarationStatusDetails \ declaration \ goodsReleasedDateTime \ dateTimeString).text),
+        DateParser.maybeZonedDateTime((responseXml \ declarationStatusDetails \ declaration \ goodsReleasedDateTime \ dateTimeString).text),
       acceptanceDateTime =
-        DateParser.optionZonedDateTime((responseXml \ declarationStatusDetails \ declaration \ acceptanceDateTime \ dateTimeString).text),
+        DateParser.maybeZonedDateTime((responseXml \ declarationStatusDetails \ declaration \ acceptanceDateTime \ dateTimeString).text),
       createdDateTime = ZonedDateTime.now(),
       roe = (responseXml \ declarationStatusDetails \ declaration \ roe).text,
       ics = (responseXml \ declarationStatusDetails \ declaration \ ics).text,
@@ -61,5 +60,4 @@ class DeclarationStatusParser {
         val typeCode = (doc \ XmlTags.typeCode).text
         PreviousDocument(id, typeCode)
       }
-
 }

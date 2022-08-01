@@ -18,7 +18,7 @@ package models.dis.parsers
 
 object StringOption {
 
-  def apply(str: String): Option[String] = Option(str).filter(_.trim.nonEmpty)
+  def apply(str: String): Option[String] = Option(str.trim).filter(_.nonEmpty)
 
   def empty: Option[String] = None
 }

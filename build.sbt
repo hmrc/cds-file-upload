@@ -15,23 +15,23 @@ lazy val microservice = (project in file("."))
   .settings(publishingSettings: _*)
   .settings(scalaVersion := "2.12.12")
   .settings(
-    unmanagedSourceDirectories in Test := Seq(
-      (baseDirectory in Test).value / "test/unit",
-      (baseDirectory in Test).value / "test/utils"
+    Test / unmanagedSourceDirectories := Seq(
+      (Test / baseDirectory).value / "test/unit",
+      (Test / baseDirectory).value / "test/utils"
     ),
     addTestReportOption(Test, "test-reports")
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
-    Keys.fork in IntegrationTest := false,
-    unmanagedSourceDirectories in IntegrationTest := Seq(
-      (baseDirectory in IntegrationTest).value / "test/it",
-      (baseDirectory in IntegrationTest).value / "test/utils"
+    IntegrationTest / Keys.fork := false,
+    IntegrationTest / unmanagedSourceDirectories := Seq(
+      (IntegrationTest / baseDirectory).value / "test/it",
+      (IntegrationTest / baseDirectory).value / "test/utils"
     ),
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := ForkedJvmPerTestSettings.oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false
+    IntegrationTest / testGrouping := ForkedJvmPerTestSettings.oneForkedJvmPerTest((IntegrationTest / definedTests).value),
+    IntegrationTest / parallelExecution := false
   )
   .settings(scoverageSettings)
   .settings(silencerSettings)
@@ -47,10 +47,10 @@ lazy val scoverageSettings: Seq[Setting[_]] = Seq(
     ".*(BuildInfo|Routes|Options|TestingUtilitiesController).*",
     "logger.*\\(.*\\)"
   ).mkString(";"),
-  coverageMinimumStmtTotal := 84,
+  coverageMinimumStmtTotal := 78,
   coverageFailOnMinimum := true,
   coverageHighlighting := true,
-  parallelExecution in Test := false
+  Test / parallelExecution := false
 )
 
 lazy val silencerSettings: Seq[Setting[_]] = {
