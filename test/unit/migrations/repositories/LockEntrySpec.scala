@@ -20,7 +20,7 @@ import java.util.Date
 
 import base.UnitSpec
 import org.bson.Document
-import scala.collection.JavaConverters.mapAsJavaMap
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 class LockEntrySpec extends UnitSpec {
 
@@ -31,7 +31,7 @@ class LockEntrySpec extends UnitSpec {
       val date = new Date()
       val lockEntry = LockEntry(key = "keyValue", status = "statusValue", owner = "ownerValue", expiresAt = date)
       val expectedOutput =
-        new Document(mapAsJavaMap(Map("key" -> "keyValue", "status" -> "statusValue", "owner" -> "ownerValue", "expiresAt" -> date)))
+        new Document(asJava(Map("key" -> "keyValue", "status" -> "statusValue", "owner" -> "ownerValue", "expiresAt" -> date)))
 
       lockEntry.buildFullDBObject mustBe expectedOutput
     }

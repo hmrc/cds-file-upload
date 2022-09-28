@@ -35,7 +35,7 @@ import org.mockito.Mockito._
 import org.mongodb.scala.bson.BsonString
 
 import java.util.Date
-import scala.collection.JavaConverters.mapAsJavaMap
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 class LockRepositorySpec extends UnitSpec {
 
@@ -58,18 +58,18 @@ class LockRepositorySpec extends UnitSpec {
   private val date = new Date
   private val lockEntry = LockEntry(lockKey, status, owner, date)
 
-  override def beforeEach: Unit = {
-    super.beforeEach
+  override def beforeEach(): Unit = {
+    super.beforeEach()
 
     reset(findIterable, mongoCollection, mongoDatabase)
 
     defineMocksBehaviourDefault()
   }
 
-  override def afterEach: Unit = {
+  override def afterEach(): Unit = {
     reset(findIterable, mongoCollection, mongoDatabase)
 
-    super.afterEach
+    super.afterEach()
   }
 
   private def defineMocksBehaviourDefault(): Unit = {
@@ -134,7 +134,7 @@ class LockRepositorySpec extends UnitSpec {
 
     "return LockEntry built from Document returned by MongoCollection" in {
       val elementInDb =
-        new Document(mapAsJavaMap(Map(KeyField -> lockKey, StatusField -> "statusValue", OwnerField -> "ownerValue", ExpiresAtField -> date)))
+        new Document(asJava(Map(KeyField -> lockKey, StatusField -> "statusValue", OwnerField -> "ownerValue", ExpiresAtField -> date)))
       when(findIterable.iterator()).thenReturn(buildMongoCursor(Seq(elementInDb)))
 
       val result = repo.findByKey(lockKey)

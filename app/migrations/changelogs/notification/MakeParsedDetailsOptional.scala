@@ -25,7 +25,7 @@ import org.mongodb.scala.model.UpdateOneModel
 import org.mongodb.scala.model.Updates.{combine, set, unset}
 import play.api.Logging
 
-import scala.collection.JavaConverters._
+import scala.jdk.javaapi.CollectionConverters._
 
 class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
 
@@ -91,7 +91,7 @@ class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
       case (requests, idx) =>
         logger.info(s"Updating batch no. $idx...")
 
-        collection.bulkWrite(seqAsJavaList(requests))
+        collection.bulkWrite(asJava(requests))
         logger.info(s"Updated batch no. $idx")
     }
 
@@ -99,7 +99,7 @@ class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
   }
 
   private def getDocumentsToUpdate(db: MongoDatabase, filter: Bson, queryBatchSize: Int): Iterator[Document] =
-    asScalaIterator(
+    asScala(
       db.getCollection(collectionName)
         .find(filter)
         .batchSize(queryBatchSize)

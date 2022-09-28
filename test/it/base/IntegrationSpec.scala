@@ -24,14 +24,12 @@ trait IntegrationSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting w
 
   SharedMetricRegistries.clear()
 
-  override protected def beforeAll() {
+  override protected def beforeAll(): Unit =
     startMockServer()
-  }
 
   override protected def afterEach(): Unit =
     resetMockServer()
 
-  override protected def afterAll() {
+  override protected def afterAll(): Unit =
     stopMockServer()
-  }
 }
