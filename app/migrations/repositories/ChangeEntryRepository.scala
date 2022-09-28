@@ -19,12 +19,12 @@ package migrations.repositories
 import com.mongodb.client.MongoDatabase
 import migrations.repositories.ChangeEntry.{KeyAuthor, KeyChangeId}
 import org.bson.Document
-import scala.collection.JavaConverters.asScalaIterator
+import scala.jdk.javaapi.CollectionConverters.asScala
 
 class ChangeEntryRepository(collectionName: String, mongoDatabase: MongoDatabase)
     extends MongoRepository(mongoDatabase, collectionName, Array(KeyAuthor, KeyChangeId)) {
 
-  private[migrations] def findAll(): List[Document] = asScalaIterator(collection.find().iterator()).toList
+  private[migrations] def findAll(): List[Document] = asScala(collection.find().iterator()).toList
 
   private[migrations] def save(changeEntry: ChangeEntry): Unit = collection.insertOne(changeEntry.buildFullDBObject)
 

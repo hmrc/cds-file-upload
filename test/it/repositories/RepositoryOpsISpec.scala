@@ -9,13 +9,13 @@ import testdata.notifications.NotificationsTestData._
 
 class RepositoryOpsISpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  override def fakeApplication: Application =
+  override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .configure(TestMongoDB.mongoConfiguration)
       .build()
 
-  private val repository = fakeApplication.injector.instanceOf[NotificationsRepository]
+  private val repository = fakeApplication().injector.instanceOf[NotificationsRepository]
 
   private implicit val format = Notification.MongoFormat.format
 

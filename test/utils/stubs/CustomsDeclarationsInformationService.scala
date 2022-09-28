@@ -40,13 +40,12 @@ trait CustomsDeclarationsInformationService extends MockGenericDownstreamService
     case _         => declarationStatusInternalServerErrorResponse
   }
 
-  def verifyDecServiceWasCalledCorrectly(mrn: String, expectedApiVersion: String) {
+  def verifyDecServiceWasCalledCorrectly(mrn: String, expectedApiVersion: String): Unit =
     verify(
       getRequestedFor(urlMatching(fetchMrnStatusUrl.replace(id, mrn)))
         .withHeader(CONTENT_TYPE, equalTo(ContentTypes.XML(Codec.utf_8)))
         .withHeader(ACCEPT, equalTo(s"application/vnd.hmrc.$expectedApiVersion+xml"))
     )
-  }
 }
 
 object CustomsDeclarationsInformationService {

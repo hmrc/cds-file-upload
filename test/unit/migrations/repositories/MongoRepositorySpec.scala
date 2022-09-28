@@ -27,7 +27,7 @@ import org.mockito.Mockito._
 import org.mongodb.scala.bson.conversions.Bson
 import play.api.libs.json.Json
 
-import scala.collection.JavaConverters._
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 class MongoRepositorySpec extends UnitSpec {
 
@@ -59,7 +59,7 @@ class MongoRepositorySpec extends UnitSpec {
 
   private def buildIndex(field: String): Document = {
     val fields = Map("key" -> new Document(field, 1), "name" -> s"${field}Name")
-    new Document(mapAsJavaMap(fields))
+    new Document(asJava(fields))
   }
 
   private def buildUniqueIndex(field: String): Document = {
