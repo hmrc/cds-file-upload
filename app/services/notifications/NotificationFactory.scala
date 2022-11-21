@@ -31,12 +31,12 @@ class NotificationFactory @Inject()(notificationParser: NotificationParser) exte
         Notification(payload = notificationXml.toString, details = Some(notificationDetails))
 
       case Failure(exc) =>
-        logParseExceptionAtPagerDutyLevel(exc)
+        logParseExceptionAtPagerDutyLevel(exc, notificationXml)
         Notification(payload = notificationXml.toString)
     }
 
-  private def logParseExceptionAtPagerDutyLevel(exc: Throwable): Unit =
-    logger.warn(s"${logParseExceptionAtPagerDutyLevelMessage}. Payload did not contain the required values!")
-
-  private val logParseExceptionAtPagerDutyLevelMessage = "There was a problem during parsing notification"
+  private def logParseExceptionAtPagerDutyLevel(exc: Throwable, notificationXml: NodeSeq): Unit =
+    logger.warn(
+      s"There was a problem during parsing notification. Payload: |${notificationXml}| did not contain the required values! Error: ${exc.getMessage}"
+    )
 }
