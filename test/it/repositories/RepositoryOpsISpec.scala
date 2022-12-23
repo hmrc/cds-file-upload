@@ -1,7 +1,6 @@
 package repositories
 
 import base.{TestMongoDB, UnitSpec}
-import models.Notification
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -16,8 +15,6 @@ class RepositoryOpsISpec extends UnitSpec with GuiceOneAppPerSuite {
       .build()
 
   private val repository = fakeApplication().injector.instanceOf[NotificationsRepository]
-
-  private implicit val format = Notification.MongoFormat.format
 
   private val document1 = parsedNotification
   private val document2 = unparsedNotification

@@ -61,7 +61,7 @@ class NotificationControllerSpec extends ControllerUnitSpec {
         val ref = s""""fileReference":"$fileReference""""
         val outcome = s""""outcome":"$outcomeSuccess""""
         val file = s""""filename":"$filename""""
-        val created = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
+        val created = s""""createdAt":"$createdAt""""
         contentAsString(result) mustBe s"""{$ref,$outcome,$file,$created}"""
       }
     }

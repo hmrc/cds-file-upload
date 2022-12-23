@@ -16,8 +16,7 @@
 
 package models.email
 
-import play.api.libs.json.{Format, Json, OFormat}
-import repositories.ZonedDateTimeFormat.{zonedDateTimeReads, zonedDateTimeWrites}
+import play.api.libs.json.Json
 
 import java.time.ZonedDateTime
 
@@ -31,8 +30,5 @@ final case class UndeliverableInformation(
 
 object UndeliverableInformation {
 
-  implicit val format = {
-    implicit val zonedDateTimeFormat: Format[ZonedDateTime] = Format(zonedDateTimeReads, zonedDateTimeWrites)
-    OFormat[UndeliverableInformation](Json.reads[UndeliverableInformation], Json.writes[UndeliverableInformation])
-  }
+  implicit val format = Json.format[UndeliverableInformation]
 }
