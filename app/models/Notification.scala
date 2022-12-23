@@ -49,6 +49,6 @@ object Notification {
         Json.obj("fileReference" -> "", "outcome" -> "", "filename" -> "", "createdAt" -> notification.createdAt)
       }
 
-    implicit val notificationsWrites: Writes[Notification] = writes
+    implicit val notificationsWrites: Writes[Notification] = writes _
   }
 }

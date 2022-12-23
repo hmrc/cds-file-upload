@@ -21,15 +21,14 @@ import scala.concurrent.Future
 
 import base.UnitSpec
 import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito._
-import org.scalatestplus.scalacheck.{Checkers, ScalaCheckPropertyChecks}
+import org.mockito.MockitoSugar.{mock, when}
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyChecks {
+class AuthActionSpec extends UnitSpec {
 
   val mockAuthConnector = mock[AuthConnector]
   def authAction = new AuthActionImpl(mockAuthConnector, stubControllerComponents())
@@ -40,14 +39,12 @@ class AuthActionSpec extends UnitSpec with Checkers with ScalaCheckPropertyCheck
 
     "return Ok" when {
       "user has internalId" in {
-        forAll { internalId: String =>
-          when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
-            .thenReturn(Future.successful(Some(internalId)))
+        when(mockAuthConnector.authorise[Option[String]](any(), any())(any(), any()))
+          .thenReturn(Future.successful(Some("internalId")))
 
-          val result = authController.action(FakeRequest())
+        val result = authController.action(FakeRequest())
 
-          status(result) mustBe OK
-        }
+        status(result) mustBe OK
       }
     }
 

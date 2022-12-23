@@ -16,15 +16,15 @@
 
 package migrations
 
-import java.util.Date
-
 import base.UnitSpec
 import migrations.LockManager.DefaultKey
 import migrations.exceptions.{LockManagerException, LockPersistenceException}
 import migrations.repositories.{LockEntry, LockRefreshChecker, LockRepository, LockStatus}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar.{doNothing, mock, reset, times, verify, verifyZeroInteractions, when}
+
+import java.util.Date
 
 class LockManagerSpec extends UnitSpec {
 
@@ -72,9 +72,8 @@ class LockManagerSpec extends UnitSpec {
 
   "LockManager on acquireLockDefault" should {
     "provide LockRepository with correct LockEntry" in {
-
       when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
-      doNothing().when(lockRepository).insertUpdate(any())
+      doNothing.when(lockRepository).insertUpdate(any())
 
       val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
 
@@ -91,9 +90,8 @@ class LockManagerSpec extends UnitSpec {
 
     "no exception thrown by LockRepository (no lock in DB, lock belongs to this LockManager, or to some other but is expired)" should {
       "call LockRepository only once" in {
-
         when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
-        doNothing().when(lockRepository).insertUpdate(any())
+        doNothing.when(lockRepository).insertUpdate(any())
 
         val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
 
@@ -104,11 +102,9 @@ class LockManagerSpec extends UnitSpec {
     }
 
     "LockPersistenceException is thrown by LockRepository" when {
-
       "current lock belongs to different owner and it's not expired" should {
 
         "call LockRepository up to maxTries times" in {
-
           when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
           val currentLock = LockEntry(DefaultKey, LockStatus.LockHeld.name, "OtherLockOwner", currentLockExpiryDate)
           when(lockRepository.insertUpdate(any())).thenThrow(new LockPersistenceException("Lock is held"))
@@ -122,7 +118,6 @@ class LockManagerSpec extends UnitSpec {
         }
 
         "throw LockCheckException('MaxTries(_) reached') after not succeeding any try" in {
-
           when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
           val currentLock = LockEntry(DefaultKey, LockStatus.LockHeld.name, "OtherLockOwner", currentLockExpiryDate)
           when(lockRepository.insertUpdate(any())).thenThrow(new LockPersistenceException("Lock is held"))
@@ -134,7 +129,6 @@ class LockManagerSpec extends UnitSpec {
         }
 
         "throw LockCheckException('Waiting time required...') if lock's expiry date is further in the future than lockMaxWaitMillis" in {
-
           when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
 
           val currentLockExpiryDate = new Date(newLockExpiryDate.getTime + 10 * config.lockMaxWaitMillis)
@@ -151,12 +145,10 @@ class LockManagerSpec extends UnitSpec {
   }
 
   "LockManager on ensureLockDefault" when {
-
     "does need to refresh the lock" should {
       "provide LockRepository with correct LockEntry" in {
-
         when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
-        doNothing().when(lockRepository).updateIfSameOwner(any())
+        doNothing.when(lockRepository).updateIfSameOwner(any())
         when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
 
         val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
@@ -175,14 +167,13 @@ class LockManagerSpec extends UnitSpec {
 
     "does NOT need to refresh the lock" should {
       "not call LockRepository" in {
-
         when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(false)
 
         val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
 
         lockManager.ensureLockDefault()
 
-        verifyNoInteractions(lockRepository)
+        verifyZeroInteractions(lockRepository)
       }
     }
 
@@ -190,10 +181,9 @@ class LockManagerSpec extends UnitSpec {
 
       "LockRepository does not throw any exceptions (there is a lock belonging to this LockManager)" should {
         "call LockRepository only once" in {
-
           when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
           when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
-          doNothing().when(lockRepository).updateIfSameOwner(any())
+          doNothing.when(lockRepository).updateIfSameOwner(any())
 
           val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
 
@@ -208,7 +198,6 @@ class LockManagerSpec extends UnitSpec {
         "there is no lock in the DB" should {
 
           "call LockRepository maxTries times" in {
-
             when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
             when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
             when(lockRepository.updateIfSameOwner(any())).thenThrow(new LockPersistenceException("Lock is held"))
@@ -222,7 +211,6 @@ class LockManagerSpec extends UnitSpec {
           }
 
           "throw LockCheckException('MaxTries(_) reached')" in {
-
             when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
             when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
             when(lockRepository.updateIfSameOwner(any())).thenThrow(new LockPersistenceException("Lock is held"))
@@ -237,7 +225,6 @@ class LockManagerSpec extends UnitSpec {
         "there is a lock belonging to some other LockManager (expired or not)" should {
 
           "call LockRepository only once" in {
-
             when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
             when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
             val currentLock = LockEntry(DefaultKey, LockStatus.LockHeld.name, "OtherLockOwner", currentLockExpiryDate)
@@ -252,7 +239,6 @@ class LockManagerSpec extends UnitSpec {
           }
 
           "throw LockCheckException('Lock held by other process. Cannot ensure lock')" in {
-
             when(lockRefreshChecker.needsRefreshLock(any())).thenReturn(true)
             when(timeUtils.currentTimePlusMillis(any())).thenReturn(newLockExpiryDate)
             val currentLock = LockEntry(DefaultKey, LockStatus.LockHeld.name, "OtherLockOwner", currentLockExpiryDate)
@@ -269,9 +255,7 @@ class LockManagerSpec extends UnitSpec {
   }
 
   "LockManager on releaseLockDefault" should {
-
     "call LockRepository" in {
-
       val lockManager = new LockManager(lockRepository, lockRefreshChecker, timeUtils, config)
 
       lockManager.releaseLockDefault()
@@ -279,5 +263,4 @@ class LockManagerSpec extends UnitSpec {
       verify(lockRepository).removeByKeyAndOwner(meq(DefaultKey), any())
     }
   }
-
 }

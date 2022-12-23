@@ -16,18 +16,18 @@
 
 package controllers
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
 import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
 import models.email.Email
 import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import testdata.TestData
-import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
 
@@ -79,22 +79,5 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
       val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
       status(response) mustBe NOT_FOUND
     }
-
-    "return 500(INTERNAL_SERVER_ERROR) status for any 4xx returned by the downstream service, let apart 404" in {
-      when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenAnswer(_ => upstreamErrorResponse(BAD_REQUEST))
-
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
-      status(response) mustBe INTERNAL_SERVER_ERROR
-    }
-
-    "return 500(INTERNAL_SERVER_ERROR) status for any 5xx http error code returned by the downstream service" in {
-      when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenAnswer(_ => upstreamErrorResponse(BAD_GATEWAY))
-
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
-      status(response) mustBe INTERNAL_SERVER_ERROR
-    }
   }
-
-  def upstreamErrorResponse(status: Int): Future[UpstreamErrorResponse] =
-    Future.successful(UpstreamErrorResponse("An error", status))
 }

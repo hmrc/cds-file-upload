@@ -19,7 +19,7 @@ package controllers.notifications
 import base.ControllerUnitSpec
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.MockitoSugar.{mock, reset, when}
 import play.api.test.Helpers._
 import services.notifications.NotificationService
 import testdata.notifications.NotificationsTestData._

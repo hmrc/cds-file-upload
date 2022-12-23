@@ -19,8 +19,8 @@ package services.notifications
 import base.UnitSpec
 import models.Notification
 import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito.{reset, verify, when}
-import org.mockito.{ArgumentCaptor, InOrder, Mockito}
+import org.mockito.MockitoSugar.{mock, reset, verify, when}
+import org.mockito.{ArgumentCaptor, InOrder, MockitoSugar}
 import repositories.NotificationsRepository
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 import testdata.notifications.NotificationsTestData._
@@ -53,7 +53,7 @@ class NotificationServiceSpec extends UnitSpec {
 
       notificationService.parseAndSave(SuccessNotificationXml).futureValue
 
-      val inOrder: InOrder = Mockito.inOrder(notificationFactory, notificationsRepository)
+      val inOrder: InOrder = MockitoSugar.inOrder(notificationFactory, notificationsRepository)
       inOrder.verify(notificationFactory).buildNotification(any[NodeSeq])
       inOrder.verify(notificationsRepository).insertOne(any[Notification])
     }

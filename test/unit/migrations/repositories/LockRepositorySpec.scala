@@ -31,7 +31,7 @@ import org.bson.conversions.Bson
 import org.bson.{BsonDateTime, BsonDocument, Document}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import org.mongodb.scala.bson.BsonString
 
 import java.util.Date

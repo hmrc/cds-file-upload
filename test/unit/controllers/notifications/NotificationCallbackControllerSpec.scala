@@ -18,7 +18,7 @@ package controllers.notifications
 
 import base.{ControllerUnitSpec, SfusMetricsMock}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, times, verify, when}
+import org.mockito.MockitoSugar.{mock, reset, times, verify, when}
 import play.api.test.Helpers._
 import services.notifications.NotificationService
 
@@ -47,7 +47,7 @@ class NotificationCallbackControllerSpec extends ControllerUnitSpec with SfusMet
 
       status(result) mustBe ACCEPTED
 
-      verify(sfusMetrics, times(1)).incrementCounter(any())
+      verify(sfusMetrics).incrementCounter(any())
     }
 
     "return internal server error when there is a downstream failure" in {

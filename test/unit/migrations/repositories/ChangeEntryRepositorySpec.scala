@@ -16,15 +16,15 @@
 
 package migrations.repositories
 
-import java.util.Date
-
 import base.UnitSpec
 import com.mongodb.MongoNamespace
 import com.mongodb.client.{FindIterable, MongoCollection, MongoDatabase}
 import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 import org.bson.Document
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar.{mock, reset, verify, when}
+
+import java.util.Date
 
 class ChangeEntryRepositorySpec extends UnitSpec {
 
@@ -64,7 +64,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
   "ChangeEntryRepository on findAll" should {
 
     "call MongoCollection" in {
-
       when(findIterable.iterator()).thenReturn(buildMongoCursor(Seq.empty))
 
       repo.findAll()
@@ -74,7 +73,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
 
     "return empty List" when {
       "MongoCollection returned empty Iterable" in {
-
         when(findIterable.iterator()).thenReturn(buildMongoCursor(Seq.empty))
 
         val result = repo.findAll()
@@ -84,7 +82,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
     }
 
     "return List of Documents returned by MongoCollection" in {
-
       val elementsInDb = List(new Document("id", "ID_1"), new Document("id", "ID_2"), new Document("id", "ID_3"))
       when(findIterable.iterator()).thenReturn(buildMongoCursor(elementsInDb))
 
@@ -97,7 +94,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
   "ChangeEntryRepository on save" should {
 
     "call ChangeEntry" in {
-
       val changeEntry = mock[ChangeEntry]
       when(changeEntry.buildFullDBObject).thenReturn(new Document())
 
@@ -107,7 +103,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
     }
 
     "call MongoCollection" in {
-
       val changeEntry = mock[ChangeEntry]
       when(changeEntry.buildFullDBObject).thenReturn(new Document())
 
@@ -117,7 +112,6 @@ class ChangeEntryRepositorySpec extends UnitSpec {
     }
 
     "provide MongoCollection with Document from provided ChangeEntry" in {
-
       val changeEntry = ChangeEntry("changeIdValue", "authorValue", new Date(), "changeLogClassValue")
 
       repo.save(changeEntry)
@@ -126,5 +120,4 @@ class ChangeEntryRepositorySpec extends UnitSpec {
       verify(mongoCollection).insertOne(meq(expectedDocument))
     }
   }
-
 }

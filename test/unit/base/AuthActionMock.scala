@@ -18,11 +18,10 @@ package base
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
-
 import controllers.actions.AuthActionImpl
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
-import org.mockito.stubbing.OngoingStubbing
+import org.mockito.MockitoSugar.{mock, reset, when}
+import org.mockito.stubbing.ScalaOngoingStubbing
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AuthConnector
 
@@ -39,9 +38,9 @@ trait AuthActionMock extends UnitSpec {
     super.afterEach()
   }
 
-  def authorisedUser(): OngoingStubbing[Future[Option[String]]] =
+  def authorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(Some(internalId)))
 
-  def nonAuthorisedUser(): OngoingStubbing[Future[Option[String]]] =
+  def nonAuthorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(None))
 }

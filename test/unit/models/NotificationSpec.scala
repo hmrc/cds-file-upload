@@ -17,19 +17,18 @@
 package models
 
 import base.UnitSpec
+import models.Notification.FrontendFormat._
 import play.api.libs.json.Json
 import testdata.notifications.NotificationsTestData._
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.{ZoneOffset, ZonedDateTime}
 
 class NotificationSpec extends UnitSpec {
-  val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
 
   "Notifications Spec DbFormat" must {
-    val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
     "have json writes that produce a string which could be parsed by the database" in {
+      val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
       val json = Json.toJson(notification)(Notification.MongoFormat.format)
 
       val serialisedNotification = NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload)
@@ -42,6 +41,8 @@ class NotificationSpec extends UnitSpec {
           .parse(NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload))
           .as[Notification](Notification.MongoFormat.format)
 
+      val fromInstant = createdAt.toInstant.atZone(ZoneOffset.UTC)
+      val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), fromInstant)
       readNotification mustBe notification
     }
   }
@@ -50,7 +51,7 @@ class NotificationSpec extends UnitSpec {
     val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
     "have json writes that produce a string which could be parsed by the SFUS frontend" in {
-      val json = Json.toJson(notification)(Notification.FrontendFormat.writes)
+      val json = Json.toJson(notification)
 
       json.toString mustBe NotificationSpec.serialisedFrontEndFormat(fileReference, outcomeSuccess, filename, createdAt)
     }
