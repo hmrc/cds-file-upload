@@ -23,7 +23,8 @@ import com.mongodb.client.{ListIndexesIterable, MongoCollection, MongoDatabase}
 import migrations.repositories.TestObjectsBuilder.buildMongoCursor
 import org.bson.Document
 import org.mockito.ArgumentMatchers.{any, anyString, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.Mockito.atMostOnce
+import org.mockito.MockitoSugar.{mock, never, reset, verify, when}
 import org.mongodb.scala.bson.conversions.Bson
 import play.api.libs.json.Json
 
@@ -83,6 +84,7 @@ class MongoRepositorySpec extends UnitSpec {
     }
 
     "there is non-unique index in DB" should {
+
       "call MongoCollection to drop index" in {
         val mongoCursor = buildMongoCursor(Seq(buildIndex("DEFAULT_LOCK")))
         when(indexesList.iterator()).thenReturn(mongoCursor)
@@ -105,17 +107,16 @@ class MongoRepositorySpec extends UnitSpec {
     }
 
     "there is unique index in DB" should {
-      val uniqueField = "uniqueIndex"
-
       "not call MongoCollection to drop or create index" in {
+        val uniqueField = "uniqueIndex"
         val mongoCursor = buildMongoCursor(Seq(buildUniqueIndex(uniqueField)))
         when(indexesList.iterator()).thenReturn(mongoCursor)
         val repo = new MongoRepository(mongoDatabase, collectionName, Array(uniqueField)) {}
 
         repo.ensureIndex()
 
-        verify(mongoCollection, never()).dropIndex(anyString())
-        verify(mongoCollection, never()).createIndex(any[Document], any[IndexOptions])
+        verify(mongoCollection, never).dropIndex(anyString())
+        verify(mongoCollection, never).createIndex(any[Document], any[IndexOptions])
       }
     }
 
@@ -123,8 +124,7 @@ class MongoRepositorySpec extends UnitSpec {
       val uniqueField = "uniqueIndex"
 
       "call MongoCollection to drop all non-unique indexes" in {
-        val mongoCursor =
-          buildMongoCursor(Seq(buildUniqueIndex(uniqueField), buildIndex("DEFAULT_LOCK"), buildIndex("DEFAULT_LOCK_2")))
+        val mongoCursor = buildMongoCursor(Seq(buildUniqueIndex(uniqueField), buildIndex("DEFAULT_LOCK"), buildIndex("DEFAULT_LOCK_2")))
         when(indexesList.iterator()).thenReturn(mongoCursor)
         val repo = new MongoRepository(mongoDatabase, collectionName, Array(uniqueField)) {}
 
@@ -135,14 +135,13 @@ class MongoRepositorySpec extends UnitSpec {
       }
 
       "not call MongoCollection to create index qwerty" in {
-        val mongoCursor =
-          buildMongoCursor(Seq(buildUniqueIndex(uniqueField), buildIndex("DEFAULT_LOCK"), buildIndex("DEFAULT_LOCK_2")))
+        val mongoCursor = buildMongoCursor(Seq(buildUniqueIndex(uniqueField), buildIndex("DEFAULT_LOCK"), buildIndex("DEFAULT_LOCK_2")))
         when(indexesList.iterator()).thenReturn(mongoCursor)
         val repo = new MongoRepository(mongoDatabase, collectionName, Array(uniqueField)) {}
 
         repo.ensureIndex()
 
-        verify(mongoCollection, never()).createIndex(any[Document], any[IndexOptions])
+        verify(mongoCollection, never).createIndex(any[Document], any[IndexOptions])
       }
     }
 

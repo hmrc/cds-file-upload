@@ -1,7 +1,12 @@
 
 # cds-file-upload
 
-This is a placeholder README.md for a new repository
+## Summary
+This microservice is part of CDS File Upload Service. It is designed to work in tandem with [cds-file-upload-frontend](https://github.com/hmrc/cds-file-upload-frontend) service.
+
+## Running the test before a commit
+
+$ `precheck.sh`
 
 ### License
 

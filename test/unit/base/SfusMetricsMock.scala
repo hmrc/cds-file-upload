@@ -19,7 +19,7 @@ package base
 import com.codahale.metrics.{Counter, Timer}
 import metrics.SfusMetrics
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{doNothing, reset, when}
+import org.mockito.MockitoSugar.{doNothing, mock, reset, when}
 
 trait SfusMetricsMock extends UnitSpec {
 
@@ -31,7 +31,7 @@ trait SfusMetricsMock extends UnitSpec {
     when(sfusMetrics.counters).thenReturn(Map.empty[String, Counter])
     when(sfusMetrics.timers).thenReturn(Map.empty[String, Timer])
     when(sfusMetrics.startTimer(any())).thenReturn(mock[Timer.Context])
-    doNothing().when(sfusMetrics).incrementCounter(any())
+    doNothing.when(sfusMetrics).incrementCounter(any())
   }
 
   override protected def afterEach(): Unit = {

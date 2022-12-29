@@ -17,10 +17,9 @@
 package services.notifications
 
 import scala.xml.NodeSeq
-
 import base.UnitSpec
 import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair
 
 class NotificationFactorySpec extends UnitSpec {
@@ -41,7 +40,6 @@ class NotificationFactorySpec extends UnitSpec {
   }
 
   "NotificationFactory on buildNotification" should {
-
     "call NotificationParser passing xml payload" in {
       val testNotification = ExampleXmlAndNotificationDetailsPair.exampleNotification()
       when(notificationParser.parse(any[NodeSeq])).thenReturn(testNotification.asDomainModel)
@@ -55,7 +53,6 @@ class NotificationFactorySpec extends UnitSpec {
   "NotificationFactory on buildNotification" when {
 
     "NotificationParser returns NotificationDetails" should {
-
       val testNotification = ExampleXmlAndNotificationDetailsPair.exampleNotification()
 
       "return Notification with payload" in {
@@ -77,7 +74,6 @@ class NotificationFactorySpec extends UnitSpec {
     }
 
     "NotificationParser throws an Exception" should {
-
       val testNotification = ExampleXmlAndNotificationDetailsPair.exampleNotificationMissingFileName()
       val exception = new RuntimeException("Test parse exception")
 
@@ -104,5 +100,4 @@ class NotificationFactorySpec extends UnitSpec {
       }
     }
   }
-
 }

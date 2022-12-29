@@ -17,7 +17,6 @@
 package models
 
 import play.api.libs.json._
-import repositories.ZonedDateTimeFormat.{zonedDateTimeReads, zonedDateTimeWrites}
 
 import java.time.{ZoneOffset, ZonedDateTime}
 
@@ -30,11 +29,8 @@ object NotificationDetails {
 case class Notification(payload: String, details: Option[NotificationDetails] = None, createdAt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC))
 
 object Notification {
-  implicit val zonedDateTimeFormat: Format[ZonedDateTime] = Format(zonedDateTimeReads, zonedDateTimeWrites)
 
-  object MongoFormat {
-    val format: OFormat[Notification] = OFormat[Notification](Json.reads[Notification], Json.writes[Notification])
-  }
+  implicit val format = Json.format[Notification]
 
   object FrontendFormat {
     def writes(notification: Notification): JsObject =
@@ -49,6 +45,6 @@ object Notification {
         Json.obj("fileReference" -> "", "outcome" -> "", "filename" -> "", "createdAt" -> notification.createdAt)
       }
 
-    implicit val notificationsWrites: Writes[Notification] = writes
+    implicit val notificationsWrites: Writes[Notification] = writes _
   }
 }

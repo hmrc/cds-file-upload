@@ -19,7 +19,7 @@ package controllers.notifications
 import base.ControllerUnitSpec
 import models.{Notification, NotificationDetails}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.{reset, when}
+import org.mockito.MockitoSugar.{mock, reset, when}
 import play.api.test.Helpers._
 import services.notifications.NotificationService
 import testdata.notifications.NotificationsTestData._
@@ -61,7 +61,7 @@ class NotificationControllerSpec extends ControllerUnitSpec {
         val ref = s""""fileReference":"$fileReference""""
         val outcome = s""""outcome":"$outcomeSuccess""""
         val file = s""""filename":"$filename""""
-        val created = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
+        val created = s""""createdAt":"$createdAt""""
         contentAsString(result) mustBe s"""{$ref,$outcome,$file,$created}"""
       }
     }

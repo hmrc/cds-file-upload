@@ -17,40 +17,19 @@
 package models
 
 import base.UnitSpec
+import models.Notification.FrontendFormat
 import play.api.libs.json.Json
 import testdata.notifications.NotificationsTestData._
 
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 class NotificationSpec extends UnitSpec {
-  val formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
-
-  "Notifications Spec DbFormat" must {
-    val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
-
-    "have json writes that produce a string which could be parsed by the database" in {
-      val json = Json.toJson(notification)(Notification.MongoFormat.format)
-
-      val serialisedNotification = NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload)
-      json.toString mustBe serialisedNotification
-    }
-
-    "have json reads that produce object from the serialized database format" in {
-      val readNotification =
-        Json
-          .parse(NotificationSpec.serialisedDbFormat(fileReference, outcomeSuccess, filename, createdAt, payload))
-          .as[Notification](Notification.MongoFormat.format)
-
-      readNotification mustBe notification
-    }
-  }
 
   "Notifications Spec FrontendFormat" must {
     val notification = Notification(payload, Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))), createdAt)
 
     "have json writes that produce a string which could be parsed by the SFUS frontend" in {
-      val json = Json.toJson(notification)(Notification.FrontendFormat.writes)
+      val json = Json.toJson(notification)(FrontendFormat.notificationsWrites)
 
       json.toString mustBe NotificationSpec.serialisedFrontEndFormat(fileReference, outcomeSuccess, filename, createdAt)
     }
@@ -58,13 +37,7 @@ class NotificationSpec extends UnitSpec {
 }
 
 object NotificationSpec {
-  def serialisedDbFormat(ref: String, outcome: String, file: String, createdAt: ZonedDateTime, payload: String): String = {
-    val dateObj = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
-    s"""{"payload":"${payload}","details":{"fileReference":"${ref}","outcome":"${outcome}","filename":"${file}"},$dateObj}"""
-  }
 
-  def serialisedFrontEndFormat(ref: String, outcome: String, filename: String, createdAt: ZonedDateTime): String = {
-    val dateObj = s""""createdAt":{"$$date":${createdAt.toInstant.toEpochMilli}}"""
-    s"""{"fileReference":"${ref}","outcome":"${outcome}","filename":"${filename}",$dateObj}"""
-  }
+  def serialisedFrontEndFormat(ref: String, outcome: String, filename: String, createdAt: ZonedDateTime): String =
+    s"""{"fileReference":"${ref}","outcome":"${outcome}","filename":"${filename}","createdAt":"$createdAt"}"""
 }

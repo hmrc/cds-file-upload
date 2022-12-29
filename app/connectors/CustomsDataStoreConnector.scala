@@ -16,14 +16,14 @@
 
 package connectors
 
-import scala.concurrent.{ExecutionContext, Future}
 import config.AppConfig
+import models.email.{Email, EmailResponse}
+import play.api.http.Status.NOT_FOUND
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 
 import javax.inject.Inject
-import play.api.http.Status.NOT_FOUND
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import models.email.{Email, EmailResponse}
+import scala.concurrent.{ExecutionContext, Future}
 
 class CustomsDataStoreConnector @Inject()(http: HttpClient)(implicit appConfig: AppConfig, ec: ExecutionContext) {
 

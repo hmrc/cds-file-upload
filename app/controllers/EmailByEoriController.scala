@@ -16,15 +16,15 @@
 
 package controllers
 
-import scala.concurrent.ExecutionContext
-
 import connectors.CustomsDataStoreConnector
 import controllers.actions.AuthAction
-import javax.inject.{Inject, Singleton}
+import models.email.Email
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import models.email.Email
+
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class EmailByEoriController @Inject()(authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(

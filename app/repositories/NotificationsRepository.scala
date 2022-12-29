@@ -19,7 +19,6 @@ package repositories
 import com.mongodb.client.model.Indexes.ascending
 import config.AppConfig
 import models.Notification
-import models.Notification.MongoFormat
 import org.bson.BsonNull
 import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.{IndexModel, IndexOptions}
@@ -36,7 +35,7 @@ class NotificationsRepository @Inject()(mongoComponent: MongoComponent, appConfi
     extends PlayMongoRepository[Notification](
       mongoComponent = mongoComponent,
       collectionName = "notifications",
-      domainFormat = MongoFormat.format,
+      domainFormat = Notification.format,
       indexes = NotificationRepository.indexes(appConfig)
     ) with RepositoryOps[Notification] {
 
