@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import javax.inject.Inject
 import migrations.MigrationRoutine
 import play.api.inject.ApplicationLifecycle
 
-class RoutineRunner @Inject()(migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
+class RoutineRunner @Inject() (migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
   implicit mec: RoutinesExecutionContext
 ) {
 

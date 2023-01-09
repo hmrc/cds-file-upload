@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+class AuthActionImpl @Inject() (val authConnector: AuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
     extends AuthAction with AuthorisedFunctions {
   override val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
@@ -37,8 +37,8 @@ class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerC
       .retrieve(internalId) {
         case Some(_) => Future.successful(None)
         case None    => Future.successful(Some(Unauthorized))
-      } recover {
-      case _ => Some(Unauthorized)
+      } recover { case _ =>
+      Some(Unauthorized)
     }
   }
 }

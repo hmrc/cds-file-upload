@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
+class NotificationService @Inject() (repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
     extends Logging {
 
   def parseAndSave(notificationXml: NodeSeq): Future[Boolean] = {
