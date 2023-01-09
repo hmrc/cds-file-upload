@@ -53,9 +53,9 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
     } catch {
       case _: LockPersistenceException =>
         handleLockException(true)
-    } while ({
+    } while (
       keepLooping
-    })
+    )
   }
 
   private[migrations] def ensureLockDefault(): Unit = ensureLock(DefaultKey)
@@ -75,9 +75,10 @@ class LockManager(val repository: LockRepository, val lockRefreshChecker: LockRe
     } catch {
       case _: LockPersistenceException =>
         handleLockException(false)
-    } else keepLooping = false while ({
+    }
+    else keepLooping = false while (
       keepLooping
-    })
+    )
   }
 
   private def updateStatus(lockExpiresAt: Option[Date]): Unit = {

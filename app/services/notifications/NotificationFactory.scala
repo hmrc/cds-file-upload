@@ -23,7 +23,7 @@ import javax.inject.Inject
 import scala.util.{Failure, Success, Try}
 import scala.xml.NodeSeq
 
-class NotificationFactory @Inject()(notificationParser: NotificationParser) extends Logging {
+class NotificationFactory @Inject() (notificationParser: NotificationParser) extends Logging {
 
   def buildNotification(notificationXml: NodeSeq) =
     Try(notificationParser.parse(notificationXml)) match {

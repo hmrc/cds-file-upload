@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationService @Inject()(repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
+class NotificationService @Inject() (repository: NotificationsRepository, notificationFactory: NotificationFactory)(implicit ec: ExecutionContext)
     extends Logging {
 
   def parseAndSave(notificationXml: NodeSeq): Future[Boolean] = {

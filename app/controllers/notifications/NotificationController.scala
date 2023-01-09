@@ -27,7 +27,7 @@ import services.notifications.NotificationService
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class NotificationController @Inject()(authorise: AuthAction, notificationService: NotificationService, cc: ControllerComponents)(
+class NotificationController @Inject() (authorise: AuthAction, notificationService: NotificationService, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
 

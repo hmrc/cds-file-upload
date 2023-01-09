@@ -22,7 +22,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()(configuration: Configuration, servicesConfig: ServicesConfig) {
+class AppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   val mongodbUri: String = configuration.get[String]("mongodb.uri")
 

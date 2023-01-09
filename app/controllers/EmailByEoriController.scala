@@ -27,7 +27,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class EmailByEoriController @Inject()(authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(
+class EmailByEoriController @Inject() (authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
 

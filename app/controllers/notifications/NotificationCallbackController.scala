@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 @Singleton
-class NotificationCallbackController @Inject()(metrics: SfusMetrics, notificationsService: NotificationService, cc: ControllerComponents)(
+class NotificationCallbackController @Inject() (metrics: SfusMetrics, notificationsService: NotificationService, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) with Logging {
 

@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
+class AuthActionImpl @Inject() (val authConnector: AuthConnector, cc: ControllerComponents)(implicit val executionContext: ExecutionContext)
     extends AuthAction with AuthorisedFunctions {
   override val parser: BodyParser[AnyContent] = cc.parsers.defaultBodyParser
 
@@ -37,8 +37,8 @@ class AuthActionImpl @Inject()(val authConnector: AuthConnector, cc: ControllerC
       .retrieve(internalId) {
         case Some(_) => Future.successful(None)
         case None    => Future.successful(Some(Unauthorized))
-      } recover {
-      case _ => Some(Unauthorized)
+      } recover { case _ =>
+      Some(Unauthorized)
     }
   }
 }

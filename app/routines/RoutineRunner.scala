@@ -24,7 +24,7 @@ import javax.inject.Inject
 import migrations.MigrationRoutine
 import play.api.inject.ApplicationLifecycle
 
-class RoutineRunner @Inject()(migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
+class RoutineRunner @Inject() (migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
   implicit mec: RoutinesExecutionContext
 ) {
 

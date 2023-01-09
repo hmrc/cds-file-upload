@@ -32,40 +32,55 @@ object ExampleXmlAndNotificationDetailsPair {
     filename: String = filename,
     batchId: String = batchId
   ) =
-    ExampleXmlAndNotificationDetailsPair(asXml = <Root>
+    ExampleXmlAndNotificationDetailsPair(
+      asXml = <Root>
         <FileReference>{fileReference}</FileReference>
         <BatchId>{batchId}</BatchId>
         <FileName>{filename}</FileName>
         <Outcome>{outcome}</Outcome>
         <Details>[detail block]</Details>
-      </Root>, asDomainModel = NotificationDetails(fileReference, outcome, Some(filename)))
+      </Root>,
+      asDomainModel = NotificationDetails(fileReference, outcome, Some(filename))
+    )
 
   def exampleNotificationMandatoryElementsOnly(fileReference: String = fileReference, outcome: String = outcomeSuccess, filename: String = filename) =
-    ExampleXmlAndNotificationDetailsPair(asXml = <Root>
+    ExampleXmlAndNotificationDetailsPair(
+      asXml = <Root>
           <FileReference>{fileReference}</FileReference>
           <FileName>{filename}</FileName>
           <Outcome>{outcome}</Outcome>
-        </Root>, asDomainModel = NotificationDetails(fileReference, outcome, Some(filename)))
+        </Root>,
+      asDomainModel = NotificationDetails(fileReference, outcome, Some(filename))
+    )
 
   def exampleNotificationMissingFileReference(outcome: String = outcomeSuccess, filename: String = filename, batchId: String = batchId) =
-    ExampleXmlAndNotificationDetailsPair(asXml = <Root>
+    ExampleXmlAndNotificationDetailsPair(
+      asXml = <Root>
           <BatchId>{batchId}</BatchId>
           <FileName>{filename}</FileName>
           <Outcome>{outcome}</Outcome>
-        </Root>, asDomainModel = NotificationDetails("", outcome, Some(filename)))
+        </Root>,
+      asDomainModel = NotificationDetails("", outcome, Some(filename))
+    )
 
   def exampleNotificationMissingFileName(fileReference: String = fileReference, outcome: String = outcomeSuccess, batchId: String = batchId) =
-    ExampleXmlAndNotificationDetailsPair(asXml = <Root>
+    ExampleXmlAndNotificationDetailsPair(
+      asXml = <Root>
           <FileReference>{fileReference}</FileReference>
           <BatchId>{batchId}</BatchId>
           <Outcome>{outcome}</Outcome>
-        </Root>, asDomainModel = NotificationDetails(fileReference, outcome, None))
+        </Root>,
+      asDomainModel = NotificationDetails(fileReference, outcome, None)
+    )
 
   def exampleNotificationMissingOutcome(fileReference: String = fileReference, filename: String = filename, batchId: String = batchId) =
-    ExampleXmlAndNotificationDetailsPair(asXml = <Root>
+    ExampleXmlAndNotificationDetailsPair(
+      asXml = <Root>
           <FileReference>{fileReference}</FileReference>
           <BatchId>{batchId}</BatchId>
           <FileName>{filename}</FileName>
-        </Root>, asDomainModel = NotificationDetails(fileReference, "", Some(filename)))
+        </Root>,
+      asDomainModel = NotificationDetails(fileReference, "", Some(filename))
+    )
 
 }

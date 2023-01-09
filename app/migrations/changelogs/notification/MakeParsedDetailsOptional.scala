@@ -20,7 +20,7 @@ import com.mongodb.client.MongoDatabase
 import migrations.changelogs.{MigrationDefinition, MigrationInformation}
 import org.bson.Document
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters.{and, exists, or, eq => feq}
+import org.mongodb.scala.model.Filters.{and, eq => feq, exists, or}
 import org.mongodb.scala.model.UpdateOneModel
 import org.mongodb.scala.model.Updates.{combine, set, unset}
 import play.api.Logging
@@ -87,12 +87,11 @@ class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
       logger.info(s"[filter: $filter] [update: $update]")
 
       new UpdateOneModel[Document](filter, update)
-    }.grouped(updateBatchSize).zipWithIndex.foreach {
-      case (requests, idx) =>
-        logger.info(s"Updating batch no. $idx...")
+    }.grouped(updateBatchSize).zipWithIndex.foreach { case (requests, idx) =>
+      logger.info(s"Updating batch no. $idx...")
 
-        collection.bulkWrite(asJava(requests))
-        logger.info(s"Updated batch no. $idx")
+      collection.bulkWrite(asJava(requests))
+      logger.info(s"Updated batch no. $idx")
     }
 
     logger.info(s"Applying '${migrationInformation.id}' db migration... Done.")
