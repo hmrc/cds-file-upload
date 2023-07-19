@@ -61,7 +61,9 @@ class NotificationControllerSpec extends ControllerUnitSpec {
         val ref = s""""fileReference":"$fileReference""""
         val outcome = s""""outcome":"$outcomeSuccess""""
         val file = s""""filename":"$filename""""
-        val created = s""""createdAt":"$createdAt""""
+        val createdAtJson = createdAt.map(instant => s"""{"$$date":{"$$numberLong":"${instant.toEpochMilli}"}}""").getOrElse("null")
+        val created = s""""createdAt":$createdAtJson"""
+
         contentAsString(result) mustBe s"""{$ref,$outcome,$file,$created}"""
       }
     }

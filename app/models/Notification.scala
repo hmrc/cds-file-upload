@@ -17,8 +17,8 @@
 package models
 
 import play.api.libs.json._
-
-import java.time.{ZoneOffset, ZonedDateTime}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
+import java.time.Instant
 
 case class NotificationDetails(fileReference: String, outcome: String, filename: Option[String])
 
@@ -26,11 +26,12 @@ object NotificationDetails {
   implicit val format: Format[NotificationDetails] = Json.format[NotificationDetails]
 }
 
-case class Notification(payload: String, details: Option[NotificationDetails] = None, createdAt: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC))
+case class Notification(payload: String, details: Option[NotificationDetails] = None, createdAt: Option[Instant] = Some(Instant.now()))
 
 object Notification {
 
-  implicit val format = Json.format[Notification]
+  implicit val mongoDateReads: Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val format: OFormat[Notification] = Json.format[Notification]
 
   object FrontendFormat {
     def writes(notification: Notification): JsObject =

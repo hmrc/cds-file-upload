@@ -43,9 +43,8 @@ class MakeParsedDetailsOptional extends MigrationDefinition with Logging {
   override val migrationInformation: MigrationInformation =
     MigrationInformation(
       id = "CEDS-2786 Make the parsed detail fields fileReference, outcome and filename optional",
-      order = 1,
-      author = "Tim Wilkins",
-      runAlways = true
+      order = 2,
+      author = "Tim Wilkins"
     )
 
   override def migrationFunction(db: MongoDatabase): Unit = {
