@@ -92,7 +92,8 @@ class NotificationServiceSpec extends UnitSpec {
       notification.details.get.outcome mustBe outcomeSuccess
 
       val utc = ZoneId.of("UTC")
-      notification.createdAt.toLocalDate.atStartOfDay(utc) mustBe createdAt.toLocalDate.atStartOfDay(utc)
+      val timeZone: Option[ZoneId] = createdAt.map(_.atZone(ZoneId.of("UTC")).getZone)
+      timeZone.map(_.getId) mustBe Some(utc.getId)
     }
 
     "return an exception when insert fails" in {

@@ -19,7 +19,8 @@ package testdata.notifications
 import models.{Notification, NotificationDetails}
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair.exampleNotification
 
-import java.time.{ZoneOffset, ZonedDateTime}
+import java.time.{Instant, LocalDateTime, ZoneId}
+import java.time.format.DateTimeFormatter
 
 object NotificationsTestData {
 
@@ -27,17 +28,31 @@ object NotificationsTestData {
   val outcomeSuccess = "SUCCESS"
   val filename = "sample.pdf"
   val payload = "<xml></xml>"
-  val createdAt = ZonedDateTime.now(ZoneOffset.UTC)
+  val createdAt = Some(Instant.now())
   val batchId = "5e634e09-77f6-4ff1-b92a-8a9676c715c4"
 
-  val parsedNotification =
+  val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+  val formattedCreatedAt: Option[String] = createdAt.map { instant =>
+    instant.atZone(ZoneId.systemDefault()).toLocalDateTime.format(formatter)
+  }
+
+  val parsedCreatedAt: Option[Instant] = formattedCreatedAt.flatMap { dateString =>
+    try
+      Some(LocalDateTime.parse(dateString, formatter).atZone(ZoneId.systemDefault()).toInstant)
+    catch {
+      case _: Exception => None
+    }
+  }
+
+  val parsedNotification: Notification =
     Notification(
       exampleNotification(fileReference, outcomeSuccess, filename).toString,
       Some(NotificationDetails(fileReference, outcomeSuccess, Some(filename))),
-      createdAt
+      parsedCreatedAt
     )
 
-  val unparsedNotification = Notification(payload, None, createdAt)
+  val unparsedNotification: Notification = Notification(payload, None, parsedCreatedAt)
 
-  val emptyNotificationDetails = NotificationDetails("", "", None)
+  val emptyNotificationDetails: NotificationDetails = NotificationDetails("", "", None)
 }

@@ -21,7 +21,7 @@ import models.Notification.FrontendFormat
 import play.api.libs.json.Json
 import testdata.notifications.NotificationsTestData._
 
-import java.time.ZonedDateTime
+import java.time.Instant
 
 class NotificationSpec extends UnitSpec {
 
@@ -38,6 +38,10 @@ class NotificationSpec extends UnitSpec {
 
 object NotificationSpec {
 
-  def serialisedFrontEndFormat(ref: String, outcome: String, filename: String, createdAt: ZonedDateTime): String =
-    s"""{"fileReference":"${ref}","outcome":"${outcome}","filename":"${filename}","createdAt":"$createdAt"}"""
+  def serialisedFrontEndFormat(ref: String, outcome: String, filename: String, createdAt: Option[Instant]): String = {
+    val createdAtMillis: Option[Long] = createdAt.map(_.toEpochMilli)
+    val createdAtJson: String = createdAtMillis.map(millis => s"""{"$$numberLong":"$millis"}""").getOrElse("null")
+
+    s"""{"fileReference":"$ref","outcome":"$outcome","filename":"$filename","createdAt":{"$$date":$createdAtJson}}"""
+  }
 }

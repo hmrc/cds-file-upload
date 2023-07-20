@@ -19,7 +19,7 @@ package migrations
 import com.google.inject.Singleton
 import com.mongodb.client.{MongoClient, MongoClients}
 import config.AppConfig
-import migrations.changelogs.notification.MakeParsedDetailsOptional
+import migrations.changelogs.notification.{MakeParsedDetailsOptional, PurgeExpiredNotifications}
 import play.api.Logging
 import routines.{Routine, RoutinesExecutionContext}
 
@@ -54,6 +54,7 @@ class MigrationRoutine @Inject() (appConfig: AppConfig)(implicit mec: RoutinesEx
     val lockManagerConfig = LockManagerConfig(lockMaxTries, lockMaxWaitMillis, lockAcquiredForMillis)
     val migrationsRegistry = MigrationsRegistry()
       .register(new MakeParsedDetailsOptional())
+      .register(new PurgeExpiredNotifications())
     val migrationTool = ExportsMigrationTool(db, migrationsRegistry, lockManagerConfig)
 
     migrationTool.execute()
