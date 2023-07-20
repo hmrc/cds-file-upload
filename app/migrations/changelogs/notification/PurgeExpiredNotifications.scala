@@ -29,7 +29,7 @@ class PurgeExpiredNotifications extends MigrationDefinition with Logging {
   override val migrationInformation: MigrationInformation =
     MigrationInformation(
       id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'",
-      order = 1,
+      order = 2,
       author = "Mohammad Dweik",
       runAlways = true
     )
