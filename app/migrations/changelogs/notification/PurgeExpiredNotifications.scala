@@ -31,7 +31,6 @@ class PurgeExpiredNotifications extends MigrationDefinition with Logging {
       id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'",
       order = 2,
       author = "Mohammad Dweik",
-      runAlways = true
     )
 
   override def migrationFunction(db: MongoDatabase): Unit = {
