@@ -27,11 +27,7 @@ import scala.jdk.CollectionConverters.IterableHasAsScala
 class PurgeExpiredNotifications extends MigrationDefinition with Logging {
 
   override val migrationInformation: MigrationInformation =
-    MigrationInformation(
-      id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'",
-      order = 2,
-      author = "Mohammad Dweik",
-    )
+    MigrationInformation(id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'", order = 2, author = "Mohammad Dweik")
 
   override def migrationFunction(db: MongoDatabase): Unit = {
     val createdAt = "createdAt"
