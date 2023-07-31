@@ -27,12 +27,7 @@ import scala.jdk.CollectionConverters.IterableHasAsScala
 class PurgeExpiredNotifications extends MigrationDefinition with Logging {
 
   override val migrationInformation: MigrationInformation =
-    MigrationInformation(
-      id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'",
-      order = 2,
-      author = "Mohammad Dweik",
-      runAlways = true
-    )
+    MigrationInformation(id = "CEDS-4869: Purge 'createdAt' String notifications and upgrade 'createdAtIndex'", order = 2, author = "Mohammad Dweik")
 
   override def migrationFunction(db: MongoDatabase): Unit = {
     val createdAt = "createdAt"
@@ -41,31 +36,31 @@ class PurgeExpiredNotifications extends MigrationDefinition with Logging {
     logger.info(s"Applying '${migrationInformation.id}' db migration...")
 
     val redundantIndexToBeDeleted = Vector("createdAtIndex")
-    notificationsCollection.listIndexes().iterator().forEachRemaining { idx =>
-      val indexName = idx.getString("name")
-      if (redundantIndexToBeDeleted.contains(indexName))
-        notificationsCollection.dropIndex(indexName)
+    try {
+
+      notificationsCollection.listIndexes().iterator().forEachRemaining { idx =>
+        val indexName = idx.getString("name")
+        if (redundantIndexToBeDeleted.contains(indexName))
+          notificationsCollection.dropIndex(indexName)
+      }
 
       def filter = not(`type`(createdAt, BsonType.DATE_TIME))
 
-      try {
-        val recordsToDelete: Iterable[Document] = notificationsCollection
-          .find(filter)
-          .asScala
+      val recordsToDelete: Iterable[Document] = notificationsCollection
+        .find(filter)
+        .asScala
 
-        val totalDeleted = recordsToDelete.foldLeft(0) { (count, document) =>
-          val documentId = document.get("_id")
-          val docFilter = equal("_id", documentId)
-          val deleteResult = notificationsCollection.deleteOne(docFilter)
-          count + deleteResult.getDeletedCount.toInt
-        }
-
-        logger.info(s"Deleted $totalDeleted records from the Notifications collection where 'createdAt' was not a Date.")
-        logger.info(s"Finished applying '${migrationInformation.id}' db migration.")
-      } catch {
-        case e: Exception => logger.error(s"An error occurred during the db migration '${migrationInformation.id}'", e)
+      val totalDeleted = recordsToDelete.foldLeft(0) { (count, document) =>
+        val documentId = document.get("_id")
+        val docFilter = equal("_id", documentId)
+        val deleteResult = notificationsCollection.deleteOne(docFilter)
+        count + deleteResult.getDeletedCount.toInt
       }
 
+      logger.info(s"Deleted $totalDeleted records from the Notifications collection where 'createdAt' was not a Date.")
+      logger.info(s"Finished applying '${migrationInformation.id}' db migration.")
+    } catch {
+      case e: Exception => logger.error(s"An error occurred during the db migration '${migrationInformation.id}'", e)
     }
   }
 }
