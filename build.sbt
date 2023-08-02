@@ -1,5 +1,4 @@
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.SbtAutoBuildPlugin
 
 name := "cds-file-upload"
@@ -12,7 +11,6 @@ lazy val IntegrationTest = config("it") extend Test
 lazy val microservice = (project in file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
   .settings(commonSettings: _*)
-  .settings(publishingSettings: _*)
   .settings(
     Test / unmanagedSourceDirectories := Seq(
       (Test / baseDirectory).value / "test/unit",
