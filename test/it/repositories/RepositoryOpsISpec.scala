@@ -10,7 +10,7 @@ class RepositoryOpsISpec extends UnitSpec with GuiceOneAppPerSuite {
 
   override def fakeApplication(): Application =
     new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
+      .disable[com.codahale.metrics.MetricRegistry]
       .configure(TestMongoDB.mongoConfiguration)
       .build()
 

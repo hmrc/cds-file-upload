@@ -12,10 +12,7 @@ lazy val microservice = (project in file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
   .settings(commonSettings: _*)
   .settings(
-    Test / unmanagedSourceDirectories := Seq(
-      (Test / baseDirectory).value / "test/unit",
-      (Test / baseDirectory).value / "test/utils"
-    ),
+    Test / unmanagedSourceDirectories := Seq((Test / baseDirectory).value / "test/unit", (Test / baseDirectory).value / "test/utils"),
     addTestReportOption(Test, "test-reports")
   )
   .configs(IntegrationTest)
@@ -31,23 +28,22 @@ lazy val microservice = (project in file("."))
     IntegrationTest / parallelExecution := false
   )
   .settings(scoverageSettings)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
+  .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
 
-lazy val commonSettings = Seq(
-  scalaVersion := "2.13.8",
-  scalacOptions ++= scalacFlags,
-  libraryDependencies ++= Dependencies.compile ++ Dependencies.test
-)
+lazy val commonSettings =
+  Seq(scalaVersion := "2.13.12", scalacOptions ++= scalacFlags, libraryDependencies ++= Dependencies.compile ++ Dependencies.test)
 
 lazy val scalacFlags = Seq(
-  "-deprecation",            // warn about use of deprecated APIs
-  "-encoding", "UTF-8",      // source files are in UTF-8
-  "-feature",                // warn about misused language features
-  "-unchecked",              // warn about unchecked type parameters
+  "-deprecation", // warn about use of deprecated APIs
+  "-encoding",
+  "UTF-8", // source files are in UTF-8
+  "-feature", // warn about misused language features
+  "-unchecked", // warn about unchecked type parameters
   "-Ywarn-numeric-widen",
-  "-Xfatal-warnings",        // warnings are fatal!!
-  "-Wconf:cat=unused-imports&src=routes/.*:s",       // silent "unused import" warnings from Play routes
-  "-Wconf:site=Module.*&cat=lint-byname-implicit:s"  // silent warnings from Pureconfig/Shapeless
+  "-Xfatal-warnings", // warnings are fatal!!
+  "-Wconf:cat=unused-imports&src=routes/.*:s", // silent "unused import" warnings from Play routes
+  "-Wconf:site=Module.*&cat=lint-byname-implicit:s", // silent warnings from Pureconfig/Shapeless
+  "-Wconf:cat=unused&src=.*routes.*:s" // silence private val defaultPrefix in class Routes is never used
 )
 
 lazy val scoverageSettings: Seq[Setting[_]] = Seq(
