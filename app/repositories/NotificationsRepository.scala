@@ -40,7 +40,7 @@ class NotificationsRepository @Inject() (mongoComponent: MongoComponent, appConf
     ) with RepositoryOps[Notification] {
 
   override def classTag: ClassTag[Notification] = implicitly[ClassTag[Notification]]
-  implicit val executionContext = ec
+  implicit val executionContext: ExecutionContext = ec
 
   def findNotificationsByReference(fileReference: String): Future[Seq[Notification]] =
     findAll("details.fileReference", fileReference)
