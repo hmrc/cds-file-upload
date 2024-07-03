@@ -18,15 +18,7 @@ package models.email
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.ZonedDateTime
-
-final case class UndeliverableInformation(
-  subject: String,
-  eventId: String,
-  groupId: String,
-  timestamp: ZonedDateTime,
-  event: UndeliverableInformationEvent
-)
+final case class UndeliverableInformation(subject: String, eventId: String, groupId: String, timestamp: String, event: UndeliverableInformationEvent)
 
 object UndeliverableInformation {
 
