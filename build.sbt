@@ -1,5 +1,4 @@
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.SbtAutoBuildPlugin
 
 name := "cds-file-upload"
 majorVersion := 0
@@ -9,7 +8,7 @@ PlayKeys.devSettings := Seq("play.server.http.port" -> "6795")
 lazy val IntegrationTest = config("it") extend Test
 
 lazy val microservice = (project in file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(commonSettings: _*)
   .settings(
     Test / unmanagedSourceDirectories := Seq((Test / baseDirectory).value / "test/unit", (Test / baseDirectory).value / "test/utils"),
@@ -24,7 +23,6 @@ lazy val microservice = (project in file("."))
       (IntegrationTest / baseDirectory).value / "test/utils"
     ),
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
     IntegrationTest / parallelExecution := false
   )
   .settings(scoverageSettings)
