@@ -35,7 +35,6 @@ class CustomsDataStoreConnector @Inject() (http: HttpClient)(implicit appConfig:
       .map {
         case EmailResponse(email, _, None) => Some(Email(email, deliverable = true))
         case EmailResponse(email, _, _)    => Some(Email(email, deliverable = false))
-        case _                             => None
       }
       .recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
         None

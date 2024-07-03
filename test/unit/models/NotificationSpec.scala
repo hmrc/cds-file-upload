@@ -17,7 +17,7 @@
 package models
 
 import base.UnitSpec
-import models.Notification.FrontendFormat
+import models.Notification.{createDefaultJsonRepresentation, FrontendFormat}
 import play.api.libs.json.Json
 import testdata.notifications.NotificationsTestData._
 
@@ -32,6 +32,12 @@ class NotificationSpec extends UnitSpec {
       val json = Json.toJson(notification)(FrontendFormat.notificationsWrites)
 
       json.toString mustBe NotificationSpec.serialisedFrontEndFormat(fileReference, outcomeSuccess, filename, createdAt)
+    }
+
+    "have json writes that produce a string which could be parsed by the SFUS frontend when Notification.details is None" in {
+      val json = Json.toJson(Notification(payload, None, createdAt))(FrontendFormat.notificationsWrites)
+
+      json.toString mustBe createDefaultJsonRepresentation(notification).toString
     }
   }
 }
