@@ -33,6 +33,9 @@ object Notification {
   implicit val mongoDateReads: Format[Instant] = MongoJavatimeFormats.instantFormat
   implicit val format: OFormat[Notification] = Json.format[Notification]
 
+  def createDefaultJsonRepresentation(notification: Notification) =
+    Json.obj("fileReference" -> "", "outcome" -> "", "filename" -> "", "createdAt" -> notification.createdAt)
+
   object FrontendFormat {
     def writes(notification: Notification): JsObject =
       notification.details.map { details =>
@@ -43,7 +46,7 @@ object Notification {
           "createdAt" -> notification.createdAt
         )
       }.getOrElse {
-        Json.obj("fileReference" -> "", "outcome" -> "", "filename" -> "", "createdAt" -> notification.createdAt)
+        createDefaultJsonRepresentation(notification)
       }
 
     implicit val notificationsWrites: Writes[Notification] = writes _
