@@ -21,14 +21,15 @@ import scala.concurrent.duration._
 
 import org.apache.pekko.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
-import migrations.MigrationRoutine
 import play.api.inject.ApplicationLifecycle
 
-class RoutineRunner @Inject() (migrationRunner: MigrationRoutine, actorSystem: ActorSystem, applicationLifecycle: ApplicationLifecycle)(
-  implicit mec: RoutinesExecutionContext
-) {
+class RoutineRunner @Inject() (
+  migrationRunner: DeleteMigrationCollectionsRoutine,
+  actorSystem: ActorSystem,
+  applicationLifecycle: ApplicationLifecycle
+)(implicit mec: RoutinesExecutionContext) {
 
-  val migrationTask: Cancellable = actorSystem.scheduler.scheduleOnce(0.seconds) {
+  private val migrationTask: Cancellable = actorSystem.scheduler.scheduleOnce(0.seconds) {
     for {
       _ <- migrationRunner.execute()
     } yield (())
