@@ -35,7 +35,6 @@ class DeleteMigrationCollectionsRoutine @Inject() (mongoComponent: MongoComponen
 
     deleteCollection("exportsMigrationLock")
     deleteCollection("exportsMigrationChangeLog")
-    deleteCollection("fileUpload")
   }
 
   private def deleteCollection(collectionName: String) = {
