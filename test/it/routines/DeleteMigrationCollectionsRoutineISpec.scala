@@ -21,10 +21,12 @@ class DeleteMigrationCollectionsRoutineISpec extends UnitSpec with GuiceOneAppPe
 
   val collectionName1 = "exportsMigrationLock"
   val collectionName2 = "exportsMigrationChangeLog"
+  val collectionName3 = "fileUpload"
 
   before {
     mongoComponent.database.createCollection(collectionName1).toFuture().futureValue
     mongoComponent.database.createCollection(collectionName2).toFuture().futureValue
+    mongoComponent.database.createCollection(collectionName3).toFuture().futureValue
   }
 
   "DeleteMigrationCollectionsRoutine execute" should {
@@ -32,11 +34,13 @@ class DeleteMigrationCollectionsRoutineISpec extends UnitSpec with GuiceOneAppPe
 
       checkIfCollectionExists(collectionName1).futureValue must be(true)
       checkIfCollectionExists(collectionName2).futureValue must be(true)
+      checkIfCollectionExists(collectionName3).futureValue must be(true)
 
       deleteMigrationCollectionsRoutine.execute().futureValue
 
       checkIfCollectionExists(collectionName1).futureValue must be(false)
       checkIfCollectionExists(collectionName2).futureValue must be(false)
+      checkIfCollectionExists(collectionName3).futureValue must be(false)
     }
   }
 
