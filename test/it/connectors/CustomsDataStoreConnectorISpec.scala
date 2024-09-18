@@ -16,20 +16,22 @@
 
 package connectors
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import base.IntegrationSpec
 import config.AppConfig
 import models.email.Email
 import play.api.test.Helpers._
 import testdata.TestData
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.client.HttpClientV2
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
+  implicit val httpClient: HttpClientV2 = inject[HttpClientV2]
 
-  val connector = new CustomsDataStoreConnector(inject[HttpClient])(appConfig, global)
+  val connector = new CustomsDataStoreConnector()(httpClient, appConfig, global)
 
   "CustomsDataStoreConnector.getEmailAddress" when {
 
