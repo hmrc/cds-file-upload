@@ -20,25 +20,25 @@ import config.AppConfig
 import models.email.{Email, EmailResponse}
 import play.api.http.Status.NOT_FOUND
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CustomsDataStoreConnector @Inject() (http: HttpClient)(implicit appConfig: AppConfig, ec: ExecutionContext) {
+class CustomsDataStoreConnector @Inject() (implicit httpClientV2: HttpClientV2, appConfig: AppConfig, ec: ExecutionContext) extends Connector {
 
   import CustomsDataStoreConnector._
 
+  protected def httpClient: HttpClientV2 = httpClientV2
+
   def getEmailAddress(eori: String)(implicit hc: HeaderCarrier): Future[Option[Email]] =
-    http
-      .GET[EmailResponse](verifiedEmailUrl(eori))
-      .map {
-        case EmailResponse(email, _, None) => Some(Email(email, deliverable = true))
-        case EmailResponse(email, _, _)    => Some(Email(email, deliverable = false))
-      }
-      .recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
-        None
-      }
+    get[EmailResponse](verifiedEmailUrl(eori)).map {
+      case EmailResponse(email, _, None) => Some(Email(email, deliverable = true))
+      case EmailResponse(email, _, _)    => Some(Email(email, deliverable = false))
+    }.recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
+      None
+    }
 }
 
 object CustomsDataStoreConnector {
