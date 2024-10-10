@@ -3,3 +3,5 @@
 GET     /notification/:reference          controllers.notifications.NotificationController.getNotification(reference: String)
 
 GET     /eori-email/:eori                 controllers.EmailByEoriController.getEmailIfVerified(eori: String)
+
+GET     /eori-email/                       controllers.EmailByEoriController.getEmail()

@@ -18,6 +18,7 @@ package controllers
 
 import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
+import controllers.actions.Authenticator
 import models.email.Email
 import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
@@ -32,12 +33,12 @@ import scala.concurrent.Future
 class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
 
   private val connector = mock[CustomsDataStoreConnector]
-  private val controller = new EmailByEoriController(authAction, connector, stubControllerComponents())
+  val authenticator = new Authenticator(mockAuthConnector, cc)
+  private val controller = new EmailByEoriController(authAction, authenticator, connector, cc)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(connector)
-    authorisedUser()
   }
 
   override protected def afterEach(): Unit = {
@@ -45,9 +46,49 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     super.afterEach()
   }
 
+  "GET Email endpoint" should {
+
+    "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
+      withAuthorizedUser()
+      val expectedEmailAddress = Email("some@email.com", deliverable = true)
+
+      when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(expectedEmailAddress)))
+
+      val response = controller.getEmail()(getRequest())
+      status(response) mustBe OK
+      contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
+
+      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
+    }
+
+    "return 200(OK) status and deliverable = false if the email address for the given EORI is not deliverable" in {
+      withAuthorizedUser()
+      val expectedEmailAddress = Email("some@email.com", deliverable = false)
+
+      when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Some(expectedEmailAddress)))
+
+      val response = controller.getEmail()(getRequest())
+      status(response) mustBe OK
+      contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
+
+      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
+    }
+
+    "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {
+      withAuthorizedUser()
+      when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
+
+      val response = controller.getEmail()(getRequest())
+      status(response) mustBe NOT_FOUND
+    }
+  }
+
   "GET EmailIfVerified endpoint" should {
 
     "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
+      authorisedUser()
       val expectedEmailAddress = Email("some@email.com", deliverable = true)
 
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
@@ -61,6 +102,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     }
 
     "return 200(OK) status and deliverable = false if the email address for the given EORI is not deliverable" in {
+      authorisedUser()
       val expectedEmailAddress = Email("some@email.com", deliverable = false)
 
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
@@ -74,6 +116,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     }
 
     "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {
+      authorisedUser()
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
 
       val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
