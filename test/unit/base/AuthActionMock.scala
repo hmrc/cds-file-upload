@@ -18,12 +18,13 @@ package base
 
 import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
-import controllers.actions.AuthActionImpl
+import controllers.actions.{AuthActionImpl, AuthActionWithEori}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, reset, when}
 import org.mockito.stubbing.ScalaOngoingStubbing
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.AuthConnector
+import testdata.TestData.eori
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, EnrolmentIdentifier, Enrolments}
 
 trait AuthActionMock extends UnitSpec {
 
@@ -31,6 +32,7 @@ trait AuthActionMock extends UnitSpec {
   private val authConnector = mock[AuthConnector]
 
   val authAction = new AuthActionImpl(authConnector, stubControllerComponents())(global)
+  val authActionWithEori = new AuthActionWithEori(authConnector, stubControllerComponents())(global)
 
   override protected def afterEach(): Unit = {
     reset(authConnector)
@@ -40,6 +42,10 @@ trait AuthActionMock extends UnitSpec {
 
   def authorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(Some(internalId)))
+
+  def authorisedUserWithEori(): Unit =
+    when(authConnector.authorise[Enrolments](any(), any())(any(), any()))
+      .thenReturn(Future.successful(Enrolments(Set(Enrolment("HMRC-CUS-ORG", List(EnrolmentIdentifier("EORINumber", eori)), "Activated", None)))))
 
   def nonAuthorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(None))
