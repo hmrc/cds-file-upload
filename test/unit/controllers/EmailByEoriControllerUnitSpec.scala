@@ -45,42 +45,6 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     super.afterEach()
   }
 
-  "GET EmailIfVerified endpoint" should {
-
-    "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
-      val expectedEmailAddress = Email("some@email.com", deliverable = true)
-
-      when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(expectedEmailAddress)))
-
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
-      status(response) mustBe OK
-      contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
-
-      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
-    }
-
-    "return 200(OK) status and deliverable = false if the email address for the given EORI is not deliverable" in {
-      val expectedEmailAddress = Email("some@email.com", deliverable = false)
-
-      when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
-        .thenReturn(Future.successful(Some(expectedEmailAddress)))
-
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
-      status(response) mustBe OK
-      contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
-
-      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
-    }
-
-    "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {
-      when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
-
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
-      status(response) mustBe NOT_FOUND
-    }
-  }
-
   "GET Email endpoint" should {
 
     "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
