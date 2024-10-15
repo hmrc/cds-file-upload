@@ -32,12 +32,12 @@ import scala.concurrent.Future
 class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
 
   private val connector = mock[CustomsDataStoreConnector]
-  private val controller = new EmailByEoriController(authAction, connector, stubControllerComponents())
+  private val controller = new EmailByEoriController(authActionWithEori, connector, stubControllerComponents())
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     reset(connector)
-    authorisedUser()
+    authorisedUserWithEori()
   }
 
   override protected def afterEach(): Unit = {
@@ -45,7 +45,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     super.afterEach()
   }
 
-  "GET EmailIfVerified endpoint" should {
+  "GET Email endpoint" should {
 
     "return 200(OK) status and deliverable = true if the email address for the given EORI is verified" in {
       val expectedEmailAddress = Email("some@email.com", deliverable = true)
@@ -53,7 +53,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(expectedEmailAddress)))
 
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
+      val response = controller.getEmail(getRequest())
       status(response) mustBe OK
       contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
 
@@ -66,7 +66,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier]))
         .thenReturn(Future.successful(Some(expectedEmailAddress)))
 
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
+      val response = controller.getEmail(getRequest())
       status(response) mustBe OK
       contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
 
@@ -76,7 +76,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
     "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {
       when(connector.getEmailAddress(any[String])(any[HeaderCarrier])).thenReturn(Future.successful(None))
 
-      val response = controller.getEmailIfVerified(TestData.eori)(getRequest())
+      val response = controller.getEmail(getRequest())
       status(response) mustBe NOT_FOUND
     }
   }

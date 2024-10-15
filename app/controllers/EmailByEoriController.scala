@@ -17,7 +17,7 @@
 package controllers
 
 import connectors.CustomsDataStoreConnector
-import controllers.actions.AuthAction
+import controllers.actions.AuthActionWithEori
 import models.email.Email
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
@@ -27,13 +27,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class EmailByEoriController @Inject() (authorise: AuthAction, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(
+class EmailByEoriController @Inject() (authorise: AuthActionWithEori, customsDataStoreConnector: CustomsDataStoreConnector, cc: ControllerComponents)(
   implicit ec: ExecutionContext
 ) extends BackendController(cc) {
 
-  def getEmailIfVerified(eori: String): Action[AnyContent] = authorise.async { implicit request =>
+  def getEmail: Action[AnyContent] = authorise.async { implicit request =>
     customsDataStoreConnector
-      .getEmailAddress(eori)
+      .getEmailAddress(request.eori)
       .map {
         case Some(Email(email, deliverable)) => Ok(Json.toJson(Email(email, deliverable)))
         case _                               => NotFound

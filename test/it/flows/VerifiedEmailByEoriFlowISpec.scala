@@ -23,20 +23,35 @@ import controllers.routes
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import testdata.TestData
+import testdata.TestData.eori
 
 class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
   val customsDataStoreUrl = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
-  val fakeRequest =
-    FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmailIfVerified(TestData.eori).url).withHeaders("Authorization" -> "Bearer some-token")
+  val fakeRequest = FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmail.url).withHeaders("Authorization" -> "Bearer some-token")
+
+  val enrolments = Some(s"""{
+                           | "allEnrolments" : [
+                           |   {
+                           |     "key" : "HMRC-CUS-ORG",
+                           |     "identifiers" : [
+                           |       {
+                           |         "key" : "EORINumber",
+                           |         "value" : "$eori"
+                           |       }
+                           |     ],
+                           |     "state" : "Activated"
+                           |   }
+                           | ]
+                           |}""".stripMargin)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    postToDownstreamService("/auth/authorise", OK, Some("""{"internalId":"1234567890"}"""))
+    postToDownstreamService("/auth/authorise", OK, enrolments)
   }
 
-  "GET EmailIfVerified endpoint" should {
+  "GET Email endpoint" should {
 
     "return 200(OK) status if the email address for the given EORI is verified" in {
       val testEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
@@ -52,24 +67,24 @@ class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
     "return 200(OK) status if the email address for the given EORI is undeliverable" in {
       val testEmailJson =
         """{
-           |  "address": "some@email.com",
-           |  "timestamp": "2020-03-20T01:02:03Z",
-           |  "undeliverable": {
-           |    "subject": "subject-example",
-           |    "eventId": "example-id",
-           |    "groupId": "example-group-id",
-           |    "timestamp": "2021-05-14T10:59:45.811+01:00",
-           |    "event": {
-           |      "id": "example-id",
-           |      "event": "someEvent",
-           |      "emailAddress": "some@email.com",
-           |      "detected": "2021-05-14T10:59:45.811+01:00",
-           |      "code": 12,
-           |      "reason": "Inbox full",
-           |      "enrolment": "HMRC-CUS-ORG~EORINumber~testEori"
-           |    }
-           |  }
-           |}""".stripMargin
+          |  "address": "some@email.com",
+          |  "timestamp": "2020-03-20T01:02:03Z",
+          |  "undeliverable": {
+          |    "subject": "subject-example",
+          |    "eventId": "example-id",
+          |    "groupId": "example-group-id",
+          |    "timestamp": "2021-05-14T10:59:45.811+01:00",
+          |    "event": {
+          |      "id": "example-id",
+          |      "event": "someEvent",
+          |      "emailAddress": "some@email.com",
+          |      "detected": "2021-05-14T10:59:45.811+01:00",
+          |      "code": 12,
+          |      "reason": "Inbox full",
+          |      "enrolment": "HMRC-CUS-ORG~EORINumber~testEori"
+          |    }
+          |  }
+          |}""".stripMargin
 
       val expectedEmailAddress = """{"address":"some@email.com","deliverable":false}"""
 
