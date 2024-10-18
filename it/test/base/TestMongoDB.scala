@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,14 @@
  * limitations under the License.
  */
 
-package models.dis.parsers
+package base
 
-import base.UnitSpec
+import play.api.Configuration
 
-class StringOptionSpec extends UnitSpec {
+object TestMongoDB {
 
-  "StringOption.empty" should {
-    "return None" in {
-      StringOption.empty mustBe None
-    }
-  }
+  val Port = 27017
+  val DatabaseName = "test-cds-file-upload"
 
-  "StringOption.apply" should {
-
-    "return None" when {
-      "the input parameter is empty" in {
-        StringOption(" ") mustBe None
-      }
-    }
-
-    "return the expected Some(string) instance" when {
-      "the input parameter is NOT empty" in {
-        StringOption(" blabla ") mustBe Some("blabla")
-      }
-    }
-  }
+  val mongoConfiguration: Configuration = Configuration.from(Map("mongodb.uri" -> s"mongodb://localhost:$Port/$DatabaseName"))
 }

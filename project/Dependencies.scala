@@ -9,7 +9,6 @@ object Dependencies {
     "uk.gov.hmrc"                  %% "bootstrap-backend-play-30" % bootstrapPlayVersion,
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-30"        % hmrcMongoVersion,
     "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.2",
-    "com.github.pureconfig"        %% "pureconfig"                % "0.17.7"
   )
 
   val test = Seq(
@@ -17,4 +16,7 @@ object Dependencies {
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-30"  % hmrcMongoVersion     % "test",
     "org.mockito"            %% "mockito-scala"            % "1.17.37"            % "test"
   )
+
+  def apply(): Seq[ModuleID] =
+    (compile ++ test).map(moduleId => if (moduleId.name == "flexmark-all") moduleId else moduleId.withSources)
 }

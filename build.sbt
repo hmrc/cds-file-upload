@@ -1,40 +1,36 @@
-import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.gitstamp.GitStampPlugin.*
+import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
-name := "cds-file-upload"
-majorVersion := 0
+val appName = "cds-file-upload"
+
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.15"
 
 PlayKeys.devSettings := Seq("play.server.http.port" -> "6795")
 
-lazy val IntegrationTest = config("it") extend Test
-
-lazy val microservice = (project in file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
-  .settings(commonSettings: _*)
-  .settings(
-    Test / unmanagedSourceDirectories := Seq((Test / baseDirectory).value / "test/unit", (Test / baseDirectory).value / "test/utils"),
-    addTestReportOption(Test, "test-reports")
-  )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-  .settings(
-    IntegrationTest / Keys.fork := false,
-    IntegrationTest / unmanagedSourceDirectories := Seq(
-      (IntegrationTest / baseDirectory).value / "test/it",
-      (IntegrationTest / baseDirectory).value / "test/utils"
-    ),
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / parallelExecution := false
-  )
+lazy val microservice = Project(appName, file("."))
+  .enablePlugins(PlayScala, SbtDistributablesPlugin)
+  .settings(commonSettings)
   .settings(scoverageSettings)
   .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
 
-lazy val commonSettings =
-  Seq(scalaVersion := "2.13.12", scalacOptions ++= scalacFlags, libraryDependencies ++= Dependencies.compile ++ Dependencies.test)
+lazy val it = (project in file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test")
+  .settings(
+    publish / skip := true,
+    Test / testOptions += Tests.Argument("-o", "-h", "it/target/html-report")
+  )
+
+lazy val commonSettings = List(
+    scalacOptions ++= scalacFlags,
+    retrieveManaged := true,
+    libraryDependencies ++= Dependencies()
+  )
 
 lazy val scalacFlags = Seq(
   "-deprecation", // warn about use of deprecated APIs
-  "-encoding",
-  "UTF-8", // source files are in UTF-8
+  "-encoding", "UTF-8", // source files are in UTF-8
   "-feature", // warn about misused language features
   "-unchecked", // warn about unchecked type parameters
   "-Ywarn-numeric-widen",
@@ -59,3 +55,7 @@ lazy val scoverageSettings: Seq[Setting[_]] = Seq(
   coverageHighlighting := true,
   Test / parallelExecution := false
 )
+
+addCommandAlias("ucomp", "Test/compile")
+addCommandAlias("icomp", "it/Test/compile")
+addCommandAlias("precommit", ";clean;scalafmt;Test/scalafmt;it/Test/scalafmt;coverage;test;it/test;scalafmtCheckAll;coverageReport")
