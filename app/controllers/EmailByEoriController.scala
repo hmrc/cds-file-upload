@@ -40,14 +40,4 @@ class EmailByEoriController @Inject() (authorise: AuthActionWithEori, customsDat
       }
       .recover { case _ => InternalServerError }
   }
-
-  def getEmailIfVerified(eori: String): Action[AnyContent] = authorise.async { implicit request =>
-    customsDataStoreConnector
-      .getEmailAddress(eori)
-      .map {
-        case Some(Email(email, deliverable)) => Ok(Json.toJson(Email(email, deliverable)))
-        case _                               => NotFound
-      }
-      .recover { case _ => InternalServerError }
-  }
 }
