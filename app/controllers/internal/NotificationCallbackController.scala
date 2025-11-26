@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.notifications
+package controllers.internal
 
 import metrics.MetricIdentifiers.notificationMetric
 import metrics.SfusMetrics

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.notifications
+package controllers.internal
 
 import base.{ControllerUnitSpec, SfusMetricsMock}
 import org.mockito.ArgumentMatchers.any
