@@ -32,8 +32,8 @@ class CustomsDataStoreConnector @Inject() (implicit httpClientV2: HttpClientV2, 
 
   protected def httpClient: HttpClientV2 = httpClientV2
 
-  def getEmailAddress(eori: String)(implicit hc: HeaderCarrier): Future[Option[Email]] =
-    get[EmailResponse](verifiedEmailUrl(eori)).map {
+  def getEmailAddress(implicit hc: HeaderCarrier): Future[Option[Email]] =
+    get[EmailResponse](verifiedEmailUrl).map {
       case EmailResponse(email, _, None) => Some(Email(email, deliverable = true))
       case EmailResponse(email, _, _)    => Some(Email(email, deliverable = false))
     }.recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
@@ -42,10 +42,6 @@ class CustomsDataStoreConnector @Inject() (implicit httpClientV2: HttpClientV2, 
 }
 
 object CustomsDataStoreConnector {
-
-  def verifiedEmailPath(eori: String)(implicit appConfig: AppConfig): String =
-    s"${appConfig.verifiedEmailPath.replace("EORI", eori)}"
-
-  def verifiedEmailUrl(eori: String)(implicit appConfig: AppConfig): String =
-    s"${appConfig.customsDataStoreBaseUrl}${verifiedEmailPath(eori)}"
+  def verifiedEmailUrl(implicit appConfig: AppConfig): String =
+    s"${appConfig.customsDataStoreBaseUrl}${appConfig.verifiedEmailPath}"
 }

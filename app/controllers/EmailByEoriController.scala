@@ -32,12 +32,9 @@ class EmailByEoriController @Inject() (authorise: AuthActionWithEori, customsDat
 ) extends BackendController(cc) {
 
   def getEmail: Action[AnyContent] = authorise.async { implicit request =>
-    customsDataStoreConnector
-      .getEmailAddress(request.eori)
-      .map {
-        case Some(Email(email, deliverable)) => Ok(Json.toJson(Email(email, deliverable)))
-        case _                               => NotFound
-      }
-      .recover { case _ => InternalServerError }
+    customsDataStoreConnector.getEmailAddress.map {
+      case Some(Email(email, deliverable)) => Ok(Json.toJson(Email(email, deliverable)))
+      case _                               => NotFound
+    }.recover { case _ => InternalServerError }
   }
 }

@@ -18,17 +18,15 @@ package flows
 
 import base.IntegrationSpec
 import config.AppConfig
-import connectors.CustomsDataStoreConnector
 import controllers.routes
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import testdata.TestData
 import testdata.TestData.eori
 
 class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
-  val customsDataStoreUrl = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
+  val customsDataStoreUrl = appConfig.verifiedEmailPath
   val fakeRequest = FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmail.url).withHeaders("Authorization" -> "Bearer some-token")
 
   val enrolments = Some(s"""{

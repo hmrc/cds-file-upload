@@ -42,7 +42,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val path = s"/customs-data-store/eori/verified-email"
         getFromDownstreamService(path, OK, Some(testVerifiedEmailJson))
 
-        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
 
         response mustBe Some(expectedVerifiedEmailAddress)
         verifyGetFromDownStreamService(path)
@@ -76,7 +76,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val path = s"/customs-data-store/eori/verified-email"
         getFromDownstreamService(path, OK, Some(testUndeliverableEmailJson))
 
-        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
 
         response mustBe Some(expectedUndeliverableEmailAddress)
         verifyGetFromDownStreamService(path)
@@ -88,7 +88,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val path = s"/customs-data-store/eori/verified-email"
         getFromDownstreamService(path, NOT_FOUND, None)
 
-        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
 
         response mustBe None
         verifyGetFromDownStreamService(path)
@@ -101,7 +101,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val errorMsg = "Upstream service test error"
         getFromDownstreamService(path, BAD_GATEWAY, Some(errorMsg))
 
-        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).failed.futureValue
+        val response = connector.getEmailAddress(HeaderCarrier()).failed.futureValue
 
         response.getMessage must include(errorMsg)
         verifyGetFromDownStreamService(path)
@@ -113,9 +113,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
     "return correct path" in {
       val expectedPath = s"/customs-data-store/eori/verified-email"
 
-      val actualPath = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
-
-      actualPath mustBe expectedPath
+      appConfig.verifiedEmailPath mustBe expectedPath
     }
   }
 }
