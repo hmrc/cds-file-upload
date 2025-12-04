@@ -39,7 +39,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
       "return a valid Email instance" in {
         val testVerifiedEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
         val expectedVerifiedEmailAddress = Email("some@email.com", deliverable = true)
-        val path = s"/customs-data-store/eori/verified-email"
+        val path = s"/customs-data-store/eori/verified-email-third-party"
         postToDownstreamService(path, OK, Some(testVerifiedEmailJson))
 
         val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
@@ -73,7 +73,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
              |}""".stripMargin
 
         val expectedUndeliverableEmailAddress = Email("some@email.com", deliverable = false)
-        val path = s"/customs-data-store/eori/verified-email"
+        val path = s"/customs-data-store/eori/verified-email-third-party"
         postToDownstreamService(path, OK, Some(testUndeliverableEmailJson))
 
         val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
@@ -85,7 +85,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
     "email service responds with NOT_FOUND (404)" should {
       "return empty Option" in {
-        val path = s"/customs-data-store/eori/verified-email"
+        val path = s"/customs-data-store/eori/verified-email-third-party"
         getFromDownstreamService(path, NOT_FOUND, None)
 
         val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
@@ -97,7 +97,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
     "email service responds with any other error code" should {
       "return failed Future" in {
-        val path = s"/customs-data-store/eori/verified-email"
+        val path = s"/customs-data-store/eori/verified-email-third-party"
         val errorMsg = "Upstream service test error"
         postToDownstreamService(path, BAD_GATEWAY, Some(errorMsg))
 
@@ -111,7 +111,7 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
   "CustomsDataStoreConnector.verifiedEmailPath" should {
     "return correct path" in {
-      val expectedPath = s"/customs-data-store/eori/verified-email"
+      val expectedPath = s"/customs-data-store/eori/verified-email-third-party"
 
       appConfig.verifiedEmailPath mustBe expectedPath
     }
