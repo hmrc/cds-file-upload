@@ -40,12 +40,12 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val testVerifiedEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
         val expectedVerifiedEmailAddress = Email("some@email.com", deliverable = true)
         val path = s"/customs-data-store/eori/verified-email"
-        getFromDownstreamService(path, OK, Some(testVerifiedEmailJson))
+        postToDownstreamService(path, OK, Some(testVerifiedEmailJson))
 
-        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
 
         response mustBe Some(expectedVerifiedEmailAddress)
-        verifyGetFromDownStreamService(path)
+        verifyPostFromDownStreamService(path)
       }
     }
 
@@ -74,12 +74,12 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
 
         val expectedUndeliverableEmailAddress = Email("some@email.com", deliverable = false)
         val path = s"/customs-data-store/eori/verified-email"
-        getFromDownstreamService(path, OK, Some(testUndeliverableEmailJson))
+        postToDownstreamService(path, OK, Some(testUndeliverableEmailJson))
 
-        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
 
         response mustBe Some(expectedUndeliverableEmailAddress)
-        verifyGetFromDownStreamService(path)
+        verifyPostFromDownStreamService(path)
       }
     }
 
@@ -88,10 +88,10 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
         val path = s"/customs-data-store/eori/verified-email"
         getFromDownstreamService(path, NOT_FOUND, None)
 
-        val response = connector.getEmailAddress(HeaderCarrier()).futureValue
+        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).futureValue
 
         response mustBe None
-        verifyGetFromDownStreamService(path)
+        verifyPostFromDownStreamService(path)
       }
     }
 
@@ -99,12 +99,12 @@ class CustomsDataStoreConnectorISpec extends IntegrationSpec {
       "return failed Future" in {
         val path = s"/customs-data-store/eori/verified-email"
         val errorMsg = "Upstream service test error"
-        getFromDownstreamService(path, BAD_GATEWAY, Some(errorMsg))
+        postToDownstreamService(path, BAD_GATEWAY, Some(errorMsg))
 
-        val response = connector.getEmailAddress(HeaderCarrier()).failed.futureValue
+        val response = connector.getEmailAddress(TestData.eori)(HeaderCarrier()).failed.futureValue
 
         response.getMessage must include(errorMsg)
-        verifyGetFromDownStreamService(path)
+        verifyPostFromDownStreamService(path)
       }
     }
   }

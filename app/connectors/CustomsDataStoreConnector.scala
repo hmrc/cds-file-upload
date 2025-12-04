@@ -17,7 +17,7 @@
 package connectors
 
 import config.AppConfig
-import models.email.{Email, EmailResponse}
+import models.email.{Email, EmailResponse, SendVerifiedEmailRequest}
 import play.api.http.Status.NOT_FOUND
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -32,8 +32,8 @@ class CustomsDataStoreConnector @Inject() (implicit httpClientV2: HttpClientV2, 
 
   protected def httpClient: HttpClientV2 = httpClientV2
 
-  def getEmailAddress(implicit hc: HeaderCarrier): Future[Option[Email]] =
-    get[EmailResponse](verifiedEmailUrl).map {
+  def getEmailAddress(eori: String)(implicit hc: HeaderCarrier): Future[Option[Email]] =
+    post[SendVerifiedEmailRequest, EmailResponse](verifiedEmailUrl, SendVerifiedEmailRequest(eori)).map {
       case EmailResponse(email, _, None) => Some(Email(email, deliverable = true))
       case EmailResponse(email, _, _)    => Some(Email(email, deliverable = false))
     }.recover { case UpstreamErrorResponse(_, NOT_FOUND, _, _) =>
