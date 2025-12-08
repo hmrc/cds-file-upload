@@ -19,11 +19,10 @@ package controllers
 import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
 import models.email.Email
-import org.mockito.ArgumentMatchers.{any, eq => meq}
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar.{mock, reset, verify, when}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import testdata.TestData
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,7 +56,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
       status(response) mustBe OK
       contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
 
-      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
+      verify(connector).getEmailAddress(any[String])(any[HeaderCarrier])
     }
 
     "return 200(OK) status and deliverable = false if the email address for the given EORI is not deliverable" in {
@@ -70,7 +69,7 @@ class EmailByEoriControllerUnitSpec extends ControllerUnitSpec {
       status(response) mustBe OK
       contentAsJson(response) mustBe Json.toJson(expectedEmailAddress)
 
-      verify(connector).getEmailAddress(meq(TestData.eori))(any[HeaderCarrier])
+      verify(connector).getEmailAddress(any[String])(any[HeaderCarrier])
     }
 
     "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {

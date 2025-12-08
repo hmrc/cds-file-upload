@@ -18,17 +18,15 @@ package flows
 
 import base.IntegrationSpec
 import config.AppConfig
-import connectors.CustomsDataStoreConnector
 import controllers.routes
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import testdata.TestData
 import testdata.TestData.eori
 
 class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
 
   implicit val appConfig: AppConfig = inject[AppConfig]
-  val customsDataStoreUrl = CustomsDataStoreConnector.verifiedEmailPath(TestData.eori)
+  val customsDataStoreUrl = appConfig.verifiedEmailPath
   val fakeRequest = FakeRequest(Helpers.GET, routes.EmailByEoriController.getEmail.url).withHeaders("Authorization" -> "Bearer some-token")
 
   val enrolments = Some(s"""{
@@ -57,11 +55,11 @@ class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
       val testEmailJson = """{"address":"some@email.com","timestamp": "2020-03-20T01:02:03Z"}"""
       val expectedEmailAddress = """{"address":"some@email.com","deliverable":true}"""
 
-      getFromDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
+      postToDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
       val response = route(app, fakeRequest).get
       status(response) mustBe OK
       contentAsString(response) mustBe expectedEmailAddress
-      verifyGetFromDownStreamService(customsDataStoreUrl)
+      verifyPostFromDownStreamService(customsDataStoreUrl)
     }
 
     "return 200(OK) status if the email address for the given EORI is undeliverable" in {
@@ -88,32 +86,32 @@ class VerifiedEmailByEoriFlowISpec extends IntegrationSpec {
 
       val expectedEmailAddress = """{"address":"some@email.com","deliverable":false}"""
 
-      getFromDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
+      postToDownstreamService(customsDataStoreUrl, OK, Some(testEmailJson))
       val response = route(app, fakeRequest).get
       status(response) mustBe OK
       contentAsString(response) mustBe expectedEmailAddress
-      verifyGetFromDownStreamService(customsDataStoreUrl)
+      verifyPostFromDownStreamService(customsDataStoreUrl)
     }
 
     "return 404(NOT_FOUND) status if the email address for the given EORI was not provided or was not verified yet" in {
-      getFromDownstreamService(customsDataStoreUrl, NOT_FOUND, Some("The email address is not verified"))
+      postToDownstreamService(customsDataStoreUrl, NOT_FOUND, Some("The email address is not verified"))
       val response = route(app, fakeRequest).get
       status(response) mustBe NOT_FOUND
-      verifyGetFromDownStreamService(customsDataStoreUrl)
+      verifyPostFromDownStreamService(customsDataStoreUrl)
     }
 
     "return 500(INTERNAL_SERVER_ERROR) status for any 4xx returned by the downstream service, let apart 404" in {
-      getFromDownstreamService(customsDataStoreUrl, BAD_REQUEST)
+      postToDownstreamService(customsDataStoreUrl, BAD_REQUEST)
       val response = route(app, fakeRequest).get
       status(response) mustBe INTERNAL_SERVER_ERROR
-      verifyGetFromDownStreamService(customsDataStoreUrl)
+      verifyPostFromDownStreamService(customsDataStoreUrl)
     }
 
     "return 500(INTERNAL_SERVER_ERROR) status for any 5xx http error code returned by the downstream service" in {
-      getFromDownstreamService(customsDataStoreUrl, BAD_GATEWAY)
+      postToDownstreamService(customsDataStoreUrl, BAD_GATEWAY)
       val response = route(app, fakeRequest).get
       status(response) mustBe INTERNAL_SERVER_ERROR
-      verifyGetFromDownStreamService(customsDataStoreUrl)
+      verifyPostFromDownStreamService(customsDataStoreUrl)
     }
   }
 }
