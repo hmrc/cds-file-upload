@@ -21,7 +21,8 @@ import scala.concurrent.Future
 
 import base.UnitSpec
 import org.mockito.ArgumentMatchers._
-import org.mockito.MockitoSugar.{mock, when}
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.mvc.{Action, AnyContent}
 import play.api.test.Helpers._
 import play.api.test._

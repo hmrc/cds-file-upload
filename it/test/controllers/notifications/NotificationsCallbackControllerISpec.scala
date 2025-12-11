@@ -19,6 +19,7 @@ package controllers.notifications
 import base.UnitSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.libs.ws.WSClient
+import play.api.libs.ws.XMLBodyWritables.writeableOf_NodeSeq
 import play.api.test.Helpers._
 
 class NotificationsCallbackControllerISpec extends UnitSpec with GuiceOneServerPerSuite {

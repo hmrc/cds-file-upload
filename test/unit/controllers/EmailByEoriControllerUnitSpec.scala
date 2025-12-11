@@ -20,7 +20,8 @@ import base.ControllerUnitSpec
 import connectors.CustomsDataStoreConnector
 import models.email.Email
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, reset, verify, when}
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier

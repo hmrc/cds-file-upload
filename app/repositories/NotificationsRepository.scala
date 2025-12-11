@@ -61,7 +61,7 @@ object NotificationRepository {
         ascending("createdAt"),
         IndexOptions()
           .name("createdAtIndex")
-          .expireAfter(appConfig.notificationsTtlSeconds, TimeUnit.SECONDS)
+          .expireAfter(appConfig.notificationsTtlSeconds.toLong, TimeUnit.SECONDS)
       )
     )
 }
