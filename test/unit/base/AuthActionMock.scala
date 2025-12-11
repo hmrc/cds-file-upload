@@ -20,8 +20,9 @@ import scala.concurrent.ExecutionContext.global
 import scala.concurrent.Future
 import controllers.actions.{AuthActionImpl, AuthActionWithEori}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, reset, when}
-import org.mockito.stubbing.ScalaOngoingStubbing
+import org.mockito.Mockito.{reset, when}
+import org.mockito.stubbing.OngoingStubbing
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers._
 import testdata.TestData.eori
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, EnrolmentIdentifier, Enrolments}
@@ -40,13 +41,13 @@ trait AuthActionMock extends UnitSpec {
     super.afterEach()
   }
 
-  def authorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
+  def authorisedUser(): OngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(Some(internalId)))
 
   def authorisedUserWithEori(): Unit =
     when(authConnector.authorise[Enrolments](any(), any())(any(), any()))
       .thenReturn(Future.successful(Enrolments(Set(Enrolment("HMRC-CUS-ORG", List(EnrolmentIdentifier("EORINumber", eori)), "Activated", None)))))
 
-  def nonAuthorisedUser(): ScalaOngoingStubbing[Future[Option[String]]] =
+  def nonAuthorisedUser(): OngoingStubbing[Future[Option[String]]] =
     when(authConnector.authorise[Option[String]](any(), any())(any(), any())).thenReturn(Future.successful(None))
 }

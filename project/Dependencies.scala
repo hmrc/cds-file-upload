@@ -2,19 +2,19 @@ import sbt._
 
 object Dependencies {
 
-  val bootstrapPlayVersion = "9.19.0"
-  val hmrcMongoVersion = "2.10.0"
+  val bootstrapPlayVersion = "10.4.0"
+  val hmrcMongoVersion = "2.11.0"
 
   val compile = Seq(
     "uk.gov.hmrc"                  %% "bootstrap-backend-play-30" % bootstrapPlayVersion,
     "uk.gov.hmrc.mongo"            %% "hmrc-mongo-play-30"        % hmrcMongoVersion,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.17.2",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"      % "2.20.1",
   )
 
   val test = Seq(
     "uk.gov.hmrc"            %% "bootstrap-test-play-30"   % bootstrapPlayVersion % "test",
     "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-30"  % hmrcMongoVersion     % "test",
-    "org.mockito"            %% "mockito-scala"            % "1.17.37"            % "test"
+    "org.scalatestplus"      %% "mockito-4-11"             % "3.2.18.0"           % "test"
   )
 
   def apply(): Seq[ModuleID] =

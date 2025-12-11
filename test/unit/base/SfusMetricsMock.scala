@@ -19,7 +19,8 @@ package base
 import com.codahale.metrics.{Counter, Timer}
 import metrics.SfusMetrics
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{doNothing, mock, reset, when}
+import org.mockito.Mockito.{doNothing, reset, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 trait SfusMetricsMock extends UnitSpec {
 

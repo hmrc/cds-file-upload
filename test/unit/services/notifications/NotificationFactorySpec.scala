@@ -19,7 +19,8 @@ package services.notifications
 import scala.xml.NodeSeq
 import base.UnitSpec
 import org.mockito.ArgumentMatchers.{any, eq => meq}
-import org.mockito.MockitoSugar.{mock, reset, verify, when}
+import org.mockito.Mockito.{reset, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import testdata.notifications.ExampleXmlAndNotificationDetailsPair
 
 class NotificationFactorySpec extends UnitSpec {

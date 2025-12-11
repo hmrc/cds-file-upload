@@ -18,7 +18,8 @@ package controllers.internal
 
 import base.{ControllerUnitSpec, SfusMetricsMock}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar.{mock, reset, times, verify, when}
+import org.mockito.Mockito.{reset, times, verify, when}
+import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.test.Helpers._
 import services.notifications.NotificationService
 
