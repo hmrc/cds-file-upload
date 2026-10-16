@@ -83,6 +83,7 @@ After the successful [deployment pipeline](https://build.tax.service.gov.uk/job/
 
 ## Jenkins Pipeline
 - [cds-file-upload build](https://build.tax.service.gov.uk/job/BordersAndTradeLiveServices/job/CDSExports/job/cds-file-upload/)
+- [cds-file-upload deployment pipeline](https://build.tax.service.gov.uk/job/BordersAndTradeLiveServices/job/CDSExports/job/cds-file-upload-pipeline/)
 
 - The acceptance test Jenkins jobs (smoke and regression) are listed in the [sfus-acceptance-ui-journey-tests README](https://github.com/hmrc/sfus-acceptance-ui-journey-tests).
 - The performance test Jenkins jobs are listed in the [cds-file-upload-performance-tests README](https://github.com/hmrc/cds-file-upload-performance-tests).
@@ -104,7 +105,7 @@ These profiles are defined in [service-manager-config](https://github.com/hmrc/s
 
 ## Endpoints
 
-All paths are relative to the service root (`http://localhost:6795` when running locally). The `/cds-file-upload` endpoints need an [authenticated user with the HMRC-CUS-ORG enrolment](https://github.com/hmrc/sfus-acceptance-ui-journey-tests).
+All paths are relative to the service root (`http://localhost:6795` when running locally).
 
 | Method | Path | Purpose | Sample request | Response |
 |---|---|---|---|---|
