@@ -182,7 +182,7 @@ curl --location --request POST 'http://localhost:6795/internal/notification' --h
 ## Developer Notes
 
 ### Feature Flags
-This service has no feature flags.
+Feature flags can be used to enable or disable some of this service's features. You can change or override them in config under the `microservice.services.features.<featureName>` key.
 
 ### Config settings
 The following setting determines how long notifications are stored before they are deleted automatically:
